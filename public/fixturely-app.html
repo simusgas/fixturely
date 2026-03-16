@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fixturely</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white:     #FFFFFF;
+    --off:       #FAF8F5;
+    --card:      #FFFFFF;
+    --text:      #1C1407;
+    --soft:      #7A6840;
+    --muted:     #BBA87A;
+    --border:    #EEE8DC;
+    --nav-h:     70px;
+    /* Schedule — amber */
+    --s-a:#F5A623; --s-b:#FDC75A; --s-c:#FDE68A; --s-pl:#FEF0C7; --s-dk:#D4880F;
+    /* Today — warm coral */
+    --t-a:#E8724A; --t-b:#F09070; --t-c:#F8C0A8; --t-pl:#FEF0EB; --t-dk:#C05530;
+    /* Students — sage */
+    --u-a:#6B8F71; --u-b:#8FB896; --u-c:#B8D9BC; --u-pl:#E8F5EA; --u-dk:#4D6B52;
+    /* Payments — teal */
+    --p-a:#2E8B84; --p-b:#4AADA6; --p-c:#80CCC8; --p-pl:#E0F5F4; --p-dk:#1F6B65;
+    /* Radar — blue slate */
+    --r-a:#3B6B9E; --r-b:#5A8DC0; --r-c:#8AB4D8; --r-pl:#E4EFF8; --r-dk:#2A4E78;
+    /* Status */
+    --ok:#3D8B5E; --ok-lt:#E6F5EE;
+    --warn:#C47A1E; --warn-lt:#FEF3DC;
+    --err:#B85450; --err-lt:#FDECEA;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:#EDE4D4;font-family:'Nunito',sans-serif;color:var(--text);overflow:hidden;}
+  .phone{max-width:420px;margin:0 auto;height:100vh;background:var(--off);position:relative;display:flex;flex-direction:column;overflow:hidden;}
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h)+8px);display:none;}
+  .screen.active{display:block;}
+
+  /* ── NAV ── */
+  .bnav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,0.06);z-index:90;border-radius:20px 20px 0 0;}
+  .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:6px 2px;position:relative;}
+  .ntab .ni{font-size:20px;transition:transform 0.2s;}
+  .ntab .nl{font-size:10px;font-weight:700;color:var(--muted);transition:color 0.2s;}
+  .ntab.active .ni{transform:scale(1.15);}
+  .ntab[data-t="today"].active   .nl{color:var(--t-dk);}
+  .ntab[data-t="schedule"].active .nl{color:var(--s-dk);}
+  .ntab[data-t="students"].active .nl{color:var(--u-dk);}
+  .ntab[data-t="payments"].active .nl{color:var(--p-dk);}
+  .ntab[data-t="radar"].active   .nl{color:var(--r-dk);}
+  .ntab::after{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;border-radius:0 0 4px 4px;transform:scaleX(0);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+  .ntab[data-t="today"]::after   {background:var(--t-a);}
+  .ntab[data-t="schedule"]::after{background:var(--s-a);}
+  .ntab[data-t="students"]::after{background:var(--u-a);}
+  .ntab[data-t="payments"]::after{background:var(--p-a);}
+  .ntab[data-t="radar"]::after   {background:var(--r-a);}
+  .ntab.active::after{transform:scaleX(1);}
+
+  /* ── SHARED HEADER BITS ── */
+  .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
+  .hdr-btn:hover{transform:scale(1.03);background:var(--white);}
+  .hdr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .hst{background:rgba(255,255,255,0.22);border-radius:14px;padding:11px;text-align:center;}
+  .hst-n{font-size:19px;font-weight:900;color:var(--white);}
+  .hst-l{font-size:10px;font-weight:700;color:rgba(255,255,255,0.72);margin-top:2px;}
+
+  /* ══════════════════════
+     TODAY
+  ══════════════════════ */
+  .t-hdr{background:linear-gradient(155deg,var(--t-a) 0%,var(--t-b) 55%,var(--t-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .t-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .t-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
+  .t-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
+  .t-hdr-btn{color:var(--t-dk);}
+
+  /* Weather strip */
+  .wx-strip{background:rgba(255,255,255,0.2);border-radius:14px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.2s;}
+  .wx-strip:hover{background:rgba(255,255,255,0.3);}
+  .wx-left{display:flex;align-items:center;gap:10px;}
+  .wx-icon{font-size:24px;}
+  .wx-temp{font-size:22px;font-weight:900;color:var(--white);}
+  .wx-desc{font-size:12px;color:rgba(255,255,255,0.8);font-weight:600;}
+  .wx-right{text-align:right;}
+  .wx-rain{font-size:13px;font-weight:800;color:var(--white);}
+  .wx-wind{font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;}
+  .wx-court-ok  {background:rgba(62,180,100,0.3);border:1px solid rgba(62,180,100,0.5);}
+  .wx-court-warn{background:rgba(220,180,60,0.3);border:1px solid rgba(220,180,60,0.5);}
+  .wx-court-bad {background:rgba(220,100,80,0.3);border:1px solid rgba(220,100,80,0.5);}
+
+  .t-body{padding:16px;}
+  .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+
+  /* Today lesson card */
+  .tl-card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border-left:4px solid var(--t-a);transition:all 0.3s;}
+  .tl-card:hover{transform:translateY(-1px);}
+  .tl-card.paid{border-left-color:var(--ok);background:#F6FEF9;}
+  .tl-card.notpaid{border-left-color:var(--warn);}
+  .tl-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+  .tl-name{font-size:16px;font-weight:900;}
+  .tl-time{font-size:12px;color:var(--soft);font-weight:600;margin-top:3px;}
+
+  /* Paid / Not Paid toggle buttons — side by side */
+  .tl-toggle{display:flex;gap:0;border-radius:100px;overflow:hidden;border:1.5px solid var(--border);width:fit-content;}
+  .tl-tog-btn{padding:8px 18px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Nunito',sans-serif;background:var(--off);color:var(--muted);transition:all 0.2s;white-space:nowrap;}
+  .tl-tog-btn:first-child{border-right:1px solid var(--border);}
+  .tl-tog-btn.sel-paid{background:var(--ok);color:var(--white);}
+  .tl-tog-btn.sel-notpaid{background:var(--warn-lt);color:var(--warn);}
+
+  /* All caught up state */
+  .tl-caught-up{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--ok);margin-top:8px;padding:10px 14px;background:var(--ok-lt);border-radius:12px;}
+
+  /* Not paid — action buttons that appear below */
+  .tl-notpaid-actions{margin-top:10px;display:flex;gap:8px;animation:fadeUp 0.2s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .tl-act-btn{flex:1;padding:10px;border-radius:100px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;text-align:center;}
+  .btn-send-inv{background:var(--t-pl);color:var(--t-dk);}
+  .btn-send-inv:hover{background:#F8D0B8;}
+  .btn-remind{background:var(--s-pl);color:var(--s-dk);}
+  .btn-remind:hover{background:#FDE9A0;}
+
+  /* Invoice slide panel */
+  .inv-panel{background:var(--off);border-radius:14px;padding:14px;margin-top:8px;border:1.5px solid var(--border);display:none;animation:fadeUp 0.2s ease;}
+  .inv-panel.open{display:block;}
+  .inv-panel-title{font-size:13px;font-weight:900;color:var(--t-dk);margin-bottom:10px;}
+  .inv-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid var(--border);}
+  .inv-row:last-of-type{border:none;}
+  .inv-lbl{color:var(--soft);font-weight:600;}
+  .inv-val{font-weight:800;}
+  .inv-send-btn{width:100%;padding:11px;border-radius:100px;margin-top:10px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .inv-send-btn:hover{transform:translateY(-1px);}
+
+  .t-empty{text-align:center;padding:40px 20px;}
+  .t-empty-icon{font-size:40px;margin-bottom:12px;}
+  .t-empty-t{font-size:16px;font-weight:800;color:var(--soft);margin-bottom:6px;}
+  .t-empty-s{font-size:13px;color:var(--muted);font-weight:500;}
+
+  /* Invoice slide-up panel */
+  .inv-panel{background:var(--white);border-radius:20px;padding:16px;margin-top:8px;border:1.5px solid var(--border);animation:slideDown 0.25s ease;display:none;}
+  .inv-panel.open{display:block;}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  .inv-panel-title{font-size:14px;font-weight:900;color:var(--t-dk);margin-bottom:12px;}
+  .inv-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);}
+  .inv-row:last-of-type{border:none;}
+  .inv-lbl{color:var(--soft);font-weight:600;}
+  .inv-val{font-weight:800;}
+  .inv-send-btn{width:100%;padding:12px;border-radius:100px;margin-top:12px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .inv-send-btn:hover{transform:translateY(-1px);}
+
+  /* ══════════════════════
+     SCHEDULE
+  ══════════════════════ */
+  .s-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .s-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .s-title{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
+  .s-sub{font-size:13px;font-weight:700;color:var(--s-dk);margin-top:2px;}
+  .s-hdr-btn{color:var(--s-dk);}
+  .mnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .mlbl{font-size:15px;font-weight:800;color:var(--text);}
+  .narr{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text);padding:4px 8px;font-weight:700;}
+  .term-banner{background:var(--s-pl);border:1.5px solid var(--s-a);border-radius:14px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.2s;}
+  .term-banner:hover{background:#FEE9A0;}
+  .term-banner.hol{background:var(--warn-lt);border-color:#E8C070;}
+  .tb-left{display:flex;align-items:center;gap:8px;}
+  .tb-name{font-size:13px;font-weight:800;color:var(--text);}
+  .tb-dates{font-size:11px;color:var(--soft);font-weight:600;}
+  .tb-wks{font-size:12px;font-weight:800;color:var(--s-dk);}
+  .dstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .dcell{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:12px;cursor:pointer;transition:background 0.2s;}
+  .dcell:hover{background:rgba(255,255,255,0.35);}
+  .dcell.sel{background:var(--white);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .dc-n{font-size:10px;font-weight:700;color:rgba(28,20,7,0.55);margin-bottom:4px;text-transform:uppercase;}
+  .dc-d{font-size:17px;font-weight:900;color:var(--text);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+  .dcell.sel .dc-d{background:var(--s-dk);color:var(--white);}
+  .dcell.tod .dc-d{background:var(--s-dk);color:var(--white);}
+  .dcell.hol .dc-d{background:var(--warn);color:var(--white);}
+  .dot-row{display:flex;gap:2px;margin-top:4px;height:6px;align-items:center;justify-content:center;}
+  .sdot{width:5px;height:5px;border-radius:50%;background:var(--s-dk);}
+  .s-body{padding:16px;}
+  .day-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+  .day-full{font-size:17px;font-weight:900;}
+  .day-date{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px;}
+  .day-cnt{font-size:13px;color:var(--s-dk);font-weight:700;margin-top:5px;}
+  .day-badge{width:42px;height:42px;border-radius:50%;background:var(--s-a);color:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;line-height:1;}
+  .db-n{font-size:9px;text-transform:uppercase;} .db-d{font-size:17px;}
+  .s-book-btn{background:var(--s-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;transition:background 0.2s;}
+  .s-book-btn:hover{background:var(--s-dk);}
+  .hol-notice{background:var(--warn-lt);border:1px solid #E8C070;border-radius:10px;padding:9px 13px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--warn);display:flex;align-items:center;gap:8px;}
+  .sess-card{background:var(--card);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid var(--s-a);transition:transform 0.2s;}
+  .sess-card:hover{transform:translateY(-2px);}
+  .sess-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .sess-name{font-size:16px;font-weight:900;}
+  .sess-tags{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
+  .stag{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:800;background:var(--s-pl);color:var(--s-dk);}
+  .cx{background:#FDE8E8;color:#B05050;border:none;width:28px;height:28px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .cx:hover{background:#F9D0D0;}
+  .sess-det{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);font-weight:600;margin-bottom:5px;}
+  .sess-bar{height:3px;border-radius:100px;margin-top:12px;background:var(--s-pl);}
+  .sess-bar-f{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--s-a),var(--s-dk));}
+  .cred-lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:5px;text-align:right;}
+  .empty{text-align:center;padding:36px 20px;}
+  .empty-icon{font-size:36px;margin-bottom:10px;}
+  .empty-t{font-size:15px;font-weight:700;color:var(--soft);margin-bottom:5px;}
+  .empty-s{font-size:13px;color:var(--muted);font-weight:500;}
+  .fab{position:fixed;bottom:calc(var(--nav-h)+14px);right:calc(50% - 210px + 16px);width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;font-size:24px;cursor:pointer;box-shadow:0 5px 18px rgba(212,136,15,0.45);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:50;}
+  .fab:hover{transform:scale(1.08);}
+
+  /* ══════════════════════
+     STUDENTS
+  ══════════════════════ */
+  .u-hdr{background:linear-gradient(155deg,var(--u-a) 0%,var(--u-b) 55%,var(--u-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .u-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .u-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
+  .u-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
+  .u-hdr-btn{color:var(--u-dk);}
+  .srch-wrap{padding:16px 16px 0;}
+  .srch-bar{display:flex;align-items:center;gap:10px;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:11px 15px;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+  .srch-bar input{flex:1;border:none;outline:none;font-size:14px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;background:none;}
+  .srch-bar input::placeholder{color:var(--muted);font-weight:500;}
+  .stu-list{padding:12px 16px 8px;}
+  .stu-card{background:var(--card);border-radius:16px;padding:13px 15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;display:flex;align-items:center;gap:13px;transition:transform 0.2s;border-left:4px solid var(--u-b);}
+  .stu-card:hover{transform:translateY(-2px);}
+  .stu-av{width:44px;height:44px;border-radius:50%;background:var(--u-pl);border:2px solid var(--u-b);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--u-dk);flex-shrink:0;}
+  .stu-name{font-size:15px;font-weight:900;margin-bottom:3px;}
+  .stu-meta{font-size:12px;color:var(--soft);font-weight:600;display:flex;gap:6px;flex-wrap:wrap;}
+  .stu-ow{color:#B05050;font-weight:800;}
+  .cn{font-size:19px;font-weight:900;color:var(--u-dk);line-height:1;}
+  .cl{font-size:10px;color:var(--muted);font-weight:600;}
+  .cbar{width:36px;height:3px;background:var(--border);border-radius:100px;margin-top:4px;}
+  .cbarf{height:100%;border-radius:100px;background:var(--u-a);}
+  .stu-detail{position:absolute;inset:0;background:var(--off);z-index:60;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.77,0,0.18,1);overflow-y:auto;padding-bottom:80px;}
+  .stu-detail.open{transform:translateX(0);}
+  .det-hdr{background:linear-gradient(155deg,var(--u-a) 0%,var(--u-b) 100%);padding:52px 20px 24px;border-radius:0 0 28px 28px;}
+  .det-back{background:rgba(255,255,255,0.25);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+  .det-av{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--white);margin-bottom:12px;}
+  .det-name{font-size:22px;font-weight:900;color:var(--white);}
+  .det-sub{font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:3px;}
+  .det-body{padding:16px;}
+  .det-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+  .det-stat{background:var(--card);border-radius:13px;padding:13px;text-align:center;box-shadow:0 2px 7px rgba(0,0,0,0.05);}
+  .det-stat-n{font-size:20px;font-weight:900;color:var(--u-dk);}
+  .det-stat-l{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;}
+  .sec-lbl{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin:18px 0 10px;}
+  .up-l{background:var(--card);border-radius:12px;padding:12px 13px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,0.04);border-left:4px solid var(--u-a);}
+  .ul-t{font-size:13px;font-weight:800;color:var(--u-dk);white-space:nowrap;}
+  .ul-d{font-size:12px;font-weight:700;}
+  .ul-c{font-size:11px;color:var(--muted);font-weight:600;}
+  .u-inv-btn{width:100%;padding:14px;border-radius:100px;margin-top:14px;background:linear-gradient(135deg,var(--u-a),var(--u-dk));color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 13px rgba(77,107,82,0.3);transition:transform 0.15s;}
+  .u-inv-btn:hover{transform:translateY(-1px);}
+
+  /* ══════════════════════
+     PAYMENTS
+  ══════════════════════ */
+  .p-hdr{background:linear-gradient(155deg,var(--p-a) 0%,var(--p-b) 55%,var(--p-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .p-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .p-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
+  .p-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
+  .p-hdr-btn{color:var(--p-dk);}
+  .p-body{padding:16px;}
+  .fpills{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;}
+  .fpills::-webkit-scrollbar{display:none;}
+  .fpill{padding:7px 16px;border-radius:100px;font-size:12px;font-weight:800;border:1.5px solid var(--border);background:var(--white);color:var(--soft);cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all 0.2s;}
+  .fpill.active{background:var(--p-a);color:var(--white);border-color:var(--p-a);}
+  .inv-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:11px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.2s;border-left:4px solid var(--p-b);}
+  .inv-card:hover{transform:translateY(-2px);}
+  .inv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;}
+  .inv-name{font-size:16px;font-weight:900;}
+  .inv-num{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;font-family:monospace;}
+  .inv-amt{font-size:22px;font-weight:900;text-align:right;}
+  .inv-items-l{font-size:10px;color:var(--muted);font-weight:600;}
+  .sbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;font-size:11px;font-weight:800;}
+  .sb-paid{background:var(--ok-lt);color:var(--ok);}
+  .sb-pend{background:var(--warn-lt);color:var(--warn);}
+  .sb-over{background:var(--err-lt);color:var(--err);}
+  .inv-foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:11px;border-top:1px solid var(--border);}
+  .inv-ft{font-size:12px;color:var(--soft);font-weight:600;}
+  .sl-btn{background:var(--p-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.2s;}
+  .sl-btn:hover{background:var(--p-dk);}
+  .sl-btn.sent{background:var(--ok);}
+
+  /* ══════════════════════
+     RADAR
+  ══════════════════════ */
+  .r-hdr{background:linear-gradient(155deg,var(--r-a) 0%,var(--r-b) 55%,var(--r-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .r-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .r-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
+  .r-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
+  .r-body{padding:16px;}
+
+  /* Court conditions banner */
+  .court-cond{border-radius:18px;padding:18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(0,0,0,0.08);}
+  .court-cond.good{background:linear-gradient(135deg,#2D7D4F,#3DA066);color:var(--white);}
+  .court-cond.warn{background:linear-gradient(135deg,#B8740A,#D4940E);color:var(--white);}
+  .court-cond.bad {background:linear-gradient(135deg,#8B3A38,#C05050);color:var(--white);}
+  .cc-icon{font-size:36px;}
+  .cc-text{}
+  .cc-title{font-size:18px;font-weight:900;margin-bottom:4px;}
+  .cc-sub{font-size:13px;opacity:0.85;font-weight:600;}
+  .cc-cancel-btn{background:rgba(255,255,255,0.25);color:var(--white);border:1.5px solid rgba(255,255,255,0.4);padding:8px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
+  .cc-cancel-btn:hover{background:rgba(255,255,255,0.35);}
+
+  /* Current weather card */
+  .wx-main{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+  .wx-main-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .wx-big-icon{font-size:52px;}
+  .wx-big-temp{font-size:52px;font-weight:900;color:var(--text);line-height:1;}
+  .wx-big-feels{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .wx-big-desc{font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px;}
+  .wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .wx-stat{background:var(--r-pl);border-radius:12px;padding:10px;text-align:center;}
+  .wx-stat-n{font-size:16px;font-weight:900;color:var(--r-dk);}
+  .wx-stat-l{font-size:10px;color:var(--soft);font-weight:600;margin-top:2px;}
+
+  /* Hourly forecast */
+  .hourly-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
+  .hourly-scroll::-webkit-scrollbar{display:none;}
+  .hr-item{background:var(--card);border-radius:14px;padding:10px 12px;min-width:64px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.05);flex-shrink:0;}
+  .hr-item.rain-hr{background:var(--r-pl);border:1.5px solid var(--r-b);}
+  .hr-time{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;}
+  .hr-icon{font-size:18px;margin-bottom:4px;}
+  .hr-temp{font-size:13px;font-weight:800;color:var(--text);}
+  .hr-rain{font-size:10px;font-weight:700;color:var(--r-a);margin-top:2px;}
+
+  /* Radar map */
+  .radar-map-wrap{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:14px;}
+  .radar-map-label{padding:12px 16px;font-size:13px;font-weight:800;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .radar-map-label span{font-size:11px;color:var(--muted);font-weight:600;}
+  .radar-iframe{width:100%;height:260px;border:none;display:block;}
+  .radar-note{padding:10px 14px;background:var(--r-pl);font-size:11px;color:var(--r-dk);font-weight:700;text-align:center;}
+
+  /* Loading */
+  .wx-loading{text-align:center;padding:40px 20px;color:var(--muted);}
+  .wx-loading-icon{font-size:32px;margin-bottom:10px;animation:spin 1.5s linear infinite;display:inline-block;}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  /* ══════════════════════
+     LIVE LINK PAGE
+  ══════════════════════ */
+  .live-link-page{display:none;position:fixed;inset:0;background:var(--off);z-index:200;overflow-y:auto;}
+  .live-link-page.show{display:block;}
+  .ll-hdr{background:linear-gradient(155deg,var(--s-a),var(--s-b));padding:48px 24px 28px;text-align:center;}
+  .ll-logo{font-size:14px;font-weight:900;color:rgba(255,255,255,0.7);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+  .ll-coach{font-size:28px;font-weight:900;color:var(--white);}
+  .ll-sport{font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-top:4px;}
+  .ll-body{padding:20px;}
+  .ll-date-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;}
+  .ll-date-strip::-webkit-scrollbar{display:none;}
+  .ll-day{display:flex;flex-direction:column;align-items:center;padding:10px 12px;border-radius:14px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);min-width:52px;transition:all 0.2s;flex-shrink:0;}
+  .ll-day.active{background:var(--s-a);border-color:var(--s-a);}
+  .ll-day-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .ll-day-num{font-size:18px;font-weight:900;color:var(--text);}
+  .ll-day.active .ll-day-name{color:rgba(255,255,255,0.8);}
+  .ll-day.active .ll-day-num{color:var(--white);}
+  .ll-slots-label{font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+  .ll-slot{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+  .ll-slot.avail{border-left:4px solid var(--ok);}
+  .ll-slot.taken{border-left:4px solid var(--border);opacity:0.6;}
+  .ll-slot-time{font-size:15px;font-weight:800;color:var(--text);}
+  .ll-slot-status{font-size:12px;font-weight:700;}
+  .ll-slot.avail .ll-slot-status{color:var(--ok);}
+  .ll-slot.taken .ll-slot-status{color:var(--muted);}
+  .ll-req-btn{background:var(--ok-lt);color:var(--ok);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.2s;}
+  .ll-req-btn:hover{background:#C8EDDA;}
+  .ll-back{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);border:none;color:var(--white);padding:8px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:16px;}
+
+  /* ══════════════════════
+     MODALS / OVERLAYS
+  ══════════════════════ */
+  .overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.38);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+  .overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--white);border-radius:28px 28px 0 0;padding:24px 20px 40px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;transform:translateY(40px);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+  .overlay.open .modal{transform:translateY(0);}
+  .modal-handle{width:40px;height:4px;background:#E5E7EB;border-radius:100px;margin:0 auto 20px;}
+  .modal-title{font-size:21px;font-weight:900;color:var(--s-dk);margin-bottom:20px;}
+  .modal-close{position:absolute;top:20px;right:20px;background:#F3F4F6;border:none;width:31px;height:31px;border-radius:50%;font-size:14px;cursor:pointer;color:var(--soft);display:flex;align-items:center;justify-content:center;}
+  .field{margin-bottom:17px;position:relative;}
+  .field-label{font-size:13px;font-weight:800;color:var(--soft);margin-bottom:7px;display:block;}
+  .field-input{width:100%;padding:12px 15px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
+  .field-input:focus{border-color:var(--s-a);box-shadow:0 0 0 3px rgba(245,166,35,0.13);background:var(--white);}
+  .field-input::placeholder{color:var(--muted);font-weight:500;}
+  .field-input.err{border-color:#C07070;}
+  .ac-wrap{position:relative;}
+  .ac-list{position:absolute;top:calc(100%+4px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:200;overflow:hidden;max-height:196px;overflow-y:auto;display:none;}
+  .ac-list.open{display:block;}
+  .ac-item{padding:11px 15px;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s;border-bottom:1px solid var(--border);}
+  .ac-item:last-child{border-bottom:none;}
+  .ac-item:hover,.ac-item.hi{background:var(--s-pl);}
+  .ac-av{width:29px;height:29px;border-radius:50%;background:var(--s-pl);border:1.5px solid var(--s-a);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--s-dk);flex-shrink:0;}
+  .ac-sub{font-size:11px;color:var(--muted);font-weight:500;}
+  .hl{color:var(--s-dk);font-weight:900;}
+  .no-res{padding:13px 15px;font-size:13px;color:var(--muted);font-weight:600;text-align:center;}
+  .pill-group{display:flex;gap:8px;flex-wrap:wrap;}
+  .pill{padding:8px 15px;border-radius:100px;border:1.5px solid var(--border);font-size:13px;font-weight:700;cursor:pointer;background:var(--off);color:var(--soft);font-family:'Nunito',sans-serif;transition:all 0.2s;}
+  .pill.active{background:var(--s-a);color:var(--white);border-color:var(--s-a);box-shadow:0 3px 9px rgba(212,136,15,0.28);}
+  .pill:hover:not(.active){border-color:var(--s-a);color:var(--s-dk);}
+  .ow{background:#FEF5E0;border:1.5px solid #E8C070;border-radius:14px;padding:13px 15px;margin-bottom:16px;gap:10px;font-size:13px;font-weight:600;color:#8A5E00;display:none;line-height:1.5;}
+  .ow.show{display:flex;align-items:flex-start;}
+  .ow-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+  .ow strong{font-weight:900;}
+  .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;border-radius:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 14px rgba(212,136,15,0.3);transition:transform 0.15s;margin-top:6px;}
+  .submit-btn:hover{transform:translateY(-1px);}
+  .term-modal-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:4px;}
+  .term-modal-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:20px;}
+  .term-item{background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:10px;}
+  .term-item.cur{border-color:var(--s-a);background:var(--s-pl);}
+  .term-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .term-item-name{font-size:15px;font-weight:900;}
+  .cur-badge{background:var(--s-a);color:var(--white);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:800;}
+  .term-dates{font-size:12px;color:var(--soft);font-weight:600;margin-bottom:5px;}
+  .term-wks{font-size:13px;font-weight:800;color:var(--s-dk);}
+  .hol-sec-lbl{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin:20px 0 10px;}
+  .hol-item{background:var(--warn-lt);border:1px solid #E8C070;border-radius:10px;padding:10px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+  .hol-name{font-size:13px;font-weight:800;color:var(--warn);}
+  .hol-dates{font-size:11px;color:var(--warn);font-weight:600;}
+  .dialog-ovl{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.38);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  .dialog-ovl.open{opacity:1;pointer-events:all;}
+  .dialog{background:var(--white);border-radius:22px;padding:26px 22px;width:100%;max-width:310px;text-align:center;transform:scale(0.9);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+  .dialog-ovl.open .dialog{transform:scale(1);}
+  .dialog-icon{font-size:36px;margin-bottom:10px;}
+  .dialog-title{font-size:17px;font-weight:900;margin-bottom:7px;}
+  .dialog-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:22px;line-height:1.5;}
+  .dialog-btns{display:flex;gap:10px;}
+  .dbtn-no{flex:1;padding:12px;border-radius:100px;background:var(--off);border:1.5px solid var(--border);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .dbtn-yes{flex:1;padding:12px;border-radius:100px;background:#C07878;color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(28,20,7,0.9);color:var(--white);padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;z-index:500;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ══ TODAY ══ -->
+  <div class="screen active" id="screen-today">
+    <div class="t-hdr">
+      <div class="t-hdr-top">
+        <div><div class="t-title" id="todayTitle">Today</div><div class="t-sub" id="todaySub"></div></div>
+        <button class="hdr-btn t-hdr-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">📅 Schedule</button>
+      </div>
+      <!-- Weather strip -->
+      <div class="wx-strip wx-court-ok" id="wxStrip" onclick="switchTab('radar',document.querySelector('[data-t=radar]'))">
+        <div class="wx-left">
+          <div class="wx-icon" id="wxIcon">⏳</div>
+          <div>
+            <div class="wx-temp" id="wxTemp">--°</div>
+            <div class="wx-desc" id="wxDesc">Loading…</div>
+          </div>
+        </div>
+        <div class="wx-right">
+          <div class="wx-rain" id="wxRain">--%</div>
+          <div class="wx-wind" id="wxWind">-- km/h</div>
+        </div>
+      </div>
+    </div>
+    <div class="t-body" id="tBody"></div>
+  </div>
+
+  <!-- ══ SCHEDULE ══ -->
+  <div class="screen" id="screen-schedule">
+    <div class="s-hdr">
+      <div class="s-hdr-top">
+        <div><div class="s-title">My Schedule</div><div class="s-sub">Tennis Coach</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="hdr-btn s-hdr-btn" onclick="showLiveLink()">🔗 Live Link</button>
+          <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
+        </div>
+      </div>
+      <div class="mnav">
+        <button class="narr" onclick="changeWeek(-1)">‹</button>
+        <div class="mlbl" id="monthLabel"></div>
+        <button class="narr" onclick="changeWeek(1)">›</button>
+      </div>
+      <div class="dstrip" id="dstrip"></div>
+    </div>
+    <div class="s-body" id="sBody"></div>
+    <button class="fab" onclick="openBookModal()">+</button>
+  </div>
+
+  <!-- ══ STUDENTS ══ -->
+  <div class="screen" id="screen-students">
+    <div class="u-hdr">
+      <div class="u-hdr-top">
+        <div><div class="u-title">Students</div><div class="u-sub">Manage your roster</div></div>
+        <button class="hdr-btn u-hdr-btn" onclick="toast('Add student — coming soon!')">+ Add</button>
+      </div>
+      <div class="hdr-stats" id="uStats"></div>
+    </div>
+    <div class="srch-wrap">
+      <div class="srch-bar" style="margin-top:16px">
+        <span style="font-size:15px;color:var(--muted)">🔍</span>
+        <input type="text" placeholder="Search students…" oninput="filterStuList(this.value)" />
+      </div>
+    </div>
+    <div class="stu-list" id="stuList"></div>
+    <div class="stu-detail" id="stuDetail">
+      <div class="det-hdr">
+        <button class="det-back" onclick="closeStuDetail()">← Back</button>
+        <div class="det-av" id="detAv"></div>
+        <div class="det-name" id="detName"></div>
+        <div class="det-sub" id="detSub"></div>
+      </div>
+      <div class="det-body" id="detBody"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAYMENTS ══ -->
+  <div class="screen" id="screen-payments">
+    <div class="p-hdr">
+      <div class="p-hdr-top">
+        <div><div class="p-title">Payments</div><div class="p-sub">Invoices & billing</div></div>
+        <button class="hdr-btn p-hdr-btn" onclick="toast('New invoice — coming soon!')">+ Invoice</button>
+      </div>
+      <div class="hdr-stats" id="pStats"></div>
+    </div>
+    <div class="p-body">
+      <div class="fpills">
+        <button class="fpill active" onclick="filterInv('All',this)">All</button>
+        <button class="fpill" onclick="filterInv('Paid',this)">✓ Paid</button>
+        <button class="fpill" onclick="filterInv('Pending',this)">⏳ Pending</button>
+        <button class="fpill" onclick="filterInv('Overdue',this)">⚠ Overdue</button>
+      </div>
+      <div id="invList"></div>
+    </div>
+  </div>
+
+  <!-- ══ RADAR ══ -->
+  <div class="screen" id="screen-radar">
+    <div class="r-hdr">
+      <div class="r-hdr-top">
+        <div><div class="r-title">🌧 Radar</div><div class="r-sub" id="rLocation">Sydney, NSW</div></div>
+        <button class="hdr-btn" style="color:var(--r-dk)" onclick="loadWeather()">↻ Refresh</button>
+      </div>
+      <div class="hdr-stats" id="rStats">
+        <div class="hst"><div class="hst-n" id="rTemp">--°</div><div class="hst-l">Temp</div></div>
+        <div class="hst"><div class="hst-n" id="rRain">--%</div><div class="hst-l">Rain</div></div>
+        <div class="hst"><div class="hst-n" id="rWind">--</div><div class="hst-l">km/h</div></div>
+      </div>
+    </div>
+    <div class="r-body" id="rBody">
+      <div class="wx-loading"><div class="wx-loading-icon">⏳</div><div>Loading weather…</div></div>
+    </div>
+  </div>
+
+  <!-- ══ BOTTOM NAV ══ -->
+  <nav class="bnav">
+    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni">☀️</span><span class="nl">Today</span></button>
+    <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni">📅</span><span class="nl">Schedule</span></button>
+    <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni">👤</span><span class="nl">Students</span></button>
+    <button class="ntab"        data-t="payments" onclick="switchTab('payments',this)"> <span class="ni">💳</span><span class="nl">Payments</span></button>
+    <button class="ntab"        data-t="radar"    onclick="switchTab('radar',this)">    <span class="ni">🌧</span><span class="nl">Radar</span></button>
+  </nav>
+</div>
+
+<!-- LIVE LINK PAGE -->
+<div class="live-link-page" id="llPage">
+  <div class="ll-hdr">
+    <button class="ll-back" onclick="hideLiveLink()">← Back to app</button>
+    <div class="ll-logo">Fixturely</div>
+    <div class="ll-coach">Coach Alex</div>
+    <div class="ll-sport">Tennis Coach · Sydney</div>
+  </div>
+  <div class="ll-body">
+    <div class="ll-date-strip" id="llStrip"></div>
+    <div class="ll-slots-label">Available Times</div>
+    <div id="llSlots"></div>
+  </div>
+</div>
+
+<!-- BOOK MODAL -->
+<div class="overlay" id="bookOvl" onclick="handleBookBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeBookModal()">✕</button>
+    <div class="modal-title">Book New Lesson</div>
+    <div class="ow" id="owarn"><div class="ow-icon">⚠️</div><div id="owarnText"></div></div>
+    <div class="field">
+      <label class="field-label">Student Name</label>
+      <div class="ac-wrap">
+        <input type="text" class="field-input" id="stuIn" placeholder="Type a name…" autocomplete="off" oninput="filterAC(this.value)" onkeydown="acKey(event)" onfocus="filterAC(this.value)" />
+        <div class="ac-list" id="acList"></div>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Lesson Level</label>
+      <select class="field-input" id="lvlSel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Elite</option></select>
+    </div>
+    <div class="field"><label class="field-label">Start Time</label>
+      <input type="time" class="field-input" id="startTime" value="09:00" oninput="checkOverlap()" />
+    </div>
+    <div class="field"><label class="field-label">Duration</label>
+      <div class="pill-group" id="durPills">
+        <button class="pill" onclick="setPill(this,'dur','30 min')">30 min</button>
+        <button class="pill active" onclick="setPill(this,'dur','1 hour')">1 hour</button>
+        <button class="pill" onclick="setPill(this,'dur','1.5 hrs')">1.5 hrs</button>
+        <button class="pill" onclick="setPill(this,'dur','2 hours')">2 hours</button>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Court Location</label>
+      <input type="text" class="field-input" id="courtIn" placeholder="e.g., Court 1" oninput="checkOverlap()" />
+    </div>
+    <div class="field"><label class="field-label">Recurrence</label>
+      <div class="pill-group" id="recurPills">
+        <button class="pill active" onclick="setPill(this,'recur','One-time')">One-time</button>
+        <button class="pill" onclick="setPill(this,'recur','Weekly')">Weekly</button>
+        <button class="pill" onclick="setPill(this,'recur','Fortnightly')">Fortnightly</button>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Notes <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
+      <textarea class="field-input" id="notesIn" rows="3" placeholder="e.g., Focus on backhand" style="resize:none;line-height:1.5"></textarea>
+    </div>
+    <button class="submit-btn" onclick="bookLesson()">Book Lesson ✓</button>
+  </div>
+</div>
+
+<!-- TERM MODAL -->
+<div class="overlay" id="termOvl" onclick="handleTermBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeTermModal()">✕</button>
+    <div class="term-modal-title">📆 School Terms & Holidays</div>
+    <div class="term-modal-sub">Weekly lessons follow term dates and skip school holidays.</div>
+    <div id="termList"></div>
+    <div class="hol-sec-lbl">School Holidays</div>
+    <div id="holList"></div>
+  </div>
+</div>
+
+<!-- CANCEL DIALOG -->
+<div class="dialog-ovl" id="cancelOvl">
+  <div class="dialog">
+    <div class="dialog-icon">🗓</div>
+    <div class="dialog-title">Cancel this lesson?</div>
+    <div class="dialog-sub" id="cancelSub">They'll be notified automatically.</div>
+    <div class="dialog-btns">
+      <button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+      <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ══ DATA ══
+const STUDENTS=[
+  {name:'Emma Johnson',   level:'Beginner',     credits:7, sessions:12,owing:0  },
+  {name:'Lucas Martinez',level:'Intermediate',credits:4, sessions:8, owing:80 },
+  {name:'Ava Williams',  level:'Advanced',     credits:10,sessions:20,owing:0  },
+  {name:'Noah Thompson', level:'Elite',        credits:6, sessions:15,owing:0  },
+  {name:'Sophie Chen',   level:'Beginner',     credits:9, sessions:6, owing:160},
+  {name:'James Wilson',  level:'Intermediate',credits:3, sessions:5, owing:0  },
+  {name:'Mia Davis',     level:'Advanced',     credits:8, sessions:11,owing:0  },
+  {name:'Oliver Brown',  level:'Beginner',     credits:5, sessions:4, owing:40 },
+  {name:'Lily Parker',   level:'Elite',        credits:12,sessions:18,owing:0  },
+  {name:'Ethan Moore',   level:'Intermediate',credits:2, sessions:7, owing:0  },
+];
+const TERMS=[
+  {name:'Term 1',start:'2026-01-28',end:'2026-04-03',weeks:10},
+  {name:'Term 2',start:'2026-04-20',end:'2026-06-26',weeks:10},
+  {name:'Term 3',start:'2026-07-13',end:'2026-09-18',weeks:10},
+  {name:'Term 4',start:'2026-10-05',end:'2026-12-11',weeks:10},
+];
+const HOLIDAYS=[
+  {name:'Summer Holidays',start:'2025-12-20',end:'2026-01-27'},
+  {name:'Easter Break',   start:'2026-04-04',end:'2026-04-19'},
+  {name:'Winter Holidays',start:'2026-06-27',end:'2026-07-12'},
+  {name:'Spring Break',   start:'2026-09-19',end:'2026-10-04'},
+  {name:'Christmas Break',start:'2026-12-12',end:'2027-01-26'},
+];
+const INVOICES=[
+  {id:'INV-024',student:'Emma Johnson',  amount:400,status:'Paid',   date:'Mar 10',items:'10× Lesson Pack'},
+  {id:'INV-025',student:'Lucas Martinez',amount:80, status:'Pending',date:'Mar 14',items:'2× Lessons'},
+  {id:'INV-026',student:'Sophie Chen',   amount:160,status:'Overdue',date:'Mar 1', items:'4× Lessons'},
+  {id:'INV-027',student:'Ava Williams',  amount:320,status:'Paid',   date:'Mar 12',items:'8× Lesson Pack'},
+  {id:'INV-028',student:'Oliver Brown',  amount:40, status:'Pending',date:'Mar 15',items:'1× Lesson'},
+  {id:'INV-029',student:'Lily Parker',   amount:480,status:'Paid',   date:'Mar 8', items:'12× Lesson Pack'},
+  {id:'INV-030',student:'Noah Thompson', amount:200,status:'Paid',   date:'Mar 5', items:'5× Lesson Pack'},
+];
+
+const today=new Date(); today.setHours(0,0,0,0);
+let SESSIONS=[
+  {id:1,student:'Emma Johnson',  level:'Beginner',    time:'09:00',dur:'1 hour',  court:'Court 1',recur:'Weekly',    date:ds(today),       payStatus:'unpaid'},
+  {id:2,student:'Lucas Martinez',level:'Intermediate',time:'10:30',dur:'1 hour',  court:'Court 2',recur:'Weekly',    date:ds(today),       payStatus:'unpaid'},
+  {id:3,student:'Ava Williams',  level:'Advanced',    time:'12:00',dur:'1.5 hrs', court:'Court 1',recur:'Fortnightly',date:ds(today),      payStatus:'paid'},
+  {id:4,student:'Noah Thompson', level:'Elite',       time:'07:30',dur:'1 hour',  court:'Court 3',recur:'Weekly',    date:ds(add(today,1)),payStatus:'unpaid'},
+  {id:5,student:'Sophie Chen',   level:'Beginner',    time:'11:00',dur:'1 hour',  court:'Court 2',recur:'One-time',  date:ds(add(today,2)),payStatus:'unpaid'},
+  {id:6,student:'Lily Parker',   level:'Elite',       time:'08:00',dur:'1.5 hrs', court:'Court 3',recur:'Weekly',    date:ds(add(today,4)),payStatus:'unpaid'},
+];
+let nextId=7;
+
+// ══ HELPERS ══
+function ds(d){return d.toISOString().split('T')[0];}
+function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2);}
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DF=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DS_=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function fmt(t){const[h,m]=t.split(':').map(Number);return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
+function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function dm(d){return d==='30 min'?30:d==='1 hour'?60:d==='1.5 hrs'?90:120;}
+function et(t,d){let m=t2m(t)+dm(d);const h=Math.floor(m/60)%24,mm=m%60;return `${h%12||12}:${mm.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
+function fmtD(s){const d=new Date(s);return `${d.getDate()} ${MS[d.getMonth()]} ${d.getFullYear()}`;}
+function wkStart(d){const r=new Date(d),day=r.getDay(),diff=day===0?-6:1-day;r.setDate(r.getDate()+diff);r.setHours(0,0,0,0);return r;}
+function getTerm(d){const s=ds(d);return TERMS.find(t=>s>=t.start&&s<=t.end)||null;}
+function getHol(d){const s=ds(d);return HOLIDAYS.find(h=>s>=h.start&&s<=h.end)||null;}
+function wksLeft(e){return Math.max(0,Math.ceil((new Date(e)-today)/(7*24*3600*1000)));}
+
+// ══ TABS ══
+function switchTab(tab,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else document.querySelector(`[data-t="${tab}"]`).classList.add('active');
+  if(tab==='students') renderStudents();
+  if(tab==='payments') renderPayments();
+  if(tab==='radar')    loadWeather();
+  if(tab==='today')    renderToday();
+}
+
+// ══ TODAY ══
+function renderToday(){
+  const dstr=ds(today);
+  document.getElementById('todayTitle').textContent=DF[today.getDay()];
+  document.getElementById('todaySub').textContent=`${MN[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+  const todaySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+  let html=`<div class="t-date-label">${todaySess.length} lesson${todaySess.length!==1?'s':''} today</div>`;
+  if(!todaySess.length){
+    html+=`<div class="t-empty"><div class="t-empty-icon">🎾</div><div class="t-empty-t">No lessons today</div><div class="t-empty-s">Enjoy your day off!</div></div>`;
+  } else {
+    todaySess.forEach(s=>{
+      const isPaid = s.payStatus==='paid';
+      const isNotPaid = s.payStatus==='notpaid';
+      html+=`<div class="tl-card ${isPaid?'paid':isNotPaid?'notpaid':''}" id="tlcard-${s.id}">
+        <div class="tl-top">
+          <div>
+            <div class="tl-name">${s.student}</div>
+            <div class="tl-time">${fmt(s.time)} · ${s.court} · ${s.dur}</div>
+          </div>
+        </div>
+
+        <!-- Paid / Not Paid toggle — always visible -->
+        <div class="tl-toggle">
+          <button class="tl-tog-btn ${isPaid?'sel-paid':''}" onclick="setPayStatus(${s.id},'paid')">✓ Paid</button>
+          <button class="tl-tog-btn ${isNotPaid?'sel-notpaid':''}" onclick="setPayStatus(${s.id},'notpaid')">Not paid</button>
+        </div>
+
+        <!-- All caught up — shown when paid -->
+        ${isPaid ? `<div class="tl-caught-up"><span>🎉</span> All caught up!</div>` : ''}
+
+        <!-- Actions — only shown when not paid is selected -->
+        ${isNotPaid ? `
+          <div class="tl-notpaid-actions">
+            <button class="tl-act-btn btn-send-inv" onclick="toggleInvPanel(${s.id})">Send Invoice</button>
+            <button class="tl-act-btn btn-remind" onclick="sendRemind(${s.id},'${s.student}')">Remind 💬</button>
+          </div>
+          <div class="inv-panel" id="invpanel-${s.id}">
+            <div class="inv-panel-title">Invoice for ${s.student}</div>
+            <div class="inv-row"><span class="inv-lbl">Lesson</span><span class="inv-val">${fmt(s.time)} · ${s.dur}</span></div>
+            <div class="inv-row"><span class="inv-lbl">Court</span><span class="inv-val">${s.court}</span></div>
+            <div class="inv-row"><span class="inv-lbl">Amount</span><span class="inv-val">$80.00</span></div>
+            <button class="inv-send-btn" onclick="sendInvoice(${s.id},'${s.student}')">Send Invoice Link 📨</button>
+          </div>
+        ` : ''}
+      </div>`;
+    });
+  }
+  document.getElementById('tBody').innerHTML=html;
+}
+
+function setPayStatus(id, status){
+  const s=SESSIONS.find(s=>s.id===id);
+  if(!s) return;
+  // Toggle off if clicking same status again
+  s.payStatus = s.payStatus===status ? 'unpaid' : status;
+  renderToday();
+  if(s.payStatus==='paid') toast('🎉 All caught up!');
+}
+
+function toggleInvPanel(id){
+  const p=document.getElementById('invpanel-'+id);
+  if(p) p.classList.toggle('open');
+}
+
+function sendInvoice(id,name){
+  toast(`📨 Invoice sent to ${name}!`);
+  const p=document.getElementById('invpanel-'+id);
+  if(p) p.classList.remove('open');
+}
+
+function sendRemind(id,name){
+  toast(`💬 Reminder sent to ${name}!`);
+}
+
+// ══ LIVE LINK ══
+let llSelDate=new Date(today);
+function showLiveLink(){
+  llSelDate=new Date(today);
+  renderLLStrip();
+  renderLLSlots();
+  document.getElementById('llPage').classList.add('show');
+}
+function hideLiveLink(){document.getElementById('llPage').classList.remove('show');}
+function renderLLStrip(){
+  const strip=document.getElementById('llStrip'); strip.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=add(today,i), dstr=ds(d);
+    const isSel=dstr===ds(llSelDate);
+    const div=document.createElement('div');
+    div.className='ll-day'+(isSel?' active':'');
+    div.onclick=()=>{llSelDate=new Date(d);renderLLStrip();renderLLSlots();};
+    div.innerHTML=`<div class="ll-day-name">${DS_[d.getDay()]}</div><div class="ll-day-num">${d.getDate()}</div>`;
+    strip.appendChild(div);
+  }
+}
+function renderLLSlots(){
+  const dstr=ds(llSelDate);
+  const booked=SESSIONS.filter(s=>s.date===dstr);
+  const slots=[];
+  for(let h=7;h<=18;h++){
+    const t=`${h.toString().padStart(2,'0')}:00`;
+    const tM=t2m(t);
+    const taken=booked.some(s=>{const sS=t2m(s.time),sE=sS+dm(s.dur);return tM>=sS&&tM<sE;});
+    slots.push({time:t,taken});
+  }
+  document.getElementById('llSlots').innerHTML=slots.map(sl=>`
+    <div class="ll-slot ${sl.taken?'taken':'avail'}">
+      <div class="ll-slot-time">${fmt(sl.time)}</div>
+      ${sl.taken
+        ? `<div class="ll-slot-status">Unavailable</div>`
+        : `<div style="display:flex;align-items:center;gap:8px"><div class="ll-slot-status">Available</div><button class="ll-req-btn" onclick="toast('Request sent for ${fmt(sl.time)}! Coach will confirm.')">Request</button></div>`
+      }
+    </div>
+  `).join('');
+}
+
+// ══ SCHEDULE ══
+let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,sentLinks=new Set();
+
+function renderSchedule(){
+  document.getElementById('monthLabel').textContent=MN[sel.getMonth()]+' '+sel.getFullYear();
+  const strip=document.getElementById('dstrip'); strip.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=add(ws,i),dstr=ds(d);
+    const isSel=dstr===ds(sel),isT=dstr===ds(today),hol=getHol(d);
+    const dc=SESSIONS.filter(s=>s.date===dstr);
+    const cell=document.createElement('div');
+    cell.className='dcell'+(isSel?' sel':'')+(isT&&!isSel?' tod':'')+(hol&&!isSel?' hol':'');
+    cell.onclick=()=>selectDay(d);
+    const dots=dc.slice(0,3).map(()=>`<div class="sdot"></div>`).join('');
+    cell.innerHTML=`<div class="dc-n">${DW[i]}</div><div class="dc-d">${d.getDate()}</div><div class="dot-row">${dots}</div>`;
+    strip.appendChild(cell);
+  }
+  const dstr=ds(sel),daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+  const term=getTerm(sel),hol=getHol(sel);
+  let html='';
+  if(term){
+    html+=`<div class="term-banner" onclick="openTermModal()"><div class="tb-left"><span>📆</span><div><div class="tb-name">${term.name}</div><div class="tb-dates">${fmtD(term.start)} – ${fmtD(term.end)}</div></div></div><div class="tb-wks">${wksLeft(term.end)}w left ›</div></div>`;
+  } else {
+    html+=`<div class="term-banner hol" onclick="openTermModal()"><div class="tb-left"><span>🏖</span><div><div class="tb-name" style="color:var(--warn)">School Holidays</div><div class="tb-dates">No term active</div></div></div><div class="tb-wks" style="color:var(--warn)">View ›</div></div>`;
+  }
+  html+=`<div class="day-card"><div><div class="day-full">${DF[sel.getDay()]}</div><div class="day-date">${MN[sel.getMonth()]} ${sel.getDate()}, ${sel.getFullYear()}</div><div class="day-cnt">${daySess.length} lesson${daySess.length!==1?'s':''} scheduled</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:7px"><div class="day-badge"><div class="db-n">${DS_[sel.getDay()]}</div><div class="db-d">${sel.getDate()}</div></div><button class="s-book-btn" onclick="openBookModal()">+ Book</button></div></div>`;
+  if(hol) html+=`<div class="hol-notice">🏖 ${hol.name}</div>`;
+  if(!daySess.length){
+    html+=`<div class="empty"><div class="empty-icon">🎾</div><div class="empty-t">No lessons today</div><div class="empty-s">Tap + to book a session</div></div>`;
+  } else {
+    daySess.forEach(s=>{
+      const stu=STUDENTS.find(st=>st.name===s.student);
+      const credits=stu?stu.credits:0;
+      const bar=credits>0?`<div class="sess-bar"><div class="sess-bar-f" style="width:${Math.min((credits/12)*100,100)}%"></div></div><div class="cred-lbl">${credits} credits remaining</div>`:'';
+      html+=`<div class="sess-card"><div class="sess-top"><div><div class="sess-name">${s.student}</div><div class="sess-tags"><span class="stag">${s.level}</span><span class="stag">${s.recur}</span><span class="stag">${s.court}</span></div></div><button class="cx" onclick="openCancelDialog(event,${s.id})">✕</button></div><div class="sess-det"><span>⏰</span>${fmt(s.time)} – ${et(s.time,s.dur)}</div><div class="sess-det"><span>⏱</span>${s.dur}</div>${bar}</div>`;
+    });
+  }
+  document.getElementById('sBody').innerHTML=html;
+}
+function selectDay(d){sel=new Date(d);renderSchedule();}
+function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
+function changeWeek(n){ws=add(ws,n*7);sel=new Date(ws);renderSchedule();}
+
+function checkOverlap(){
+  const warn=document.getElementById('owarn');
+  const time=document.getElementById('startTime').value;
+  const court=document.getElementById('courtIn').value.trim().toLowerCase();
+  if(!time){warn.classList.remove('show');return;}
+  const sM=t2m(time),eM=sM+dm(selDur),dstr=ds(sel);
+  const conflict=SESSIONS.find(s=>{
+    if(s.date!==dstr) return false;
+    if(court&&s.court.toLowerCase()!==court) return false;
+    const sS=t2m(s.time),sE=sS+dm(s.dur);
+    return sM<sE&&eM>sS;
+  });
+  if(conflict){
+    document.getElementById('owarnText').innerHTML=`<strong>Heads up!</strong> This overlaps with ${conflict.student}'s session at ${fmt(conflict.time)}${court?' on '+conflict.court:''}. Are you sure you want to book it anyway?`;
+    warn.classList.add('show');
+  } else warn.classList.remove('show');
+}
+
+function openBookModal(){
+  document.getElementById('stuIn').value='';
+  document.getElementById('lvlSel').value='Beginner';
+  document.getElementById('startTime').value='09:00';
+  document.getElementById('courtIn').value='';
+  document.getElementById('notesIn').value='';
+  document.querySelectorAll('#durPills .pill').forEach((p,i)=>p.classList.toggle('active',i===1));
+  document.querySelectorAll('#recurPills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  selDur='1 hour';selRecur='One-time';acIdx=-1;
+  document.getElementById('acList').classList.remove('open');
+  document.getElementById('owarn').classList.remove('show');
+  document.getElementById('bookOvl').classList.add('open');
+  setTimeout(()=>document.getElementById('stuIn').focus(),400);
+}
+function closeBookModal(){document.getElementById('bookOvl').classList.remove('open');document.getElementById('acList').classList.remove('open');}
+function handleBookBg(e){if(e.target===document.getElementById('bookOvl'))closeBookModal();}
+
+function filterAC(val){
+  const list=document.getElementById('acList'),q=val.trim().toLowerCase();
+  const fil=q===''?STUDENTS:STUDENTS.filter(s=>s.name.toLowerCase().includes(q));
+  if(!fil.length){list.innerHTML=`<div class="no-res">No students found</div>`;list.classList.add('open');return;}
+  list.innerHTML=fil.map((s,i)=>{
+    const hi=q?s.name.replace(new RegExp(`(${q})`,'gi'),'<span class="hl">$1</span>'):s.name;
+    return `<div class="ac-item" onmousedown="pickStu('${s.name}','${s.level}')" data-idx="${i}"><div class="ac-av">${ini(s.name)}</div><div><div>${hi}</div><div class="ac-sub">${s.level} · ${s.credits} credits left</div></div></div>`;
+  }).join('');
+  list.classList.add('open');acIdx=-1;
+}
+function pickStu(name,level){document.getElementById('stuIn').value=name;document.getElementById('lvlSel').value=level;document.getElementById('acList').classList.remove('open');checkOverlap();}
+function acKey(e){
+  const list=document.getElementById('acList'),items=list.querySelectorAll('.ac-item');
+  if(!list.classList.contains('open')) return;
+  if(e.key==='ArrowDown'){e.preventDefault();acIdx=Math.min(acIdx+1,items.length-1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();acIdx=Math.max(acIdx-1,0);}
+  else if(e.key==='Enter'&&acIdx>=0){e.preventDefault();items[acIdx].dispatchEvent(new MouseEvent('mousedown'));return;}
+  else if(e.key==='Escape'){list.classList.remove('open');return;}
+  items.forEach((it,i)=>it.classList.toggle('hi',i===acIdx));
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))document.getElementById('acList').classList.remove('open');});
+
+function setPill(btn,group,val){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  if(group==='dur'){selDur=val;checkOverlap();}else selRecur=val;
+}
+function bookLesson(){
+  const name=document.getElementById('stuIn').value.trim();
+  if(!name){document.getElementById('stuIn').classList.add('err');setTimeout(()=>document.getElementById('stuIn').classList.remove('err'),1500);return;}
+  const time=document.getElementById('startTime').value;
+  const court=document.getElementById('courtIn').value.trim()||'Court 1';
+  SESSIONS.push({id:nextId++,student:name,level:document.getElementById('lvlSel').value,time,dur:selDur,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
+}
+
+function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id===id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
+function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;}
+function confirmCancel(){const s=SESSIONS.find(s=>s.id===cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!==cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);}
+
+function openTermModal(){
+  const td=ds(today);
+  document.getElementById('termList').innerHTML=TERMS.map(t=>{
+    const isCur=td>=t.start&&td<=t.end;
+    return `<div class="term-item${isCur?' cur':''}"><div class="term-item-top"><div class="term-item-name">${t.name}</div>${isCur?`<span class="cur-badge">Current</span>`:''}</div><div class="term-dates">${fmtD(t.start)} – ${fmtD(t.end)}</div><div class="term-wks">${t.weeks} weeks${isCur?' · '+wksLeft(t.end)+' remaining':''}</div></div>`;
+  }).join('');
+  document.getElementById('holList').innerHTML=HOLIDAYS.map(h=>`<div class="hol-item"><div class="hol-name">${h.name}</div><div class="hol-dates">${fmtD(h.start)} – ${fmtD(h.end)}</div></div>`).join('');
+  document.getElementById('termOvl').classList.add('open');
+}
+function closeTermModal(){document.getElementById('termOvl').classList.remove('open');}
+function handleTermBg(e){if(e.target===document.getElementById('termOvl'))closeTermModal();}
+
+// ══ STUDENTS ══
+function renderStudents(){
+  const tc=STUDENTS.reduce((a,s)=>a+s.credits,0),ow=STUDENTS.filter(s=>s.owing>0).length;
+  document.getElementById('uStats').innerHTML=`<div class="hst"><div class="hst-n">${STUDENTS.length}</div><div class="hst-l">Students</div></div><div class="hst"><div class="hst-n">${tc}</div><div class="hst-l">Credits</div></div><div class="hst"><div class="hst-n">${ow}</div><div class="hst-l">Owing</div></div>`;
+  renderStuList(STUDENTS);
+}
+function renderStuList(list){
+  document.getElementById('stuList').innerHTML=list.map(s=>`<div class="stu-card" onclick="openStuDetail('${s.name}')"><div class="stu-av">${ini(s.name)}</div><div style="flex:1"><div class="stu-name">${s.name}</div><div class="stu-meta"><span>${s.level}</span><span>·</span><span>${s.sessions} sessions</span>${s.owing>0?`<span class="stu-ow">· $${s.owing} owing</span>`:''}</div></div><div style="text-align:right"><div class="cn">${s.credits}</div><div class="cl">credits</div><div class="cbar"><div class="cbarf" style="width:${Math.min((s.credits/12)*100,100)}%"></div></div></div></div>`).join('');
+}
+function filterStuList(q){renderStuList(q?STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):STUDENTS);}
+function openStuDetail(name){
+  const s=STUDENTS.find(s=>s.name===name);
+  const up=SESSIONS.filter(se=>se.student===name&&se.date>=ds(today)).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+  document.getElementById('detAv').textContent=ini(s.name);
+  document.getElementById('detName').textContent=s.name;
+  document.getElementById('detSub').textContent=`${s.level} · ${s.sessions} sessions total`;
+  document.getElementById('detBody').innerHTML=`<div class="det-stats"><div class="det-stat"><div class="det-stat-n">${s.credits}</div><div class="det-stat-l">Credits</div></div><div class="det-stat"><div class="det-stat-n">${s.sessions}</div><div class="det-stat-l">Sessions</div></div><div class="det-stat"><div class="det-stat-n" style="color:${s.owing>0?'#B05050':'var(--ok)'}">$${s.owing}</div><div class="det-stat-l">Owing</div></div></div><div class="sec-lbl">Upcoming Lessons</div>${up.length?up.map(se=>`<div class="up-l"><div class="ul-t">${fmt(se.time)}</div><div><div class="ul-d">${fmtD(se.date)}</div><div class="ul-c">${se.court} · ${se.dur}</div></div></div>`).join(''):`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No upcoming lessons</div>`}<button class="u-inv-btn" onclick="toast('Invoice sent to ${s.name}! 💸')">Send Invoice →</button>`;
+  document.getElementById('stuDetail').classList.add('open');
+}
+function closeStuDetail(){document.getElementById('stuDetail').classList.remove('open');}
+
+// ══ PAYMENTS ══
+let invFilter='All';
+function renderPayments(){
+  const paid=INVOICES.filter(i=>i.status==='Paid').reduce((a,i)=>a+i.amount,0);
+  const pend=INVOICES.filter(i=>i.status!=='Paid').reduce((a,i)=>a+i.amount,0);
+  const pc=INVOICES.filter(i=>i.status==='Paid').length;
+  document.getElementById('pStats').innerHTML=`<div class="hst"><div class="hst-n">$${paid}</div><div class="hst-l">Collected</div></div><div class="hst"><div class="hst-n">$${pend}</div><div class="hst-l">Pending</div></div><div class="hst"><div class="hst-n">${pc}</div><div class="hst-l">Paid</div></div>`;
+  renderInvList();
+}
+function renderInvList(){
+  const list=invFilter==='All'?INVOICES:INVOICES.filter(i=>i.status===invFilter);
+  document.getElementById('invList').innerHTML=list.map(inv=>{
+    const sc=inv.status==='Paid'?'sb-paid':inv.status==='Pending'?'sb-pend':'sb-over';
+    const si=inv.status==='Paid'?'✓':inv.status==='Pending'?'⏳':'⚠';
+    const isSent=sentLinks.has(inv.id);
+    const btn=inv.status!=='Paid'?`<button class="sl-btn${isSent?' sent':''}" onclick="sendLink(event,'${inv.id}','${inv.student}')">${isSent?'✓ Sent':'Send Link'}</button>`:`<span style="font-size:12px;color:var(--ok);font-weight:700">✓ Paid ${inv.date}</span>`;
+    return `<div class="inv-card"><div class="inv-top"><div><div class="inv-name">${inv.student}</div><div class="inv-num">${inv.id}</div></div><div style="text-align:right"><div class="inv-amt">$${inv.amount}</div><div class="inv-items-l">${inv.items}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center"><span class="sbadge ${sc}">${si} ${inv.status}</span><span style="font-size:11px;color:var(--muted);font-weight:600">${inv.date}</span></div><div class="inv-foot"><span class="inv-ft">${inv.items}</span>${btn}</div></div>`;
+  }).join('');
+}
+function filterInv(status,btn){invFilter=status;document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('active'));btn.classList.add('active');renderInvList();}
+function sendLink(e,id,name){e.stopPropagation();sentLinks.add(id);renderInvList();toast(`💸 Payment link sent to ${name}!`);}
+
+// ══ WEATHER (OpenWeatherMap — free API, works for Australia) ══
+let wxLoaded=false;
+async function loadWeather(){
+  if(wxLoaded) return;
+  // Using Open-Meteo — completely free, no API key, great for Australia
+  try {
+    // Default to Sydney — in production this would use geolocation
+    const lat=-33.8688, lon=151.2093, city='Sydney, NSW';
+    document.getElementById('rLocation').textContent=city;
+
+    // Current + hourly forecast
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&timezone=Australia%2FSydney&forecast_days=1`;
+    const res=await fetch(url);
+    const data=await res.json();
+
+    const cur=data.current;
+    const temp=Math.round(cur.temperature_2m);
+    const feels=Math.round(cur.apparent_temperature);
+    const rainPct=cur.precipitation_probability||0;
+    const wind=Math.round(cur.wind_speed_10m);
+    const wcode=cur.weather_code||0;
+    const icon=wxIcon(wcode);
+    const desc=wxDesc(wcode);
+
+    // Court condition
+    let condClass='good',condTitle='Good to play',condSub='Conditions look great on court today.';
+    if(rainPct>=70){condClass='bad';condTitle='Rain likely';condSub='Consider cancelling outdoor sessions today.';}
+    else if(rainPct>=40){condClass='warn';condTitle='Might be wet';condSub='Keep an eye on conditions before heading out.';}
+
+    // Weather strip on Today tab
+    const stripEl=document.getElementById('wxStrip');
+    stripEl.className=`wx-strip wx-court-${condClass==='good'?'ok':condClass==='warn'?'warn':'bad'}`;
+    document.getElementById('wxIcon').textContent=icon;
+    document.getElementById('wxTemp').textContent=`${temp}°`;
+    document.getElementById('wxDesc').textContent=desc;
+    document.getElementById('wxRain').textContent=`${rainPct}% rain`;
+    document.getElementById('wxWind').textContent=`${wind} km/h`;
+
+    // Radar header stats
+    document.getElementById('rTemp').textContent=`${temp}°`;
+    document.getElementById('rRain').textContent=`${rainPct}%`;
+    document.getElementById('rWind').textContent=wind;
+
+    // Hourly
+    const hours=data.hourly;
+    const now=new Date().getHours();
+    let hourlyHTML='';
+    for(let i=now;i<Math.min(now+12,24);i++){
+      const ht=Math.round(hours.temperature_2m[i]);
+      const hr=hours.precipitation_probability[i]||0;
+      const hc=hours.weather_code[i]||0;
+      const isRainHr=hr>=50;
+      hourlyHTML+=`<div class="hr-item${isRainHr?' rain-hr':''}"><div class="hr-time">${i%12||12}${i>=12?'pm':'am'}</div><div class="hr-icon">${wxIcon(hc)}</div><div class="hr-temp">${ht}°</div><div class="hr-rain">${hr}%</div></div>`;
+    }
+
+    document.getElementById('rBody').innerHTML=`
+      <div class="court-cond ${condClass}">
+        <div class="cc-icon">${condClass==='good'?'🎾':condClass==='warn'?'⚠️':'🌧'}</div>
+        <div class="cc-text"><div class="cc-title">${condTitle}</div><div class="cc-sub">${condSub}</div></div>
+        ${condClass==='bad'?`<button class="cc-cancel-btn" onclick="toast('All today\\'s lessons cancelled — students notified!')">Cancel all</button>`:''}
+      </div>
+      <div class="wx-main">
+        <div class="wx-main-top">
+          <div style="font-size:52px">${icon}</div>
+          <div><div class="wx-big-temp">${temp}°</div><div class="wx-big-feels">Feels like ${feels}°</div></div>
+        </div>
+        <div class="wx-big-desc">${desc}</div>
+        <div class="wx-grid">
+          <div class="wx-stat"><div class="wx-stat-n">${rainPct}%</div><div class="wx-stat-l">Rain chance</div></div>
+          <div class="wx-stat"><div class="wx-stat-n">${wind}</div><div class="wx-stat-l">km/h wind</div></div>
+          <div class="wx-stat"><div class="wx-stat-n">${cur.relative_humidity_2m}%</div><div class="wx-stat-l">Humidity</div></div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Hourly Forecast</div>
+      <div class="hourly-scroll">${hourlyHTML}</div>
+      <div class="radar-map-wrap">
+        <div class="radar-map-label">BOM Rain Radar — Sydney <span>Live</span></div>
+        <iframe class="radar-iframe" src="https://www.rainviewer.com/map.html?loc=-33.8688,151.2093,9&oFa=0&oC=1&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=3&o=83&lm=1&layer=radar&sm=1&sn=1" allowfullscreen></iframe>
+        <div class="radar-note">🌧 Live radar via RainViewer · Tap map to interact</div>
+      </div>
+    `;
+    wxLoaded=true;
+  } catch(err){
+    document.getElementById('rBody').innerHTML=`<div class="wx-loading"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;color:var(--soft)">Weather data unavailable.<br>Check your connection and try refreshing.</div></div>`;
+    // Still show something on the today strip
+    document.getElementById('wxDesc').textContent='Tap Radar tab for weather';
+    wxLoaded=false;
+  }
+}
+
+function wxIcon(code){
+  if(code===0) return '☀️';
+  if(code<=2) return '⛅';
+  if(code<=3) return '☁️';
+  if(code<=49) return '🌫';
+  if(code<=59) return '🌦';
+  if(code<=69) return '🌧';
+  if(code<=79) return '🌨';
+  if(code<=84) return '🌧';
+  if(code<=99) return '⛈';
+  return '🌤';
+}
+function wxDesc(code){
+  if(code===0) return 'Clear sky';
+  if(code<=2) return 'Partly cloudy';
+  if(code<=3) return 'Overcast';
+  if(code<=49) return 'Foggy';
+  if(code<=59) return 'Light drizzle';
+  if(code<=69) return 'Rain';
+  if(code<=79) return 'Snow';
+  if(code<=84) return 'Rain showers';
+  if(code<=99) return 'Thunderstorm';
+  return 'Mixed conditions';
+}
+
+// ══ TOAST ══
+function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══ INIT ══
+renderToday();
+renderSchedule();
+loadWeather();
+</script>
+</body>
+</html>
