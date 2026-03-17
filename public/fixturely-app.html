@@ -422,17 +422,165 @@
   .dbtn-yes{flex:1;padding:12px;border-radius:100px;background:#C07878;color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
   .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(28,20,7,0.9);color:var(--white);padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;z-index:500;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
   .toast.show{transform:translateX(-50%) translateY(0);}
+
+  /* ── Desktop-only elements: hidden on mobile ── */
+  .topnav { display:none; }
+  /* Two-col wrappers transparent on mobile */
+  .dsk-split { display:contents; }
+  /* Mobile defaults for desktop-split elements */
+  #sSchedSplit   { display:none; }
+  #dsk-radar-split { display:none; }
+  #dsk-pay-stats { display:none; }
+  /* Desktop-only panels hidden on mobile */
+  #dsk-wx-panel, #dsk-stu-placeholder { display:none; }
+
+  @media (min-width:1024px) {
+    html,body { overflow:hidden; }
+
+    /* ── Shell ── */
+    .phone { max-width:100%; height:100vh; flex-direction:column; overflow:hidden; }
+    .bnav  { display:none !important; }
+
+    /* FAB repositioned */
+    .fab { position:fixed; bottom:24px; right:24px; }
+
+    /* ── Top nav ── */
+    .topnav {
+      display:flex; align-items:center; height:60px; flex-shrink:0;
+      background:var(--white); border-bottom:1px solid var(--border);
+      padding:0 24px; gap:8px; z-index:90;
+    }
+    .topnav-logo {
+      font-size:16px; font-weight:900; color:var(--text);
+      display:flex; align-items:center; gap:8px; margin-right:16px; white-space:nowrap;
+    }
+    .topnav-tabs { display:flex; gap:4px; flex:1; }
+    .tnav-btn {
+      display:flex; align-items:center; gap:7px;
+      padding:8px 14px; border:none; background:none; border-radius:10px;
+      cursor:pointer; font-family:'Nunito',sans-serif; font-size:14px;
+      font-weight:700; color:var(--soft); transition:background 0.15s,color 0.15s;
+      white-space:nowrap;
+    }
+    .tnav-btn:hover { background:var(--off); }
+    .tnav-btn[data-t="today"].active    { background:var(--t-pl); color:var(--t-dk); }
+    .tnav-btn[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
+    .tnav-btn[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
+    .tnav-btn[data-t="payments"].active { background:var(--p-pl); color:var(--p-dk); }
+    .tnav-btn[data-t="radar"].active    { background:var(--r-pl); color:var(--r-dk); }
+
+    /* ── Screens ── */
+    .screen        { display:none; flex-direction:column; flex:1; overflow:hidden; padding-bottom:0; min-height:0; }
+    .screen.active { display:flex; }
+
+    /* ── Compact section headers ── */
+    .t-hdr,.s-hdr,.u-hdr,.p-hdr,.r-hdr {
+      padding:16px 28px; border-radius:0; flex-shrink:0;
+    }
+    .t-hdr-top,.s-hdr-top,.u-hdr-top,.p-hdr-top,.r-hdr-top { margin-bottom:0; }
+    .t-title,.s-title,.u-title,.p-title,.r-title { font-size:22px; }
+    .wx-strip  { display:none; }
+    .s-hdr .mnav,.s-hdr .dstrip { display:none; }
+    .hdr-stats { display:none; }
+
+    /* ── Two-col split wrapper ── */
+    .dsk-split { display:flex; flex:1; overflow:hidden; min-height:0; }
+    .dsk-main  { flex:1; overflow-y:auto; padding:20px 24px; }
+    .dsk-aside {
+      width:300px; min-width:260px; flex-shrink:0;
+      border-left:1px solid var(--border); background:var(--off);
+      overflow-y:auto; padding:20px;
+    }
+    .dsk-left-col {
+      width:340px; min-width:280px; flex-shrink:0;
+      border-right:1px solid var(--border); background:var(--off);
+      overflow-y:auto; padding:20px;
+    }
+
+    /* ── TODAY ── */
+    .t-body { flex:1; overflow-y:auto; padding:20px 24px; }
+    #dsk-wx-panel { display:flex; flex-direction:column; }
+
+    /* ── SCHEDULE ── */
+    .s-body { display:none; }
+    #sSchedRight { flex:1; overflow-y:auto; padding:20px 24px; }
+
+    /* ── STUDENTS ── */
+    #screen-students .dsk-split {
+      display:grid;
+      grid-template-columns:340px 1fr;
+      flex:1; overflow:hidden; min-height:0;
+    }
+    #dsk-stu-left {
+      display:flex; flex-direction:column;
+      border-right:1px solid var(--border); overflow:hidden;
+    }
+    #dsk-stu-left .srch-wrap { flex-shrink:0; }
+    #dsk-stu-left .stu-list  { flex:1; overflow-y:auto; }
+    .stu-detail {
+      position:relative !important; inset:auto !important;
+      transform:none !important; z-index:auto !important;
+      opacity:1; overflow-y:auto; padding-bottom:0;
+      background:var(--off); transition:none;
+    }
+    .stu-detail .det-hdr { padding-top:20px; border-radius:0; }
+    .det-back { display:none; }
+    #dsk-stu-placeholder {
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; height:100%; text-align:center; padding:40px;
+      color:var(--muted); gap:12px;
+    }
+    #dsk-stu-right.has-detail #dsk-stu-placeholder { display:none; }
+    #dsk-stu-right { position:relative; overflow:hidden; }
+
+    /* ── PAYMENTS ── */
+    .p-body { display:flex; flex:1; overflow:hidden; padding:0; min-height:0; }
+    #dsk-pay-inv  { flex:1; overflow-y:auto; padding:20px 24px; }
+    #dsk-pay-stats {
+      display:flex; flex-direction:column;
+      width:280px; flex-shrink:0; border-left:1px solid var(--border);
+      background:var(--off); padding:20px; overflow-y:auto;
+    }
+    .fpills { flex-wrap:wrap; overflow-x:visible; }
+
+    /* ── RADAR ── */
+    .r-body { display:none; }
+    #dsk-radar-left  { display:block; width:360px; min-width:300px; flex-shrink:0;
+                       border-right:1px solid var(--border); overflow-y:auto; padding:20px; }
+    #dsk-radar-right { display:flex; flex-direction:column; flex:1; overflow:hidden; }
+    #dsk-radar-right .radar-map-wrap  { flex:1; display:flex; flex-direction:column; border-radius:0; margin:0; }
+    #dsk-radar-right .radar-iframe    { flex:1; height:100%; min-height:400px; }
+
+    /* ── Modals — centered ── */
+    .overlay { align-items:center; }
+    .modal   { border-radius:24px; max-width:520px; max-height:85vh; }
+    .modal-handle { display:none; }
+  }
 </style>
 </head>
 <body>
 <div class="phone">
+
+  <header class="topnav">
+    <div class="topnav-logo"><span>🎾</span><strong>Fixturely</strong></div>
+    <nav class="topnav-tabs">
+      <button class="tnav-btn active" data-t="today"    onclick="switchTab('today',this)">☀️ Today</button>
+      <button class="tnav-btn"        data-t="schedule" onclick="switchTab('schedule',this)">📅 Schedule</button>
+      <button class="tnav-btn"        data-t="students" onclick="switchTab('students',this)">👤 Students</button>
+      <button class="tnav-btn"        data-t="payments" onclick="switchTab('payments',this)">💳 Payments</button>
+      <button class="tnav-btn"        data-t="radar"    onclick="switchTab('radar',this)">🌧 Radar</button>
+    </nav>
+  </header>
 
   <!-- ══ TODAY ══ -->
   <div class="screen active" id="screen-today">
     <div class="t-hdr">
       <div class="t-hdr-top">
         <div><div class="t-title" id="todayTitle">Today</div><div class="t-sub" id="todaySub"></div></div>
-        <button class="hdr-btn t-hdr-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">📅 Schedule</button>
+        <div style="display:flex;gap:8px">
+          <button class="hdr-btn t-hdr-btn" onclick="openBookModal()">+ Book Lesson</button>
+          <button class="hdr-btn t-hdr-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">📅 Schedule</button>
+        </div>
       </div>
       <!-- Weather strip -->
       <div class="wx-strip wx-court-ok" id="wxStrip" onclick="switchTab('radar',document.querySelector('[data-t=radar]'))">
@@ -449,7 +597,12 @@
         </div>
       </div>
     </div>
-    <div class="t-body" id="tBody"></div>
+    <div class="dsk-split">
+      <div class="t-body" id="tBody"></div>
+      <div class="dsk-aside" id="dsk-wx-panel">
+        <p style="color:var(--muted);font-size:13px;text-align:center;padding:30px 0">Visit Radar tab for weather</p>
+      </div>
+    </div>
   </div>
 
   <!-- ══ SCHEDULE ══ -->
@@ -470,6 +623,10 @@
       <div class="dstrip" id="dstrip"></div>
     </div>
     <div class="s-body" id="sBody"></div>
+    <div class="dsk-split" id="sSchedSplit">
+      <div class="dsk-left-col" id="sSchedLeft"></div>
+      <div id="sSchedRight"></div>
+    </div>
     <button class="fab" onclick="openBookModal()">+</button>
   </div>
 
@@ -482,21 +639,32 @@
       </div>
       <div class="hdr-stats" id="uStats"></div>
     </div>
-    <div class="srch-wrap">
-      <div class="srch-bar" style="margin-top:16px">
-        <span style="font-size:15px;color:var(--muted)">🔍</span>
-        <input type="text" placeholder="Search students…" oninput="filterStuList(this.value)" />
+    <div class="dsk-split">
+      <div id="dsk-stu-left">
+        <div class="srch-wrap">
+          <div class="srch-bar" style="margin-top:16px">
+            <span style="font-size:15px;color:var(--muted)">🔍</span>
+            <input type="text" placeholder="Search students…" oninput="filterStuList(this.value)" />
+          </div>
+        </div>
+        <div class="stu-list" id="stuList"></div>
       </div>
-    </div>
-    <div class="stu-list" id="stuList"></div>
-    <div class="stu-detail" id="stuDetail">
-      <div class="det-hdr">
-        <button class="det-back" onclick="closeStuDetail()">← Back</button>
-        <div class="det-av" id="detAv"></div>
-        <div class="det-name" id="detName"></div>
-        <div class="det-sub" id="detSub"></div>
+      <div id="dsk-stu-right">
+        <div class="stu-detail" id="stuDetail">
+          <div class="det-hdr">
+            <button class="det-back" onclick="closeStuDetail()">← Back</button>
+            <div class="det-av" id="detAv"></div>
+            <div class="det-name" id="detName"></div>
+            <div class="det-sub" id="detSub"></div>
+          </div>
+          <div class="det-body" id="detBody"></div>
+        </div>
+        <div id="dsk-stu-placeholder">
+          <div style="font-size:48px">👤</div>
+          <div style="font-size:15px;font-weight:800;color:var(--soft)">Select a student</div>
+          <div style="font-size:13px">Choose a student to see their details.</div>
+        </div>
       </div>
-      <div class="det-body" id="detBody"></div>
     </div>
   </div>
 
@@ -510,13 +678,16 @@
       <div class="hdr-stats" id="pStats"></div>
     </div>
     <div class="p-body">
-      <div class="fpills">
-        <button class="fpill active" onclick="filterInv('All',this)">All</button>
-        <button class="fpill" onclick="filterInv('Paid',this)">✓ Paid</button>
-        <button class="fpill" onclick="filterInv('Pending',this)">⏳ Pending</button>
-        <button class="fpill" onclick="filterInv('Overdue',this)">⚠ Overdue</button>
+      <div id="dsk-pay-inv">
+        <div class="fpills">
+          <button class="fpill active" onclick="filterInv('All',this)">All</button>
+          <button class="fpill" onclick="filterInv('Paid',this)">✓ Paid</button>
+          <button class="fpill" onclick="filterInv('Pending',this)">⏳ Pending</button>
+          <button class="fpill" onclick="filterInv('Overdue',this)">⚠ Overdue</button>
+        </div>
+        <div id="invList"></div>
       </div>
-      <div id="invList"></div>
+      <div id="dsk-pay-stats"></div>
     </div>
   </div>
 
@@ -525,7 +696,7 @@
     <div class="r-hdr">
       <div class="r-hdr-top">
         <div><div class="r-title">🌧 Radar</div><div class="r-sub" id="rLocation">Sydney, NSW</div></div>
-        <button class="hdr-btn" style="color:var(--r-dk)" onclick="loadWeather()">↻ Refresh</button>
+        <button class="hdr-btn" style="color:var(--r-dk)" onclick="wxLoaded=false;loadWeather()">↻ Refresh</button>
       </div>
       <div class="hdr-stats" id="rStats">
         <div class="hst"><div class="hst-n" id="rTemp">--°</div><div class="hst-l">Temp</div></div>
@@ -535,6 +706,10 @@
     </div>
     <div class="r-body" id="rBody">
       <div class="wx-loading"><div class="wx-loading-icon">⏳</div><div>Loading weather…</div></div>
+    </div>
+    <div id="dsk-radar-split" style="display:none;flex:1;overflow:hidden;min-height:0;">
+      <div id="dsk-radar-left"></div>
+      <div id="dsk-radar-right"></div>
     </div>
   </div>
 
@@ -577,11 +752,11 @@
         <div class="ac-list" id="acList"></div>
       </div>
     </div>
-    <div class="field"><label class="field-label">Lesson Level</label>
-      <select class="field-input" id="lvlSel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Elite</option></select>
-    </div>
     <div class="field"><label class="field-label">Start Time</label>
-      <input type="time" class="field-input" id="startTime" value="09:00" oninput="checkOverlap()" />
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="time" class="field-input" id="startTime" value="09:00" onclick="this.select()" oninput="checkOverlap();updateAmPmBtn()" style="flex:1" />
+        <button type="button" id="ampmBtn" onclick="toggleAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
+      </div>
     </div>
     <div class="field"><label class="field-label">Duration</label>
       <div class="pill-group" id="durPills">
@@ -638,51 +813,14 @@
 
 <script>
 // ══ DATA ══
-const STUDENTS=[
-  {name:'Emma Johnson',   level:'Beginner',     credits:7, sessions:12,owing:0  },
-  {name:'Lucas Martinez',level:'Intermediate',credits:4, sessions:8, owing:80 },
-  {name:'Ava Williams',  level:'Advanced',     credits:10,sessions:20,owing:0  },
-  {name:'Noah Thompson', level:'Elite',        credits:6, sessions:15,owing:0  },
-  {name:'Sophie Chen',   level:'Beginner',     credits:9, sessions:6, owing:160},
-  {name:'James Wilson',  level:'Intermediate',credits:3, sessions:5, owing:0  },
-  {name:'Mia Davis',     level:'Advanced',     credits:8, sessions:11,owing:0  },
-  {name:'Oliver Brown',  level:'Beginner',     credits:5, sessions:4, owing:40 },
-  {name:'Lily Parker',   level:'Elite',        credits:12,sessions:18,owing:0  },
-  {name:'Ethan Moore',   level:'Intermediate',credits:2, sessions:7, owing:0  },
-];
-const TERMS=[
-  {name:'Term 1',start:'2026-01-28',end:'2026-04-03',weeks:10},
-  {name:'Term 2',start:'2026-04-20',end:'2026-06-26',weeks:10},
-  {name:'Term 3',start:'2026-07-13',end:'2026-09-18',weeks:10},
-  {name:'Term 4',start:'2026-10-05',end:'2026-12-11',weeks:10},
-];
-const HOLIDAYS=[
-  {name:'Summer Holidays',start:'2025-12-20',end:'2026-01-27'},
-  {name:'Easter Break',   start:'2026-04-04',end:'2026-04-19'},
-  {name:'Winter Holidays',start:'2026-06-27',end:'2026-07-12'},
-  {name:'Spring Break',   start:'2026-09-19',end:'2026-10-04'},
-  {name:'Christmas Break',start:'2026-12-12',end:'2027-01-26'},
-];
-const INVOICES=[
-  {id:'INV-024',student:'Emma Johnson',  amount:400,status:'Paid',   date:'Mar 10',items:'10× Lesson Pack'},
-  {id:'INV-025',student:'Lucas Martinez',amount:80, status:'Pending',date:'Mar 14',items:'2× Lessons'},
-  {id:'INV-026',student:'Sophie Chen',   amount:160,status:'Overdue',date:'Mar 1', items:'4× Lessons'},
-  {id:'INV-027',student:'Ava Williams',  amount:320,status:'Paid',   date:'Mar 12',items:'8× Lesson Pack'},
-  {id:'INV-028',student:'Oliver Brown',  amount:40, status:'Pending',date:'Mar 15',items:'1× Lesson'},
-  {id:'INV-029',student:'Lily Parker',   amount:480,status:'Paid',   date:'Mar 8', items:'12× Lesson Pack'},
-  {id:'INV-030',student:'Noah Thompson', amount:200,status:'Paid',   date:'Mar 5', items:'5× Lesson Pack'},
-];
+const STUDENTS=[];
+const TERMS=[];
+const HOLIDAYS=[];
+const INVOICES=[];
 
 const today=new Date(); today.setHours(0,0,0,0);
-let SESSIONS=[
-  {id:1,student:'Emma Johnson',  level:'Beginner',    time:'09:00',dur:'1 hour',  court:'Court 1',recur:'Weekly',    date:ds(today),       payStatus:'unpaid'},
-  {id:2,student:'Lucas Martinez',level:'Intermediate',time:'10:30',dur:'1 hour',  court:'Court 2',recur:'Weekly',    date:ds(today),       payStatus:'unpaid'},
-  {id:3,student:'Ava Williams',  level:'Advanced',    time:'12:00',dur:'1.5 hrs', court:'Court 1',recur:'Fortnightly',date:ds(today),      payStatus:'paid'},
-  {id:4,student:'Noah Thompson', level:'Elite',       time:'07:30',dur:'1 hour',  court:'Court 3',recur:'Weekly',    date:ds(add(today,1)),payStatus:'unpaid'},
-  {id:5,student:'Sophie Chen',   level:'Beginner',    time:'11:00',dur:'1 hour',  court:'Court 2',recur:'One-time',  date:ds(add(today,2)),payStatus:'unpaid'},
-  {id:6,student:'Lily Parker',   level:'Elite',       time:'08:00',dur:'1.5 hrs', court:'Court 3',recur:'Weekly',    date:ds(add(today,4)),payStatus:'unpaid'},
-];
-let nextId=7;
+let SESSIONS=[];
+let nextId=1;
 
 // ══ HELPERS ══
 function ds(d){return d.toISOString().split('T')[0];}
@@ -706,10 +844,9 @@ function wksLeft(e){return Math.max(0,Math.ceil((new Date(e)-today)/(7*24*3600*1
 // ══ TABS ══
 function switchTab(tab,btn){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('[data-t]').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+tab).classList.add('active');
-  if(btn) btn.classList.add('active');
-  else document.querySelector(`[data-t="${tab}"]`).classList.add('active');
+  document.querySelectorAll(`[data-t="${tab}"]`).forEach(t=>t.classList.add('active'));
   if(tab==='students') renderStudents();
   if(tab==='payments') renderPayments();
   if(tab==='radar')    loadWeather();
@@ -835,9 +972,8 @@ function renderLLSlots(){
 // ══ SCHEDULE ══
 let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,sentLinks=new Set();
 
-function renderSchedule(){
-  document.getElementById('monthLabel').textContent=MN[sel.getMonth()]+' '+sel.getFullYear();
-  const strip=document.getElementById('dstrip'); strip.innerHTML='';
+function buildDstrip(container){
+  container.innerHTML='';
   for(let i=0;i<7;i++){
     const d=add(ws,i),dstr=ds(d);
     const isSel=dstr===ds(sel),isT=dstr===ds(today),hol=getHol(d);
@@ -847,29 +983,46 @@ function renderSchedule(){
     cell.onclick=()=>selectDay(d);
     const dots=dc.slice(0,3).map(()=>`<div class="sdot"></div>`).join('');
     cell.innerHTML=`<div class="dc-n">${DW[i]}</div><div class="dc-d">${d.getDate()}</div><div class="dot-row">${dots}</div>`;
-    strip.appendChild(cell);
+    container.appendChild(cell);
   }
+}
+function renderSchedule(){
+  document.getElementById('monthLabel').textContent=MN[sel.getMonth()]+' '+sel.getFullYear();
+  buildDstrip(document.getElementById('dstrip'));
   const dstr=ds(sel),daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
   const term=getTerm(sel),hol=getHol(sel);
-  let html='';
+  let termBannerHTML='';
   if(term){
-    html+=`<div class="term-banner" onclick="openTermModal()"><div class="tb-left"><span>📆</span><div><div class="tb-name">${term.name}</div><div class="tb-dates">${fmtD(term.start)} – ${fmtD(term.end)}</div></div></div><div class="tb-wks">${wksLeft(term.end)}w left ›</div></div>`;
+    termBannerHTML=`<div class="term-banner" onclick="openTermModal()"><div class="tb-left"><span>📆</span><div><div class="tb-name">${term.name}</div><div class="tb-dates">${fmtD(term.start)} – ${fmtD(term.end)}</div></div></div><div class="tb-wks">${wksLeft(term.end)}w left ›</div></div>`;
   } else {
-    html+=`<div class="term-banner hol" onclick="openTermModal()"><div class="tb-left"><span>🏖</span><div><div class="tb-name" style="color:var(--warn)">School Holidays</div><div class="tb-dates">No term active</div></div></div><div class="tb-wks" style="color:var(--warn)">View ›</div></div>`;
+    termBannerHTML=`<div class="term-banner hol" onclick="openTermModal()"><div class="tb-left"><span>🏖</span><div><div class="tb-name" style="color:var(--warn)">School Holidays</div><div class="tb-dates">No term active</div></div></div><div class="tb-wks" style="color:var(--warn)">View ›</div></div>`;
   }
-  html+=`<div class="day-card"><div><div class="day-full">${DF[sel.getDay()]}</div><div class="day-date">${MN[sel.getMonth()]} ${sel.getDate()}, ${sel.getFullYear()}</div><div class="day-cnt">${daySess.length} lesson${daySess.length!==1?'s':''} scheduled</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:7px"><div class="day-badge"><div class="db-n">${DS_[sel.getDay()]}</div><div class="db-d">${sel.getDate()}</div></div><button class="s-book-btn" onclick="openBookModal()">+ Book</button></div></div>`;
-  if(hol) html+=`<div class="hol-notice">🏖 ${hol.name}</div>`;
+  const dayCardHTML=`<div class="day-card"><div><div class="day-full">${DF[sel.getDay()]}</div><div class="day-date">${MN[sel.getMonth()]} ${sel.getDate()}, ${sel.getFullYear()}</div><div class="day-cnt">${daySess.length} lesson${daySess.length!==1?'s':''} scheduled</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:7px"><div class="day-badge"><div class="db-n">${DS_[sel.getDay()]}</div><div class="db-d">${sel.getDate()}</div></div><button class="s-book-btn" onclick="openBookModal()">+ Book</button></div></div>`;
+  let sessHTML='';
+  if(hol) sessHTML+=`<div class="hol-notice">🏖 ${hol.name}</div>`;
   if(!daySess.length){
-    html+=`<div class="empty"><div class="empty-icon">🎾</div><div class="empty-t">No lessons today</div><div class="empty-s">Tap + to book a session</div></div>`;
+    sessHTML+=`<div class="empty"><div class="empty-icon">🎾</div><div class="empty-t">No lessons today</div><div class="empty-s">Tap + to book a session</div></div>`;
   } else {
     daySess.forEach(s=>{
       const stu=STUDENTS.find(st=>st.name===s.student);
       const credits=stu?stu.credits:0;
       const bar=credits>0?`<div class="sess-bar"><div class="sess-bar-f" style="width:${Math.min((credits/12)*100,100)}%"></div></div><div class="cred-lbl">${credits} credits remaining</div>`:'';
-      html+=`<div class="sess-card"><div class="sess-top"><div><div class="sess-name">${s.student}</div><div class="sess-tags"><span class="stag">${s.level}</span><span class="stag">${s.recur}</span><span class="stag">${s.court}</span></div></div><button class="cx" onclick="openCancelDialog(event,${s.id})">✕</button></div><div class="sess-det"><span>⏰</span>${fmt(s.time)} – ${et(s.time,s.dur)}</div><div class="sess-det"><span>⏱</span>${s.dur}</div>${bar}</div>`;
+      sessHTML+=`<div class="sess-card"><div class="sess-top"><div><div class="sess-name">${s.student}</div><div class="sess-tags"><span class="stag">${s.level}</span><span class="stag">${s.recur}</span><span class="stag">${s.court}</span></div></div><button class="cx" onclick="openCancelDialog(event,${s.id})">✕</button></div><div class="sess-det"><span>⏰</span>${fmt(s.time)} – ${et(s.time,s.dur)}</div><div class="sess-det"><span>⏱</span>${s.dur}</div>${bar}</div>`;
     });
   }
-  document.getElementById('sBody').innerHTML=html;
+  const isDesk=window.innerWidth>=1024;
+  if(isDesk){
+    document.getElementById('sBody').style.display='none';
+    const split=document.getElementById('sSchedSplit');
+    split.style.display='flex'; split.style.flex='1'; split.style.overflow='hidden'; split.style.minHeight='0';
+    document.getElementById('sSchedLeft').innerHTML=`<div class="mnav"><button class="narr" onclick="changeWeek(-1)">‹</button><div class="mlbl">${MN[sel.getMonth()]+' '+sel.getFullYear()}</div><button class="narr" onclick="changeWeek(1)">›</button></div><div class="dstrip" id="dstrip2"></div>${termBannerHTML}${dayCardHTML}`;
+    buildDstrip(document.getElementById('dstrip2'));
+    document.getElementById('sSchedRight').innerHTML=sessHTML;
+  } else {
+    document.getElementById('sBody').style.display='';
+    document.getElementById('sSchedSplit').style.display='none';
+    document.getElementById('sBody').innerHTML=termBannerHTML+dayCardHTML+sessHTML;
+  }
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
 function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
@@ -895,8 +1048,8 @@ function checkOverlap(){
 
 function openBookModal(){
   document.getElementById('stuIn').value='';
-  document.getElementById('lvlSel').value='Beginner';
   document.getElementById('startTime').value='09:00';
+  updateAmPmBtn();
   document.getElementById('courtIn').value='';
   document.getElementById('notesIn').value='';
   document.querySelectorAll('#durPills .pill').forEach((p,i)=>p.classList.toggle('active',i===1));
@@ -920,7 +1073,7 @@ function filterAC(val){
   }).join('');
   list.classList.add('open');acIdx=-1;
 }
-function pickStu(name,level){document.getElementById('stuIn').value=name;document.getElementById('lvlSel').value=level;document.getElementById('acList').classList.remove('open');checkOverlap();}
+function pickStu(name,level){document.getElementById('stuIn').value=name;document.getElementById('acList').classList.remove('open');checkOverlap();}
 function acKey(e){
   const list=document.getElementById('acList'),items=list.querySelectorAll('.ac-item');
   if(!list.classList.contains('open')) return;
@@ -942,7 +1095,7 @@ function bookLesson(){
   if(!name){document.getElementById('stuIn').classList.add('err');setTimeout(()=>document.getElementById('stuIn').classList.remove('err'),1500);return;}
   const time=document.getElementById('startTime').value;
   const court=document.getElementById('courtIn').value.trim()||'Court 1';
-  SESSIONS.push({id:nextId++,student:name,level:document.getElementById('lvlSel').value,time,dur:selDur,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  SESSIONS.push({id:nextId++,student:name,level:'',time,dur:selDur,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
   closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
 }
 
@@ -980,8 +1133,15 @@ function openStuDetail(name){
   document.getElementById('detSub').textContent=`${s.level} · ${s.sessions} sessions total`;
   document.getElementById('detBody').innerHTML=`<div class="det-stats"><div class="det-stat"><div class="det-stat-n">${s.credits}</div><div class="det-stat-l">Credits</div></div><div class="det-stat"><div class="det-stat-n">${s.sessions}</div><div class="det-stat-l">Sessions</div></div><div class="det-stat"><div class="det-stat-n" style="color:${s.owing>0?'#B05050':'var(--ok)'}">$${s.owing}</div><div class="det-stat-l">Owing</div></div></div><div class="sec-lbl">Upcoming Lessons</div>${up.length?up.map(se=>`<div class="up-l"><div class="ul-t">${fmt(se.time)}</div><div><div class="ul-d">${fmtD(se.date)}</div><div class="ul-c">${se.court} · ${se.dur}</div></div></div>`).join(''):`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No upcoming lessons</div>`}<button class="u-inv-btn" onclick="toast('Invoice sent to ${s.name}! 💸')">Send Invoice →</button>`;
   document.getElementById('stuDetail').classList.add('open');
+  const right=document.getElementById('dsk-stu-right');
+  if(right) right.classList.add('has-detail');
+  if(window.innerWidth>=1024) document.getElementById('stuDetail').scrollTop=0;
 }
-function closeStuDetail(){document.getElementById('stuDetail').classList.remove('open');}
+function closeStuDetail(){
+  document.getElementById('stuDetail').classList.remove('open');
+  const right=document.getElementById('dsk-stu-right');
+  if(right) right.classList.remove('has-detail');
+}
 
 // ══ PAYMENTS ══
 let invFilter='All';
@@ -991,6 +1151,23 @@ function renderPayments(){
   const pc=INVOICES.filter(i=>i.status==='Paid').length;
   document.getElementById('pStats').innerHTML=`<div class="hst"><div class="hst-n">$${paid}</div><div class="hst-l">Collected</div></div><div class="hst"><div class="hst-n">$${pend}</div><div class="hst-l">Pending</div></div><div class="hst"><div class="hst-n">${pc}</div><div class="hst-l">Paid</div></div>`;
   renderInvList();
+  const el=document.getElementById('dsk-pay-stats');
+  if(el&&window.innerWidth>=1024){
+    el.innerHTML=`
+      <div style="font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Summary</div>
+      <div style="background:var(--ok-lt);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--ok)">$${paid}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--ok);margin-top:3px">Collected</div>
+      </div>
+      <div style="background:var(--warn-lt);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--warn)">$${pend}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--warn);margin-top:3px">Pending / Overdue</div>
+      </div>
+      <div style="background:var(--p-pl);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--p-dk)">${pc} / ${INVOICES.length}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--p-dk);margin-top:3px">Invoices Paid</div>
+      </div>`;
+  }
 }
 function renderInvList(){
   const list=invFilter==='All'?INVOICES:INVOICES.filter(i=>i.status===invFilter);
@@ -1060,32 +1237,25 @@ async function loadWeather(){
       hourlyHTML+=`<div class="hr-item${isRainHr?' rain-hr':''}"><div class="hr-time">${i%12||12}${i>=12?'pm':'am'}</div><div class="hr-icon">${wxIcon(hc)}</div><div class="hr-temp">${ht}°</div><div class="hr-rain">${hr}%</div></div>`;
     }
 
-    document.getElementById('rBody').innerHTML=`
-      <div class="court-cond ${condClass}">
-        <div class="cc-icon">${condClass==='good'?'🎾':condClass==='warn'?'⚠️':'🌧'}</div>
-        <div class="cc-text"><div class="cc-title">${condTitle}</div><div class="cc-sub">${condSub}</div></div>
-        ${condClass==='bad'?`<button class="cc-cancel-btn" onclick="toast('All today\\'s lessons cancelled — students notified!')">Cancel all</button>`:''}
-      </div>
-      <div class="wx-main">
-        <div class="wx-main-top">
-          <div style="font-size:52px">${icon}</div>
-          <div><div class="wx-big-temp">${temp}°</div><div class="wx-big-feels">Feels like ${feels}°</div></div>
-        </div>
-        <div class="wx-big-desc">${desc}</div>
-        <div class="wx-grid">
-          <div class="wx-stat"><div class="wx-stat-n">${rainPct}%</div><div class="wx-stat-l">Rain chance</div></div>
-          <div class="wx-stat"><div class="wx-stat-n">${wind}</div><div class="wx-stat-l">km/h wind</div></div>
-          <div class="wx-stat"><div class="wx-stat-n">${cur.relative_humidity_2m}%</div><div class="wx-stat-l">Humidity</div></div>
-        </div>
-      </div>
-      <div style="font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Hourly Forecast</div>
-      <div class="hourly-scroll">${hourlyHTML}</div>
-      <div class="radar-map-wrap">
-        <div class="radar-map-label">BOM Rain Radar — Sydney <span>Live</span></div>
-        <iframe class="radar-iframe" src="https://www.rainviewer.com/map.html?loc=-33.8688,151.2093,9&oFa=0&oC=1&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=3&o=83&lm=1&layer=radar&sm=1&sn=1" allowfullscreen></iframe>
-        <div class="radar-note">🌧 Live radar via RainViewer · Tap map to interact</div>
-      </div>
-    `;
+    const courtCondHTML=`<div class="court-cond ${condClass}"><div class="cc-icon">${condClass==='good'?'🎾':condClass==='warn'?'⚠️':'🌧'}</div><div class="cc-text"><div class="cc-title">${condTitle}</div><div class="cc-sub">${condSub}</div></div>${condClass==='bad'?`<button class="cc-cancel-btn" onclick="toast('All today\\'s lessons cancelled — students notified!')">Cancel all</button>`:''}</div>`;
+    const wxMainHTML=`<div class="wx-main"><div class="wx-main-top"><div style="font-size:52px">${icon}</div><div><div class="wx-big-temp">${temp}°</div><div class="wx-big-feels">Feels like ${feels}°</div></div></div><div class="wx-big-desc">${desc}</div><div class="wx-grid"><div class="wx-stat"><div class="wx-stat-n">${rainPct}%</div><div class="wx-stat-l">Rain chance</div></div><div class="wx-stat"><div class="wx-stat-n">${wind}</div><div class="wx-stat-l">km/h wind</div></div><div class="wx-stat"><div class="wx-stat-n">${cur.relative_humidity_2m}%</div><div class="wx-stat-l">Humidity</div></div></div></div>`;
+    const hourlyWrapHTML=`<div style="font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Hourly Forecast</div><div class="hourly-scroll">${hourlyHTML}</div>`;
+    const radarMapHTML=`<div class="radar-map-wrap"><div class="radar-map-label">BOM Rain Radar — Sydney <span>Live</span></div><iframe class="radar-iframe" src="https://www.rainviewer.com/map.html?loc=-33.8688,151.2093,9&oFa=0&oC=1&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=3&o=83&lm=1&layer=radar&sm=1&sn=1" allowfullscreen></iframe><div class="radar-note">🌧 Live radar via RainViewer · Tap map to interact</div></div>`;
+
+    const isDesk=window.innerWidth>=1024;
+    if(isDesk){
+      document.getElementById('rBody').style.display='none';
+      const split=document.getElementById('dsk-radar-split');
+      split.style.display='flex';
+      document.getElementById('dsk-radar-left').innerHTML=courtCondHTML+wxMainHTML+hourlyWrapHTML;
+      document.getElementById('dsk-radar-right').innerHTML=radarMapHTML;
+    } else {
+      document.getElementById('rBody').style.display='';
+      document.getElementById('dsk-radar-split').style.display='none';
+      document.getElementById('rBody').innerHTML=courtCondHTML+wxMainHTML+hourlyWrapHTML+radarMapHTML;
+    }
+    // Populate Today weather sidebar
+    renderDskWxPanel(icon,temp,feels,desc,rainPct,wind,condClass);
     wxLoaded=true;
   } catch(err){
     document.getElementById('rBody').innerHTML=`<div class="wx-loading"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;color:var(--soft)">Weather data unavailable.<br>Check your connection and try refreshing.</div></div>`;
@@ -1093,6 +1263,28 @@ async function loadWeather(){
     document.getElementById('wxDesc').textContent='Tap Radar tab for weather';
     wxLoaded=false;
   }
+}
+
+function renderDskWxPanel(icon,temp,feels,desc,rain,wind,condClass){
+  const el=document.getElementById('dsk-wx-panel');
+  if(!el) return;
+  const condColors={good:'var(--ok)',warn:'var(--warn)',bad:'var(--err)'};
+  const condLabels={good:'Good to play',warn:'Might be wet',bad:'Rain likely'};
+  el.innerHTML=`
+    <div style="text-align:center;padding:20px 0 10px">
+      <div style="font-size:52px">${icon}</div>
+      <div style="font-size:36px;font-weight:900;color:var(--text);line-height:1">${temp}°</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px">Feels like ${feels}°</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-top:8px">${desc}</div>
+    </div>
+    <div style="background:var(--off);border-radius:12px;padding:12px;margin:10px 0;display:flex;justify-content:space-between">
+      <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:var(--r-dk)">${rain}%</div><div style="font-size:10px;color:var(--soft);font-weight:600">Rain</div></div>
+      <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:var(--r-dk)">${wind}</div><div style="font-size:10px;color:var(--soft);font-weight:600">km/h</div></div>
+    </div>
+    <div style="background:var(--r-pl);border-radius:12px;padding:10px 14px;text-align:center;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:${condColors[condClass]}">${condLabels[condClass]}</div>
+    </div>
+    <button onclick="switchTab('radar',document.querySelector('[data-t=radar]'))" style="width:100%;padding:10px;border-radius:100px;background:var(--r-pl);color:var(--r-dk);border:none;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">View Radar →</button>`;
 }
 
 function wxIcon(code){
@@ -1118,6 +1310,22 @@ function wxDesc(code){
   if(code<=84) return 'Rain showers';
   if(code<=99) return 'Thunderstorm';
   return 'Mixed conditions';
+}
+
+// ══ AM/PM TOGGLE ══
+function updateAmPmBtn(){
+  const val=document.getElementById('startTime').value;
+  if(!val) return;
+  const h=parseInt(val.split(':')[0],10);
+  document.getElementById('ampmBtn').textContent=h<12?'AM':'PM';
+}
+function toggleAmPm(){
+  const inp=document.getElementById('startTime');
+  const [h,m]=inp.value.split(':').map(Number);
+  const newH=h<12?h+12:h-12;
+  inp.value=`${newH.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  updateAmPmBtn();
+  checkOverlap();
 }
 
 // ══ TOAST ══
