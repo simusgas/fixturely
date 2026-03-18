@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Fixturely</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -14,7 +14,7 @@
     --soft:      #7A6840;
     --muted:     #BBA87A;
     --border:    #EEE8DC;
-    --nav-h:     70px;
+    --nav-h:     calc(70px + env(safe-area-inset-bottom));
     /* Schedule — amber */
     --s-a:#F5A623; --s-b:#FDC75A; --s-c:#FDE68A; --s-pl:#FEF0C7; --s-dk:#D4880F;
     /* Today — warm coral */
@@ -39,7 +39,7 @@
   .screen.active{display:block;}
 
   /* ── NAV ── */
-  .bnav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,0.06);z-index:90;border-radius:20px 20px 0 0;}
+  .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,0.06);z-index:90;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom);}
   .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:6px 2px;position:relative;}
   .ntab .ni{font-size:20px;transition:transform 0.2s;}
   .ntab .nl{font-size:10px;font-weight:700;color:var(--muted);transition:color 0.2s;}
