@@ -29,6 +29,8 @@
     --ok:#3D8B5E; --ok-lt:#E6F5EE;
     --warn:#C47A1E; --warn-lt:#FEF3DC;
     --err:#B85450; --err-lt:#FDECEA;
+    /* Courts — forest green */
+    --c-a:#4A7C59; --c-b:#6B9E7A; --c-c:#96C4A4; --c-pl:#E4F2E8; --c-dk:#2E5C3A;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;background:#EDE4D4;font-family:'Nunito',sans-serif;color:var(--text);overflow:hidden;}
@@ -53,7 +55,9 @@
   .ntab[data-t="students"]::after{background:var(--u-a);}
   .ntab[data-t="payments"]::after{background:var(--p-a);}
   .ntab[data-t="radar"]::after   {background:var(--r-a);}
+  .ntab[data-t="courts"]::after  {background:var(--c-a);}
   .ntab.active::after{transform:scaleX(1);}
+  .ntab[data-t="courts"].active .nl{color:var(--c-dk);}
 
   /* ── SHARED HEADER BITS ── */
   .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
@@ -423,6 +427,41 @@
   .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(28,20,7,0.9);color:var(--white);padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;z-index:500;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
   .toast.show{transform:translateX(-50%) translateY(0);}
 
+  /* ══════════════════════
+     COURTS
+  ══════════════════════ */
+  .c-hdr{background:linear-gradient(155deg,var(--c-a) 0%,var(--c-b) 55%,var(--c-c) 100%);padding:52px 20px 16px;flex-shrink:0;}
+  .c-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+  .c-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
+  .c-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
+  .c-date-nav{display:flex;align-items:center;gap:10px;}
+  .c-date-arr{background:rgba(255,255,255,0.25);border:none;color:var(--white);width:32px;height:32px;border-radius:50%;font-size:20px;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background 0.2s;}
+  .c-date-arr:hover{background:rgba(255,255,255,0.4);}
+  .c-date-lbl{font-size:14px;font-weight:800;color:var(--white);min-width:120px;text-align:center;}
+  .c-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .c-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);}
+  .c-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .courts-outer{flex:1;min-height:0;overflow:auto;}
+  .cg-wrap{display:flex;flex-direction:column;width:100%;}
+  .cg-header{position:sticky;top:0;z-index:20;display:flex;width:100%;background:white;border-bottom:2px solid var(--border);}
+  .cg-corner{width:52px;flex-shrink:0;position:sticky;left:0;z-index:21;background:white;}
+  .cg-court-hd{flex:1;text-align:center;font-size:14px;font-weight:900;color:var(--text);padding:12px 4px;border-left:1px solid var(--border);}
+  .cg-body{display:flex;width:100%;}
+  .cg-times{width:52px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
+  .cg-time{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:6px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:3px;}
+  .cg-courts{display:flex;flex:1;}
+  .cg-court{position:relative;flex:1;border-right:1px solid var(--border);}
+  .cg-sess{position:absolute;left:2px;right:2px;border-radius:4px;overflow:hidden;padding:2px 4px;pointer-events:none;}
+  .cg-sess-name{font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.18s;}
+  .cg-slot-free:hover{background:rgba(0,0,0,0.045);}
+  .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:9px;font-weight:700;color:var(--soft);position:absolute;top:4px;left:5px;pointer-events:none;}
+  .cg-slot-free:hover .cg-slot-time{opacity:1;}
+  .cg-req-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:4px 10px;border-radius:100px;border:none;background:var(--c-a);color:#fff;font-size:10px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
+  .cg-slot-free:hover .cg-req-btn{opacity:1;pointer-events:auto;}
+  #screen-courts{display:none;}
+  #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
+
   /* ── Desktop-only elements: hidden on mobile ── */
   .topnav { display:none; }
   /* Two-col wrappers transparent on mobile */
@@ -468,13 +507,14 @@
     .tnav-btn[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
     .tnav-btn[data-t="payments"].active { background:var(--p-pl); color:var(--p-dk); }
     .tnav-btn[data-t="radar"].active    { background:var(--r-pl); color:var(--r-dk); }
+    .tnav-btn[data-t="courts"].active  { background:var(--c-pl); color:var(--c-dk); }
 
     /* ── Screens ── */
     .screen        { display:none; flex-direction:column; flex:1; overflow:hidden; padding-bottom:0; min-height:0; }
     .screen.active { display:flex; }
 
     /* ── Compact section headers ── */
-    .t-hdr,.s-hdr,.u-hdr,.p-hdr,.r-hdr {
+    .t-hdr,.s-hdr,.u-hdr,.p-hdr,.r-hdr,.c-hdr {
       padding:16px 28px; border-radius:0; flex-shrink:0;
     }
     .t-hdr-top,.s-hdr-top,.u-hdr-top,.p-hdr-top,.r-hdr-top { margin-bottom:0; }
@@ -569,6 +609,7 @@
       <button class="tnav-btn"        data-t="students" onclick="switchTab('students',this)">👤 Students</button>
       <button class="tnav-btn"        data-t="payments" onclick="switchTab('payments',this)">💳 Payments</button>
       <button class="tnav-btn"        data-t="radar"    onclick="switchTab('radar',this)">🌧 Radar</button>
+      <button class="tnav-btn"        data-t="courts"   onclick="switchTab('courts',this)">🎾 Courts</button>
     </nav>
   </header>
 
@@ -713,6 +754,33 @@
     </div>
   </div>
 
+  <!-- ══ COURTS ══ -->
+  <div class="screen" id="screen-courts">
+    <div class="c-hdr">
+      <div class="c-hdr-top">
+        <div><div class="c-title">🎾 Courts</div><div class="c-sub">Claremont Lawn Tennis Club</div></div>
+        <button class="hdr-btn" style="color:var(--c-dk)" onclick="courtsDate=ds(today);renderCourtsDateLbl();loadCourts()">Today</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+        <div class="c-date-nav">
+          <button class="c-date-arr" onclick="changeCourtsDate(-1)">‹</button>
+          <div class="c-date-lbl" id="courtsDateLbl"></div>
+          <button class="c-date-arr" onclick="changeCourtsDate(1)">›</button>
+        </div>
+        <div class="c-legend">
+          <div class="c-leg-item"><div class="c-leg-dot" style="background:#fcfabd"></div>Booking</div>
+          <div class="c-leg-item"><div class="c-leg-dot" style="background:#e1e2ff"></div>Coaching</div>
+          <div class="c-leg-item"><div class="c-leg-dot" style="background:#fdd4ff"></div>League</div>
+          <div class="c-leg-item"><div class="c-leg-dot" style="background:#cdfdff"></div>Events</div>
+          <div class="c-leg-item"><div class="c-leg-dot" style="background:#d1d1d1"></div>Closed</div>
+        </div>
+      </div>
+    </div>
+    <div class="courts-outer" id="cBody">
+      <div style="text-align:center;padding:60px 20px;color:var(--muted)">Select the Courts tab to load availability</div>
+    </div>
+  </div>
+
   <!-- ══ BOTTOM NAV ══ -->
   <nav class="bnav">
     <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni">☀️</span><span class="nl">Today</span></button>
@@ -720,6 +788,7 @@
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni">👤</span><span class="nl">Students</span></button>
     <button class="ntab"        data-t="payments" onclick="switchTab('payments',this)"> <span class="ni">💳</span><span class="nl">Payments</span></button>
     <button class="ntab"        data-t="radar"    onclick="switchTab('radar',this)">    <span class="ni">🌧</span><span class="nl">Radar</span></button>
+    <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni">🎾</span><span class="nl">Courts</span></button>
   </nav>
 </div>
 
@@ -851,6 +920,7 @@ function switchTab(tab,btn){
   if(tab==='payments') renderPayments();
   if(tab==='radar')    loadWeather();
   if(tab==='today')    renderToday();
+  if(tab==='courts')   loadCourts();
 }
 
 // ══ TODAY ══
@@ -1328,6 +1398,102 @@ function toggleAmPm(){
   checkOverlap();
 }
 
+// ══ COURTS ══
+let courtsDate = ds(today);
+
+function renderCourtsDateLbl() {
+  const d = new Date(courtsDate + 'T00:00:00');
+  document.getElementById('courtsDateLbl').textContent =
+    `${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+}
+function changeCourtsDate(n) {
+  const d = new Date(courtsDate + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  courtsDate = ds(d);
+  renderCourtsDateLbl();
+  loadCourts();
+}
+function minsToTimeLbl(m) {
+  if (m % 60 !== 0) return '';
+  const h = Math.floor(m / 60) % 24;
+  return h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h-12}pm`;
+}
+function sessColor(s) { return s.Colour || ({1000:'#fcfabd',2000:'#e1e2ff',3000:'#fdd4ff',4000:'#cdfdff',8000:'#d1d1d1'}[s.Category] || '#e8e8e8'); }
+function sessTextCol(hex) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return (r*299+g*587+b*114)/1000 > 160 ? '#1C1407' : '#fff';
+}
+async function loadCourts() {
+  const body = document.getElementById('cBody');
+  body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><div class="wx-loading-icon">⏳</div><div style="margin-top:8px;font-size:13px">Loading court availability…</div></div>';
+  try {
+    const res = await fetch(`/api/courts?date=${courtsDate}`);
+    const data = await res.json();
+    const SLOT_H = 60;
+    const GRID_S = data.EarliestStartTime || 360;
+    const GRID_E = data.LatestEndTime || 1350;
+    const resources = (data.Resources || [])
+      .filter(r => { const n = parseInt(r.Name.replace(/\D/g,'')); return n >= 13 && n <= 18; })
+      .sort((a,b) => (parseInt(a.Name.replace(/\D/g,''))||0) - (parseInt(b.Name.replace(/\D/g,''))||0));
+    const slots = [];
+    for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
+    const totalH = slots.length * SLOT_H;
+    const slotFmt = m => { const h=Math.floor(m/60)%24,mn=m%60; return `${h%12||12}:${mn.toString().padStart(2,'0')}${h>=12?'pm':'am'}`; };
+
+    let html = `<div class="cg-wrap"><div class="cg-header">
+      <div class="cg-corner"></div>
+      ${resources.map(r=>`<div class="cg-court-hd">${r.Name}</div>`).join('')}
+    </div><div class="cg-body">
+      <div class="cg-times">
+        ${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}
+        <div style="height:calc(var(--nav-h,70px) + 8px)"></div>
+      </div>
+      <div class="cg-courts">`;
+
+    resources.forEach(r => {
+      const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []);
+      const busy = sessions.filter(s => s.Category !== 0);
+
+      // Grid lines (background)
+      const lines = slots.map((m,i) =>
+        `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#f0ede6'}"></div>`
+      ).join('');
+
+      // Free-slot hover cells (only for slots not covered by a booked session)
+      const freeCells = slots.map((m,i) => {
+        const isBusy = busy.some(s => s.StartTime < m+30 && s.EndTime > m);
+        if (isBusy) return '';
+        return `<div class="cg-slot-free" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}',${m},'${courtsDate}')">Request</button></div>`;
+      }).join('');
+
+      // Session blocks (on top, pointer-events:none so hover passes through to free cells)
+      const blocks = sessions.map(s => {
+        if (s.Category === 0) return '';
+        const color = sessColor(s);
+        const top = Math.max(0, (s.StartTime - GRID_S) / 30 * SLOT_H);
+        const h = Math.max((s.EndTime - s.StartTime) / 30 * SLOT_H - 2, 14);
+        const label = (s.Name && !s.Name.includes('-')) ? s.Name : (s.Category === 8000 ? 'Closed' : '');
+        const tc = sessTextCol(color);
+        return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div></div>`;
+      }).join('');
+
+      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}</div>`;
+    });
+
+    html += `</div></div></div>`;
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;font-weight:700">Could not load court data</div></div>`;
+  }
+}
+function requestCourtSlot(court, startMins, date) {
+  const h = Math.floor(startMins/60)%24, mn = startMins%60;
+  const endMins = startMins + 30;
+  const eh = Math.floor(endMins/60)%24, emn = endMins%60;
+  const fmt12 = (hh,mm) => `${hh%12||12}:${mm.toString().padStart(2,'0')}${hh>=12?'pm':'am'}`;
+  toast(`📋 Request sent — ${court}, ${fmt12(h,mn)}–${fmt12(eh,emn)} on ${date}`);
+}
+
 // ══ TOAST ══
 function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
@@ -1335,6 +1501,7 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
 renderToday();
 renderSchedule();
 loadWeather();
+renderCourtsDateLbl();
 </script>
 </body>
 </html>
