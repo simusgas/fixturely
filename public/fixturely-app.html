@@ -104,6 +104,18 @@
   .td-lc-meta{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .td-lc-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:800;background:var(--t-pl);color:var(--t-dk);white-space:nowrap;}
 
+  /* Booking link card */
+  .td-booking-link{background:var(--s-pl);border:1.5px solid var(--s-b);border-radius:16px;padding:14px 16px;margin-bottom:16px;}
+  .td-bl-header{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:900;color:var(--s-dk);margin-bottom:4px;}
+  .td-bl-desc{font-size:12px;color:var(--soft);font-weight:600;margin-bottom:10px;}
+  .td-bl-url-row{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:10px;padding:8px 10px;border:1px solid var(--border);}
+  .td-bl-url{flex:1;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .td-bl-copy,.td-bl-share{border:none;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all 0.15s;}
+  .td-bl-copy{background:var(--s-a);color:var(--white);}
+  .td-bl-copy:hover{background:var(--s-dk);}
+  .td-bl-share{background:var(--white);color:var(--s-dk);border:1.5px solid var(--s-a);}
+  .td-bl-share:hover{background:var(--s-pl);}
+
   /* Onboarding checklist */
   .td-onboard{background:var(--card);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1.5px solid var(--border);}
   .td-onboard-title{font-size:16px;font-weight:900;color:var(--text);margin-bottom:4px;}
@@ -527,6 +539,8 @@
     .sb-item[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
     .sb-item[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
     .sb-item[data-t="courts"].active   { background:var(--c-pl); color:var(--c-dk); }
+    .sb-share-item { color:var(--s-dk) !important; }
+    .sb-share-item:hover { background:var(--s-pl) !important; }
 
     /* ── Main column (right of sidebar) ── */
     .main-col { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; min-width:0; }
@@ -631,6 +645,8 @@
       <button class="sb-item"        data-t="schedule" onclick="switchTab('schedule',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></span><span>Schedule</span></button>
       <button class="sb-item"        data-t="students" onclick="switchTab('students',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Students</span></button>
       <button class="sb-item"        data-t="courts"   onclick="switchTab('courts',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>Courts</span></button>
+      <div style="border-top:1px solid var(--border);margin:8px 10px;"></div>
+      <button class="sb-item sb-share-item" onclick="shareCalendar()"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span>Share Schedule</span></button>
     </nav>
   </aside>
   <div class="main-col">
@@ -661,7 +677,7 @@
       </div>
       <div class="s-hdr-acts">
         <button class="hdr-btn s-add-btn" onclick="openBookModal()">+ Add Lesson</button>
-        <button class="hdr-btn s-hdr-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button>
+        <button class="hdr-btn s-add-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button>
         <button class="hdr-btn s-hdr-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button>
         <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
       </div>
@@ -1004,7 +1020,7 @@ function updateTopbar(tab){
   if(tab==='today'){
     actsEl.innerHTML=``;
   } else if(tab==='schedule'){
-    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button><button class="tb-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button><button class="tb-btn" onclick="goToday()">Today</button>`;
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn tb-btn-primary tb-has-tip" onclick="shareCalendar()">📤 Share Schedule<span class="tb-tip">Share your schedule link with students</span></button><button class="tb-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button><button class="tb-btn" onclick="goToday()">Today</button>`;
   } else if(tab==='students'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
   } else if(tab==='courts'){
@@ -1051,26 +1067,41 @@ function renderToday(){
   let html='';
 
   // Onboarding check
-  const hasCourts=true; // courts are external
   const hasStudents=STUDENTS.length>0;
   const hasLessons=SESSIONS.length>0;
-  const onboardComplete=hasStudents&&hasLessons;
+  const hasShared=localStorage.getItem('fixturely_shared')==='1';
+  const onboardComplete=hasStudents&&hasLessons&&hasShared;
   if(onboardComplete&&!onboardDismissed){onboardDismissed=true;localStorage.setItem('fixturely_onboard_done','1');}
   if(!onboardComplete&&!onboardDismissed){
     const steps=[
-      {done:true, title:'Add your courts', sub:'Set up where you teach', action:"switchTab('courts',document.querySelector('[data-t=courts]'))"},
       {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
-      {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"}
+      {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"},
+      {done:hasShared, title:'Share your schedule', sub:'Send your booking link to students', action:'', isShare:true}
     ];
     const doneCount=steps.filter(s=>s.done).length;
+    const bookingUrl='fixturely.app/coach/yourname';
     html+=`<div class="td-onboard">
       <div class="td-onboard-title">Welcome to Fixturely!</div>
       <div class="td-onboard-sub">Let's get you set up — ${doneCount} of ${steps.length} complete</div>
       <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
-      ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
-        <div class="td-onboard-check">${s.done?'✓':''}</div>
-        <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
-      </div>`).join('')}
+      ${steps.map(s=>{
+        if(s.isShare&&!s.done&&hasStudents&&hasLessons){
+          return `<div class="td-onboard-step" style="flex-direction:column;align-items:stretch;gap:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="td-onboard-check"></div>
+              <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
+            </div>
+            <div style="background:var(--off);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--border)">
+              <span style="flex:1;font-size:13px;font-weight:700;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${bookingUrl}</span>
+              <button onclick="copyBookingLink();markShared()" style="background:var(--s-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap">Copy Link</button>
+            </div>
+          </div>`;
+        }
+        return `<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
+          <div class="td-onboard-check">${s.done?'✓':''}</div>
+          <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
+        </div>`;
+      }).join('')}
     </div>`;
   }
 
@@ -1096,6 +1127,20 @@ function renderToday(){
     <button class="td-qa-btn" onclick="openBookModal()">+ Add Lesson</button>
     <button class="td-qa-btn" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>
     <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
+  </div>`;
+
+  // Booking link card
+  html+=`<div class="td-booking-link">
+    <div class="td-bl-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <span>Your Booking Link</span>
+    </div>
+    <div class="td-bl-desc">Students use this link to see your availability and book lessons</div>
+    <div class="td-bl-url-row">
+      <div class="td-bl-url">${BOOKING_URL.replace('https://','')}</div>
+      <button class="td-bl-copy" onclick="copyBookingLink()">Copy</button>
+      <button class="td-bl-share" onclick="shareCalendar()">Share</button>
+    </div>
   </div>`;
 
   // Next up highlight
@@ -1179,10 +1224,23 @@ function getAvailableSlots(dstr){
   return slots;
 }
 
+const BOOKING_URL='https://fixturely.app/coach/yourname';
 function shareCalendar(){
-  const url='https://fixturely.app/cal/coach-alex';
-  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('📤 Calendar link copied to clipboard!'));}
-  else{toast('📤 Share: fixturely.app/cal/coach-alex');}
+  if(navigator.share){
+    navigator.share({title:'Book a lesson with me',text:'See my availability and book a tennis lesson',url:BOOKING_URL}).catch(()=>{});
+    markShared();
+  } else {
+    copyBookingLink();
+    markShared();
+  }
+}
+function copyBookingLink(){
+  if(navigator.clipboard){navigator.clipboard.writeText(BOOKING_URL).then(()=>toast('📤 Booking link copied to clipboard!'));}
+  else{toast('📤 Share: fixturely.app/coach/yourname');}
+}
+function markShared(){
+  localStorage.setItem('fixturely_shared','1');
+  renderToday();
 }
 
 function showStudentView(isPreview){
