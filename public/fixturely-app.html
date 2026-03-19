@@ -37,19 +37,21 @@
   /* ── NAV ── */
   .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,0.06);z-index:90;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom);}
   .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:6px 2px;position:relative;}
-  .ntab .ni{font-size:20px;transition:transform 0.2s;}
+  .ntab .ni{font-size:20px;transition:transform 0.2s;display:flex;align-items:center;justify-content:center;}
+  .ntab .ni svg{width:22px;height:22px;color:var(--muted);}
+  .ntab.active .ni svg{color:inherit;}
   .ntab .nl{font-size:10px;font-weight:700;color:var(--muted);transition:color 0.2s;}
   .ntab.active .ni{transform:scale(1.15);}
-  .ntab[data-t="today"].active   .nl{color:var(--t-dk);}
-  .ntab[data-t="schedule"].active .nl{color:var(--s-dk);}
-  .ntab[data-t="students"].active .nl{color:var(--u-dk);}
+  .ntab[data-t="today"].active   .nl,.ntab[data-t="today"].active .ni svg{color:var(--t-dk);}
+  .ntab[data-t="schedule"].active .nl,.ntab[data-t="schedule"].active .ni svg{color:var(--s-dk);}
+  .ntab[data-t="students"].active .nl,.ntab[data-t="students"].active .ni svg{color:var(--u-dk);}
   .ntab::after{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;border-radius:0 0 4px 4px;transform:scaleX(0);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
   .ntab[data-t="today"]::after   {background:var(--t-a);}
   .ntab[data-t="schedule"]::after{background:var(--s-a);}
   .ntab[data-t="students"]::after{background:var(--u-a);}
   .ntab[data-t="courts"]::after  {background:var(--c-a);}
   .ntab.active::after{transform:scaleX(1);}
-  .ntab[data-t="courts"].active .nl{color:var(--c-dk);}
+  .ntab[data-t="courts"].active .nl,.ntab[data-t="courts"].active .ni svg{color:var(--c-dk);}
 
   /* ── SHARED HEADER BITS ── */
   .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
@@ -72,7 +74,51 @@
   .t-body{padding:16px;}
   .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
 
-  /* Today lesson card */
+  /* Today dashboard */
+  .td-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+  .td-stat{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .td-stat-n{font-size:22px;font-weight:900;color:var(--t-dk);}
+  .td-stat-l{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+  .td-week-snap{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .td-week-title{font-size:12px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .td-week-row{display:flex;justify-content:space-between;}
+  .td-week-item{text-align:center;flex:1;}
+  .td-week-n{font-size:17px;font-weight:900;color:var(--text);}
+  .td-week-l{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px;}
+  .td-next-up{background:var(--card);border-radius:18px;padding:16px;margin-bottom:16px;border-left:5px solid var(--t-a);box-shadow:0 2px 10px rgba(0,0,0,0.06);cursor:pointer;transition:transform 0.15s;}
+  .td-next-up:hover{transform:translateY(-2px);}
+  .td-next-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t-dk);margin-bottom:8px;}
+  .td-next-name{font-size:18px;font-weight:900;color:var(--text);}
+  .td-next-detail{font-size:13px;font-weight:600;color:var(--soft);margin-top:4px;}
+  .td-next-countdown{font-size:12px;font-weight:800;margin-top:8px;background:var(--t-pl);color:var(--t-dk);display:inline-block;padding:4px 12px;border-radius:100px;}
+  .td-section-lbl{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin:16px 0 10px;}
+  .td-quick-actions{display:flex;gap:8px;margin-bottom:16px;}
+  .td-qa-btn{flex:1;padding:12px 8px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);text-align:center;transition:all 0.15s;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+  .td-qa-btn:hover{background:var(--t-pl);border-color:var(--t-a);color:var(--t-dk);}
+  .td-lesson-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid var(--t-a);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform 0.15s;}
+  .td-lesson-card:hover{transform:translateY(-2px);}
+  .td-lesson-card.paid{border-left-color:var(--ok);}
+  .td-lc-time{font-size:13px;font-weight:900;color:var(--t-dk);white-space:nowrap;min-width:70px;}
+  .td-lc-info{flex:1;min-width:0;}
+  .td-lc-name{font-size:15px;font-weight:900;color:var(--text);}
+  .td-lc-meta{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .td-lc-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:800;background:var(--t-pl);color:var(--t-dk);white-space:nowrap;}
+
+  /* Onboarding checklist */
+  .td-onboard{background:var(--card);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1.5px solid var(--border);}
+  .td-onboard-title{font-size:16px;font-weight:900;color:var(--text);margin-bottom:4px;}
+  .td-onboard-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:14px;}
+  .td-onboard-progress{height:6px;background:var(--border);border-radius:100px;margin-bottom:16px;overflow:hidden;}
+  .td-onboard-bar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--t-a),var(--s-a));transition:width 0.4s;}
+  .td-onboard-step{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;cursor:pointer;transition:background 0.15s;border:1.5px solid var(--border);}
+  .td-onboard-step:hover{background:var(--off);}
+  .td-onboard-step.done{opacity:0.5;border-color:var(--ok);background:var(--ok-lt);}
+  .td-onboard-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--white);background:var(--white);}
+  .td-onboard-step.done .td-onboard-check{background:var(--ok);border-color:var(--ok);}
+  .td-onboard-step-title{font-size:14px;font-weight:800;color:var(--text);}
+  .td-onboard-step-sub{font-size:12px;color:var(--muted);font-weight:600;}
+
+  /* Today lesson card (legacy) */
   .tl-card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border-left:4px solid var(--t-a);transition:all 0.3s;}
   .tl-card:hover{transform:translateY(-1px);}
   .tl-card.paid{border-left-color:var(--ok);background:#F6FEF9;}
@@ -134,41 +180,15 @@
   /* ══════════════════════
      SCHEDULE
   ══════════════════════ */
-  .s-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
-  .s-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .s-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 14px;border-radius:0 0 28px 28px;}
+  .s-hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
   .s-title{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
   .s-sub{font-size:13px;font-weight:700;color:var(--s-dk);margin-top:2px;}
   .s-hdr-btn{color:var(--s-dk);}
-  .mnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-  .mlbl{font-size:15px;font-weight:800;color:var(--text);}
-  .narr{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text);padding:4px 8px;font-weight:700;}
-  .term-banner{background:var(--s-pl);border:1.5px solid var(--s-a);border-radius:14px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.2s;}
-  .term-banner:hover{background:#FEE9A0;}
-  .term-banner.hol{background:var(--warn-lt);border-color:#E8C070;}
-  .tb-left{display:flex;align-items:center;gap:8px;}
-  .tb-name{font-size:13px;font-weight:800;color:var(--text);}
-  .tb-dates{font-size:11px;color:var(--soft);font-weight:600;}
-  .tb-wks{font-size:12px;font-weight:800;color:var(--s-dk);}
-  .dstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-  .dcell{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:12px;cursor:pointer;transition:background 0.2s;}
-  .dcell:hover{background:rgba(255,255,255,0.35);}
-  .dcell.sel{background:var(--white);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-  .dc-n{font-size:10px;font-weight:700;color:rgba(28,20,7,0.55);margin-bottom:4px;text-transform:uppercase;}
-  .dc-d{font-size:17px;font-weight:900;color:var(--text);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
-  .dcell.sel .dc-d{background:var(--s-dk);color:var(--white);}
-  .dcell.tod .dc-d{background:var(--s-dk);color:var(--white);}
-  .dcell.hol .dc-d{background:var(--warn);color:var(--white);}
-  .dot-row{display:flex;gap:2px;margin-top:4px;height:6px;align-items:center;justify-content:center;}
-  .sdot{width:5px;height:5px;border-radius:50%;background:var(--s-dk);}
+  .s-add-btn{background:var(--white)!important;color:var(--s-dk)!important;box-shadow:0 2px 8px rgba(0,0,0,0.12);}
+  .s-add-btn:hover{background:var(--s-pl)!important;}
+  .s-hdr-acts{display:flex;gap:6px;flex-wrap:nowrap;}
   .s-body{padding:16px;}
-  .day-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
-  .day-full{font-size:17px;font-weight:900;}
-  .day-date{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px;}
-  .day-cnt{font-size:13px;color:var(--s-dk);font-weight:700;margin-top:5px;}
-  .day-badge{width:42px;height:42px;border-radius:50%;background:var(--s-a);color:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;line-height:1;}
-  .db-n{font-size:9px;text-transform:uppercase;} .db-d{font-size:17px;}
-  .s-book-btn{background:var(--s-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;transition:background 0.2s;}
-  .s-book-btn:hover{background:var(--s-dk);}
   .hol-notice{background:var(--warn-lt);border:1px solid #E8C070;border-radius:10px;padding:9px 13px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--warn);display:flex;align-items:center;gap:8px;}
   .sess-card{background:var(--card);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid var(--s-a);transition:transform 0.2s;}
   .sess-card:hover{transform:translateY(-2px);}
@@ -186,11 +206,9 @@
   .empty-icon{font-size:36px;margin-bottom:10px;}
   .empty-t{font-size:15px;font-weight:700;color:var(--soft);margin-bottom:5px;}
   .empty-s{font-size:13px;color:var(--muted);font-weight:500;}
-  .fab{position:fixed;bottom:calc(var(--nav-h)+14px);right:calc(50% - 210px + 16px);width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;font-size:24px;cursor:pointer;box-shadow:0 5px 18px rgba(212,136,15,0.45);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:50;}
-  .fab:hover{transform:scale(1.08);}
 
   /* ── Schedule calendar views (day + week) ── */
-  .sv-toggle{display:flex;background:rgba(255,255,255,0.22);border-radius:100px;padding:3px;margin-top:10px;}
+  .sv-toggle{display:flex;background:rgba(255,255,255,0.22);border-radius:100px;padding:3px;width:110px;flex-shrink:0;}
   .sv-tog-btn{flex:1;padding:6px 0;border-radius:100px;border:none;background:none;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:rgba(28,20,7,0.5);transition:all 0.2s;}
   .sv-tog-btn.active{background:var(--white);color:var(--s-dk);box-shadow:0 2px 6px rgba(0,0,0,0.12);}
   /* Day view */
@@ -198,6 +216,10 @@
   .sv-day-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
   .sv-day-ttl{font-size:15px;font-weight:900;color:var(--text);}
   .sv-day-cnt{font-size:12px;font-weight:700;color:var(--s-dk);}
+  .sv-nav-arr{background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:700;transition:background 0.15s;flex-shrink:0;}
+  .sv-nav-arr:hover{background:var(--s-pl);border-color:var(--s-a);color:var(--s-dk);}
+  .sv-week-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px;}
+  .sv-week-lbl{font-size:14px;font-weight:900;color:var(--text);}
   .sv-grid{display:flex;padding:0 8px 0 0;}
   .sv-times{width:52px;flex-shrink:0;}
   .sv-time-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:8px;display:flex;align-items:flex-start;line-height:1;}
@@ -213,6 +235,12 @@
   .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
   .sv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:3;pointer-events:none;}
   .sv-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
+  .sv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;}
+  .sv-empty-icon{font-size:48px;}
+  .sv-empty-t{font-size:17px;font-weight:900;color:var(--soft);}
+  .sv-empty-s{font-size:13px;font-weight:600;color:var(--muted);text-align:center;}
+  .sv-empty-btn{background:var(--s-a);color:var(--white);border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;box-shadow:0 4px 14px rgba(245,166,35,0.3);transition:background 0.15s;}
+  .sv-empty-btn:hover{background:var(--s-dk);}
   /* Week view */
   .wv-wrap{padding-bottom:10px;}
   .wv-header{display:flex;background:var(--white);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:10;}
@@ -232,11 +260,22 @@
   .wv-half-bg{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.5);}
   .wv-free-slot{position:absolute;left:0;right:0;z-index:1;cursor:pointer;transition:background 0.18s;}
   .wv-free-slot:hover{background:rgba(0,0,0,0.04);}
-  .wv-sess{position:absolute;left:1px;right:1px;border-radius:3px;padding:1px 3px;overflow:hidden;cursor:pointer;background:var(--s-pl);border-left:2px solid var(--s-a);transition:opacity 0.15s;}
+  .wv-sess{position:absolute;left:2px;right:2px;border-radius:6px;padding:3px 5px;overflow:hidden;cursor:pointer;background:var(--s-pl);border-left:3px solid var(--s-a);transition:all 0.15s;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:2;}
   .wv-sess.wv-paid{background:var(--ok-lt);border-left-color:var(--ok);}
-  .wv-sess:hover{opacity:0.75;}
+  .wv-sess.wv-court-2{background:#FEF0EB;border-left-color:#E8724A;}
+  .wv-sess.wv-court-3{background:#F5EDE0;border-left-color:#A68B5B;}
+  .wv-sess.wv-court-4{background:#FEF3DC;border-left-color:#C47A1E;}
+  .wv-sess:hover{transform:scale(1.03);box-shadow:0 3px 10px rgba(0,0,0,0.12);z-index:3;}
   .wv-sess-name{font-size:9px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .wv-sess-time{font-size:8px;font-weight:700;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1px;}
+  .wv-sess-court{font-size:7px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
+  /* Week view tooltip */
+  .wv-sess .wv-tooltip{display:none;position:absolute;left:50%;top:100%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,0.2);pointer-events:none;margin-top:4px;}
+  .wv-sess:hover .wv-tooltip{display:block;}
   .wv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
+  .wv-now-dot{width:8px;height:8px;border-radius:50%;background:var(--t-a);position:absolute;left:-4px;top:-3px;}
+  .wv-col.wv-col-today{background:rgba(232,114,74,0.04);}
+  .wv-alt-row{position:absolute;left:0;right:0;background:rgba(0,0,0,0.015);pointer-events:none;}
 
   /* ══════════════════════
      STUDENTS
@@ -263,7 +302,7 @@
   .cbarf{height:100%;border-radius:100px;background:var(--u-a);}
   .stu-detail{position:absolute;inset:0;background:var(--off);z-index:60;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.77,0,0.18,1);overflow-y:auto;padding-bottom:80px;}
   .stu-detail.open{transform:translateX(0);}
-  .det-hdr{background:linear-gradient(155deg,var(--u-a) 0%,var(--u-b) 100%);padding:52px 20px 24px;border-radius:0 0 28px 28px;}
+  .det-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 24px;border-radius:0 0 28px 28px;}
   .det-back{background:rgba(255,255,255,0.25);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
   .det-av{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--white);margin-bottom:12px;}
   .det-name{font-size:22px;font-weight:900;color:var(--white);}
@@ -289,32 +328,64 @@
   /* ══════════════════════
      LIVE LINK PAGE
   ══════════════════════ */
-  .live-link-page{display:none;position:fixed;inset:0;background:var(--off);z-index:200;overflow-y:auto;}
-  .live-link-page.show{display:block;}
-  .ll-hdr{background:linear-gradient(155deg,var(--s-a),var(--s-b));padding:48px 24px 28px;text-align:center;}
-  .ll-logo{font-size:14px;font-weight:900;color:rgba(255,255,255,0.7);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
-  .ll-coach{font-size:28px;font-weight:900;color:var(--white);}
-  .ll-sport{font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-top:4px;}
-  .ll-body{padding:20px;}
-  .ll-date-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;}
-  .ll-date-strip::-webkit-scrollbar{display:none;}
-  .ll-day{display:flex;flex-direction:column;align-items:center;padding:10px 12px;border-radius:14px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);min-width:52px;transition:all 0.2s;flex-shrink:0;}
-  .ll-day.active{background:var(--s-a);border-color:var(--s-a);}
-  .ll-day-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
-  .ll-day-num{font-size:18px;font-weight:900;color:var(--text);}
-  .ll-day.active .ll-day-name{color:rgba(255,255,255,0.8);}
-  .ll-day.active .ll-day-num{color:var(--white);}
-  .ll-slots-label{font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
-  .ll-slot{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
-  .ll-slot.avail{border-left:4px solid var(--ok);}
-  .ll-slot.taken{border-left:4px solid var(--border);opacity:0.6;}
-  .ll-slot-time{font-size:15px;font-weight:800;color:var(--text);}
-  .ll-slot-status{font-size:12px;font-weight:700;}
-  .ll-slot.avail .ll-slot-status{color:var(--ok);}
-  .ll-slot.taken .ll-slot-status{color:var(--muted);}
-  .ll-req-btn{background:var(--ok-lt);color:var(--ok);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.2s;}
-  .ll-req-btn:hover{background:#C8EDDA;}
-  .ll-back{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);border:none;color:var(--white);padding:8px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:16px;}
+  /* ══════════════════════
+     STUDENT CALENDAR PAGE
+  ══════════════════════ */
+  .sc-page{display:none;position:fixed;inset:0;background:var(--off);z-index:200;overflow-y:auto;}
+  .sc-page.show{display:block;}
+  /* Preview banner (coach only) */
+  .sc-preview-bar{background:var(--text);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:10;gap:10px;}
+  .sc-preview-bar span{opacity:0.85;}
+  .sc-preview-exit{background:rgba(255,255,255,0.15);border:none;color:var(--white);padding:6px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:background 0.15s;}
+  .sc-preview-exit:hover{background:rgba(255,255,255,0.25);}
+  /* Header */
+  .sc-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:28px 20px 24px;text-align:center;position:relative;}
+  .sc-back{position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.2);border:none;color:var(--white);padding:7px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .sc-hdr-icon{font-size:28px;margin-bottom:6px;}
+  .sc-coach-name{font-size:22px;font-weight:900;color:var(--white);letter-spacing:-0.3px;}
+  .sc-sport{font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);margin-top:3px;}
+  /* Body */
+  .sc-body{padding:20px 16px;max-width:480px;margin:0 auto;}
+  .sc-section-lbl{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+  /* Day strip */
+  .sc-day-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;-webkit-overflow-scrolling:touch;}
+  .sc-day-strip::-webkit-scrollbar{display:none;}
+  .sc-day{display:flex;flex-direction:column;align-items:center;padding:10px 11px;border-radius:14px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);min-width:52px;transition:all 0.2s;flex-shrink:0;position:relative;}
+  .sc-day.has-slots{border-color:var(--s-b);}
+  .sc-day.active{background:var(--s-a);border-color:var(--s-a);}
+  .sc-day.empty{opacity:0.38;cursor:default;pointer-events:none;}
+  .sc-day-name{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .sc-day-num{font-size:18px;font-weight:900;color:var(--text);}
+  .sc-day.has-slots .sc-day-name{color:var(--s-dk);}
+  .sc-day.active .sc-day-name,.sc-day.active .sc-day-num{color:var(--white);}
+  .sc-day-dot{width:5px;height:5px;border-radius:50%;background:var(--s-a);position:absolute;bottom:5px;}
+  .sc-day.active .sc-day-dot{background:rgba(255,255,255,0.7);}
+  /* Slot cards */
+  .sc-slot-card{background:var(--card);border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border);gap:12px;}
+  .sc-slot-info{flex:1;min-width:0;}
+  .sc-slot-time{font-size:16px;font-weight:900;color:var(--text);}
+  .sc-slot-meta{font-size:12px;font-weight:700;color:var(--soft);margin-top:3px;}
+  .sc-slot-type{font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;}
+  .sc-req-btn{background:var(--s-a);color:var(--white);border:none;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;white-space:nowrap;box-shadow:0 2px 8px rgba(245,166,35,0.3);flex-shrink:0;}
+  .sc-req-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,0.45);}
+  /* Empty state */
+  .sc-empty{text-align:center;padding:48px 20px 60px;color:var(--muted);}
+  .sc-empty-icon{font-size:42px;margin-bottom:12px;}
+  .sc-empty-t{font-size:16px;font-weight:800;color:var(--soft);margin-bottom:6px;}
+  .sc-empty-s{font-size:14px;font-weight:600;line-height:1.5;}
+  /* Request modal inside sc-page */
+  .sc-req-ovl{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.38);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
+  .sc-req-ovl.open{display:flex;}
+  .sc-req-modal{background:var(--white);border-radius:28px 28px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(40px);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+  .sc-req-ovl.open .sc-req-modal{transform:translateY(0);}
+  .sc-req-for{font-size:13px;font-weight:800;color:var(--soft);margin:-4px 0 16px;}
+  /* Confirmation screen */
+  .sc-confirm{display:none;text-align:center;padding:20px 10px 10px;}
+  .sc-confirm.show{display:block;}
+  .sc-confirm-icon{font-size:52px;margin-bottom:12px;}
+  .sc-confirm-t{font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;}
+  .sc-confirm-s{font-size:14px;font-weight:600;color:var(--soft);line-height:1.6;margin-bottom:24px;}
+  .sc-confirm-done{width:100%;padding:14px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
 
   /* ══════════════════════
      MODALS / OVERLAYS
@@ -415,63 +486,84 @@
 
   /* ── Desktop-only elements: hidden on mobile ── */
   .topnav { display:none; }
+  .sidebar { display:none; }
+  .main-col { display:contents; }
   /* Two-col wrappers transparent on mobile */
   .dsk-split { display:contents; }
-  /* Mobile defaults for desktop-split elements */
-  #sSchedSplit   { display:none; }
   /* Desktop-only panels hidden on mobile */
   #dsk-stu-placeholder { display:none; }
 
   @media (min-width:1024px) {
     html,body { overflow:hidden; }
 
-    /* ── Shell ── */
-    .phone { max-width:100%; height:100vh; flex-direction:column; overflow:hidden; }
+    /* ── Shell: sidebar layout ── */
+    .phone { max-width:100%; height:100vh; flex-direction:row; overflow:hidden; }
     .bnav  { display:none !important; }
 
-    /* FAB repositioned */
-    .fab { position:fixed; bottom:24px; right:24px; }
-
-    /* ── Top nav ── */
-    .topnav {
-      display:flex; align-items:center; height:60px; flex-shrink:0;
-      background:var(--white); border-bottom:1px solid var(--border);
-      padding:0 24px; gap:8px; z-index:90;
+    /* ── Sidebar ── */
+    .sidebar {
+      display:flex; flex-direction:column;
+      width:220px; flex-shrink:0;
+      background:var(--white); border-right:1px solid var(--border);
+      padding:0; overflow:hidden;
     }
-    .topnav-logo {
-      font-size:16px; font-weight:900; color:var(--text);
-      display:flex; align-items:center; gap:8px; margin-right:16px; white-space:nowrap;
+    .sb-logo {
+      display:flex; align-items:center; gap:9px;
+      padding:20px 20px 16px; font-size:16px; font-weight:900; color:var(--text);
+      border-bottom:1px solid var(--border); white-space:nowrap;
     }
-    .topnav-tabs { display:flex; gap:4px; flex:1; }
-    .tnav-btn {
-      display:flex; align-items:center; gap:7px;
-      padding:8px 14px; border:none; background:none; border-radius:10px;
+    .sb-nav { display:flex; flex-direction:column; padding:10px 10px; gap:2px; }
+    .sb-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border:none; background:none; border-radius:10px;
       cursor:pointer; font-family:'Nunito',sans-serif; font-size:14px;
       font-weight:700; color:var(--soft); transition:background 0.15s,color 0.15s;
-      white-space:nowrap;
+      text-align:left; width:100%;
     }
-    .tnav-btn:hover { background:var(--off); }
-    .tnav-btn[data-t="today"].active    { background:var(--t-pl); color:var(--t-dk); }
-    .tnav-btn[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
-    .tnav-btn[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
-    .tnav-btn[data-t="courts"].active  { background:var(--c-pl); color:var(--c-dk); }
+    .sb-icon { font-size:18px; width:24px; text-align:center; display:flex;align-items:center;justify-content:center; }
+    .sb-icon svg { width:20px;height:20px; }
+    .sb-item:hover { background:var(--off); }
+    .sb-item[data-t="today"].active    { background:var(--t-pl); color:var(--t-dk); }
+    .sb-item[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
+    .sb-item[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
+    .sb-item[data-t="courts"].active   { background:var(--c-pl); color:var(--c-dk); }
+
+    /* ── Main column (right of sidebar) ── */
+    .main-col { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; min-width:0; }
+
+    /* ── Top bar (page title + actions) ── */
+    .topnav {
+      display:flex; align-items:center; justify-content:space-between;
+      height:56px; flex-shrink:0;
+      background:var(--white); border-bottom:1px solid var(--border);
+      padding:0 24px; gap:12px; z-index:89;
+    }
+    .topnav-title {
+      font-size:18px; font-weight:900; color:var(--text); white-space:nowrap;
+    }
+    .topnav-acts { display:flex; align-items:center; gap:8px; }
+    .tb-btn {
+      display:flex; align-items:center; gap:5px;
+      padding:7px 14px; border-radius:100px; border:1.5px solid var(--border);
+      background:var(--white); font-size:13px; font-weight:800;
+      cursor:pointer; font-family:'Nunito',sans-serif; color:var(--soft);
+      transition:background 0.15s, border-color 0.15s; white-space:nowrap;
+    }
+    .tb-btn:hover { background:var(--off); border-color:var(--muted); }
+    .tb-btn-primary { background:var(--s-a); color:var(--white); border-color:var(--s-a); }
+    .tb-btn-primary:hover { background:var(--s-dk); border-color:var(--s-dk); }
+    /* Toggle in topbar */
+    .topnav-acts .sv-toggle { background:var(--off); border:1.5px solid var(--border); margin:0; }
+    .topnav-acts .sv-tog-btn { color:var(--soft); padding:5px 14px; }
+    .topnav-acts .sv-tog-btn.active { background:var(--white); color:var(--s-dk); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
 
     /* ── Screens ── */
     .screen        { display:none; flex-direction:column; flex:1; overflow:hidden; padding-bottom:0; min-height:0; }
     .screen.active { display:flex; }
 
-    /* ── Compact section headers ── */
-    .t-hdr,.s-hdr,.u-hdr,.c-hdr {
-      padding:16px 28px; border-radius:0; flex-shrink:0;
-    }
-    .t-hdr-top,.s-hdr-top,.u-hdr-top { margin-bottom:0; }
-    .t-title,.s-title,.u-title { font-size:22px; }
-    .s-hdr .mnav,.s-hdr .dstrip { display:none; }
+    /* ── Hide colored mobile headers on desktop ── */
+    .t-hdr,.s-hdr,.u-hdr,.c-hdr { display:none; }
     .hdr-stats { display:none; }
-    /* Toggle visible on desktop — compact inline style */
-    .s-hdr .sv-toggle { display:flex; max-width:180px; margin-top:10px; background:rgba(0,0,0,0.08); }
-    .s-hdr .sv-tog-btn { color:rgba(28,20,7,0.55); }
-    .s-hdr .sv-tog-btn.active { background:var(--white); color:var(--s-dk); }
 
     /* ── Two-col split wrapper ── */
     .dsk-split { display:flex; flex:1; overflow:hidden; min-height:0; }
@@ -481,18 +573,11 @@
       border-left:1px solid var(--border); background:var(--off);
       overflow-y:auto; padding:20px;
     }
-    .dsk-left-col {
-      width:340px; min-width:280px; flex-shrink:0;
-      border-right:1px solid var(--border); background:var(--off);
-      overflow-y:auto; padding:20px;
-    }
-
     /* ── TODAY ── */
     .t-body { flex:1; overflow-y:auto; padding:20px 24px; }
 
     /* ── SCHEDULE ── */
-    .s-body { display:none; }
-    #sSchedRight { flex:1; overflow:auto; padding:0; }
+    .s-body { flex:1; overflow-y:auto; }
 
     /* ── STUDENTS ── */
     #screen-students .dsk-split {
@@ -522,25 +607,37 @@
     #dsk-stu-right.has-detail #dsk-stu-placeholder { display:none; }
     #dsk-stu-right { position:relative; overflow:hidden; }
 
-
     /* ── Modals — centered ── */
     .overlay { align-items:center; }
     .modal   { border-radius:24px; max-width:520px; max-height:85vh; }
     .modal-handle { display:none; }
   }
+
+  /* ── Tooltips ── */
+  .tb-has-tip{position:relative;}
+  .tb-tip{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap;z-index:50;margin-top:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;}
+  .tb-has-tip:hover .tb-tip{display:block;}
+  .s-hdr-acts .hdr-btn{position:relative;}
 </style>
 </head>
 <body>
 <div class="phone">
 
-  <header class="topnav">
-    <div class="topnav-logo"><span>🎾</span><strong>Fixturely</strong></div>
-    <nav class="topnav-tabs">
-      <button class="tnav-btn active" data-t="today"    onclick="switchTab('today',this)">☀️ Today</button>
-      <button class="tnav-btn"        data-t="schedule" onclick="switchTab('schedule',this)">📅 Schedule</button>
-      <button class="tnav-btn"        data-t="students" onclick="switchTab('students',this)">👤 Students</button>
-      <button class="tnav-btn"        data-t="courts"   onclick="switchTab('courts',this)">🎾 Courts</button>
+  <!-- Sidebar: desktop nav (hidden on mobile) -->
+  <aside class="sidebar">
+    <div class="sb-logo"><span>🎾</span><strong>Fixturely</strong></div>
+    <nav class="sb-nav">
+      <button class="sb-item active" data-t="today"    onclick="switchTab('today',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span>Today</span></button>
+      <button class="sb-item"        data-t="schedule" onclick="switchTab('schedule',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></span><span>Schedule</span></button>
+      <button class="sb-item"        data-t="students" onclick="switchTab('students',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Students</span></button>
+      <button class="sb-item"        data-t="courts"   onclick="switchTab('courts',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>Courts</span></button>
     </nav>
+  </aside>
+  <div class="main-col">
+
+  <header class="topnav">
+    <div class="topnav-title" id="topnavTitle">Today</div>
+    <div class="topnav-acts" id="topnavActs"></div>
   </header>
 
   <!-- ══ TODAY ══ -->
@@ -549,7 +646,6 @@
       <div class="t-hdr-top">
         <div><div class="t-title" id="todayTitle">Today</div><div class="t-sub" id="todaySub"></div></div>
         <div style="display:flex;gap:8px">
-          <button class="hdr-btn t-hdr-btn" onclick="openBookModal()">+ Book Lesson</button>
           <button class="hdr-btn t-hdr-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">📅 Schedule</button>
         </div>
       </div>
@@ -562,28 +658,15 @@
     <div class="s-hdr">
       <div class="s-hdr-top">
         <div><div class="s-title">My Schedule</div><div class="s-sub">Tennis Coach</div></div>
-        <div style="display:flex;gap:8px">
-          <button class="hdr-btn s-hdr-btn" onclick="showLiveLink()">🔗 Live Link</button>
-          <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
-        </div>
       </div>
-      <div class="mnav">
-        <button class="narr" onclick="changeWeek(-1)">‹</button>
-        <div class="mlbl" id="monthLabel"></div>
-        <button class="narr" onclick="changeWeek(1)">›</button>
-      </div>
-      <div class="dstrip" id="dstrip"></div>
-      <div class="sv-toggle">
-        <button class="sv-tog-btn active" id="togDay" onclick="setSchedView('day')">Day</button>
-        <button class="sv-tog-btn" id="togWeek" onclick="setSchedView('week')">Week</button>
+      <div class="s-hdr-acts">
+        <button class="hdr-btn s-add-btn" onclick="openBookModal()">+ Add Lesson</button>
+        <button class="hdr-btn s-hdr-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button>
+        <button class="hdr-btn s-hdr-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button>
+        <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
       </div>
     </div>
     <div class="s-body" id="sBody"></div>
-    <div class="dsk-split" id="sSchedSplit">
-      <div class="dsk-left-col" id="sSchedLeft"></div>
-      <div id="sSchedRight"></div>
-    </div>
-    <button class="fab" onclick="openBookModal()">+</button>
   </div>
 
   <!-- ══ STUDENTS ══ -->
@@ -616,9 +699,9 @@
           <div class="det-body" id="detBody"></div>
         </div>
         <div id="dsk-stu-placeholder">
-          <div style="font-size:48px">👤</div>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <div style="font-size:15px;font-weight:800;color:var(--soft)">Select a student</div>
-          <div style="font-size:13px">Choose a student to see their details.</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.5">Choose a student from the list<br>to see their details</div>
         </div>
       </div>
     </div>
@@ -653,25 +736,66 @@
 
   <!-- ══ BOTTOM NAV ══ -->
   <nav class="bnav">
-    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni">☀️</span><span class="nl">Today</span></button>
-    <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni">📅</span><span class="nl">Schedule</span></button>
-    <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni">👤</span><span class="nl">Students</span></button>
-    <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni">🎾</span><span class="nl">Courts</span></button>
+    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Today</span></button>
+    <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Schedule</span></button>
+    <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="nl">Students</span></button>
+    <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nl">Courts</span></button>
   </nav>
+  </div><!-- /main-col -->
 </div>
 
-<!-- LIVE LINK PAGE -->
-<div class="live-link-page" id="llPage">
-  <div class="ll-hdr">
-    <button class="ll-back" onclick="hideLiveLink()">← Back to app</button>
-    <div class="ll-logo">Fixturely</div>
-    <div class="ll-coach">Coach Alex</div>
-    <div class="ll-sport">Tennis Coach · Sydney</div>
+<!-- STUDENT CALENDAR PAGE -->
+<div class="sc-page" id="scPage">
+  <!-- Preview banner shown to coach only -->
+  <div class="sc-preview-bar" id="scPreviewBar" style="display:none">
+    <span>👁 Preview — this is exactly what your students see</span>
+    <button class="sc-preview-exit" onclick="hideStudentView()">Exit preview</button>
   </div>
-  <div class="ll-body">
-    <div class="ll-date-strip" id="llStrip"></div>
-    <div class="ll-slots-label">Available Times</div>
-    <div id="llSlots"></div>
+  <!-- Header -->
+  <div class="sc-hdr">
+    <button class="sc-back" id="scBackBtn" onclick="hideStudentView()">← Back</button>
+    <div class="sc-hdr-icon">🎾</div>
+    <div class="sc-coach-name">Coach Alex</div>
+    <div class="sc-sport">Tennis Coach · Sydney</div>
+  </div>
+  <!-- Body -->
+  <div class="sc-body">
+    <div class="sc-section-lbl">Choose a day</div>
+    <div class="sc-day-strip" id="scDayStrip"></div>
+    <div class="sc-section-lbl" id="scSlotsLbl" style="display:none">Available times</div>
+    <div id="scSlots"></div>
+  </div>
+  <!-- Slot request modal (lives inside the page so it sits above it) -->
+  <div class="sc-req-ovl" id="scReqOvl" onclick="handleScReqBg(event)">
+    <div class="sc-req-modal" id="scReqModal">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeScReq()">✕</button>
+      <!-- Request form -->
+      <div id="scReqForm">
+        <div class="modal-title" style="color:var(--s-dk)">Request a lesson</div>
+        <div id="scReqForSlot" class="sc-req-for"></div>
+        <div class="field">
+          <label class="field-label">Your Name</label>
+          <input type="text" class="field-input" id="scReqName" placeholder="e.g. Sarah Johnson" />
+        </div>
+        <div class="field">
+          <label class="field-label">Email or Phone</label>
+          <input type="text" class="field-input" id="scReqContact" placeholder="e.g. sarah@email.com or 0400 123 456" />
+        </div>
+        <div class="field">
+          <label class="field-label">Message <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
+          <textarea class="field-input" id="scReqMsg" rows="3" placeholder="e.g. I'm a beginner looking for weekly lessons" style="resize:none;line-height:1.5"></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitScReq()">Send Request ✓</button>
+      </div>
+      <!-- Confirmation screen (hidden until submitted) -->
+      <div class="sc-confirm" id="scConfirm">
+        <div class="sc-confirm-icon">✅</div>
+        <div class="sc-confirm-t">Request sent!</div>
+        <div class="sc-confirm-s">Coach Alex will get back to you shortly to confirm your booking.</div>
+        <button class="sc-confirm-done" onclick="closeScReq()">Done</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -834,7 +958,7 @@ let SESSIONS=[];
 let nextId=1;
 
 // ══ HELPERS ══
-function ds(d){return d.toISOString().split('T')[0];}
+function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2);}
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -865,59 +989,151 @@ function switchTab(tab,btn){
   document.querySelectorAll('[data-t]').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+tab).classList.add('active');
   document.querySelectorAll(`[data-t="${tab}"]`).forEach(t=>t.classList.add('active'));
+  updateTopbar(tab);
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
   if(tab==='courts')   loadCourts();
 }
 
+function updateTopbar(tab){
+  const titleEl=document.getElementById('topnavTitle');
+  const actsEl=document.getElementById('topnavActs');
+  if(!titleEl||!actsEl) return;
+  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts'};
+  titleEl.textContent=titles[tab]||tab;
+  if(tab==='today'){
+    actsEl.innerHTML=``;
+  } else if(tab==='schedule'){
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button><button class="tb-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button><button class="tb-btn" onclick="goToday()">Today</button>`;
+  } else if(tab==='students'){
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
+  } else if(tab==='courts'){
+    actsEl.innerHTML=`<button class="tb-btn" onclick="courtsDate=ds(today);renderCourtsDateLbl();loadCourts()">Today</button>`;
+  } else {
+    actsEl.innerHTML='';
+  }
+}
+
 // ══ TODAY ══
+let onboardDismissed=localStorage.getItem('fixturely_onboard_done')==='1';
+let coachRate=localStorage.getItem('fixturely_hourly_rate')?parseInt(localStorage.getItem('fixturely_hourly_rate')):null;
+function setCoachRate(){
+  const val=prompt('Set your hourly rate ($):','80');
+  if(val&&!isNaN(parseInt(val))){
+    coachRate=parseInt(val);
+    localStorage.setItem('fixturely_hourly_rate',coachRate);
+    renderToday();
+    toast('Rate set to $'+coachRate+'/hr');
+  }
+}
 function renderToday(){
   const dstr=ds(today);
   document.getElementById('todayTitle').textContent=DF[today.getDay()];
   document.getElementById('todaySub').textContent=`${MN[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
   const todaySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
-  let html=`<div class="t-date-label">${todaySess.length} lesson${todaySess.length!==1?'s':''} today</div>`;
-  if(!todaySess.length){
+  const cnt=todaySess.length;
+  const totalMins=todaySess.reduce((a,s)=>a+dm(s.dur),0);
+  const totalHrs=Math.round(totalMins/60*10)/10;
+  const hasRate=coachRate!==null;
+  const earnings=hasRate?Math.round(totalMins/60*coachRate):0;
+
+  // Weekly snapshot
+  const weekS=wkStart(today);
+  let weekLessons=0,weekStudentsSet=new Set(),weekMins=0;
+  for(let i=0;i<7;i++){
+    const wd=ds(add(weekS,i));
+    const wSess=SESSIONS.filter(s=>s.date===wd);
+    weekLessons+=wSess.length;
+    wSess.forEach(s=>{weekStudentsSet.add(s.student);weekMins+=dm(s.dur);});
+  }
+  const weekEarnings=hasRate?Math.round(weekMins/60*coachRate):0;
+
+  let html='';
+
+  // Onboarding check
+  const hasCourts=true; // courts are external
+  const hasStudents=STUDENTS.length>0;
+  const hasLessons=SESSIONS.length>0;
+  const onboardComplete=hasStudents&&hasLessons;
+  if(onboardComplete&&!onboardDismissed){onboardDismissed=true;localStorage.setItem('fixturely_onboard_done','1');}
+  if(!onboardComplete&&!onboardDismissed){
+    const steps=[
+      {done:true, title:'Add your courts', sub:'Set up where you teach', action:"switchTab('courts',document.querySelector('[data-t=courts]'))"},
+      {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
+      {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"}
+    ];
+    const doneCount=steps.filter(s=>s.done).length;
+    html+=`<div class="td-onboard">
+      <div class="td-onboard-title">Welcome to Fixturely!</div>
+      <div class="td-onboard-sub">Let's get you set up — ${doneCount} of ${steps.length} complete</div>
+      <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
+      ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
+        <div class="td-onboard-check">${s.done?'✓':''}</div>
+        <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  // Daily summary
+  html+=`<div class="td-summary">
+    <div class="td-stat"><div class="td-stat-n">${cnt}</div><div class="td-stat-l">Lessons</div></div>
+    <div class="td-stat"><div class="td-stat-n">${totalHrs}h</div><div class="td-stat-l">Coaching</div></div>
+    <div class="td-stat"${!hasRate?' style="cursor:pointer" onclick="setCoachRate()"':''}><div class="td-stat-n">${hasRate?'$'+earnings:'—'}</div><div class="td-stat-l">${hasRate?'Earnings':'<span style="color:var(--t-dk)">Set rate</span>'}</div></div>
+  </div>`;
+
+  // Weekly snapshot
+  html+=`<div class="td-week-snap">
+    <div class="td-week-title">This Week</div>
+    <div class="td-week-row">
+      <div class="td-week-item"><div class="td-week-n">${weekLessons}</div><div class="td-week-l">Lessons</div></div>
+      <div class="td-week-item"><div class="td-week-n">${weekStudentsSet.size}</div><div class="td-week-l">Students</div></div>
+      <div class="td-week-item"><div class="td-week-n">${hasRate?'$'+weekEarnings:'—'}</div><div class="td-week-l">${hasRate?'Revenue':'<span style="cursor:pointer;color:var(--t-dk)" onclick="setCoachRate()">Set rate</span>'}</div></div>
+    </div>
+  </div>`;
+
+  // Quick actions
+  html+=`<div class="td-quick-actions">
+    <button class="td-qa-btn" onclick="openBookModal()">+ Add Lesson</button>
+    <button class="td-qa-btn" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>
+    <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
+  </div>`;
+
+  // Next up highlight
+  if(cnt>0){
+    const now=new Date();
+    const nowM=now.getHours()*60+now.getMinutes();
+    const upcoming=todaySess.filter(s=>t2m(s.time)>nowM);
+    if(upcoming.length>0){
+      const next=upcoming[0];
+      const minsUntil=t2m(next.time)-nowM;
+      const countdown=minsUntil<60?`in ${minsUntil} min${minsUntil!==1?'s':''}`:`in ${Math.floor(minsUntil/60)}h ${minsUntil%60>0?minsUntil%60+'m':''}`;
+      html+=`<div class="td-next-up" onclick="openSessDetail(${next.id})">
+        <div class="td-next-label">Next Up</div>
+        <div class="td-next-name">${next.student}</div>
+        <div class="td-next-detail">${fmt(next.time)} · ${next.court} · ${next.dur}</div>
+        <div class="td-next-countdown">${countdown}</div>
+      </div>`;
+    }
+  }
+
+  // Lesson list or empty state
+  if(cnt===0){
     html+=`<div class="t-empty"><div class="t-empty-icon">🎾</div><div class="t-empty-t">No lessons today</div><div class="t-empty-s">Enjoy your day off!</div></div>`;
   } else {
+    html+=`<div class="td-section-lbl">Today's Lessons</div>`;
     todaySess.forEach(s=>{
-      const isPaid = s.payStatus==='paid';
-      const isNotPaid = s.payStatus==='notpaid';
-      html+=`<div class="tl-card ${isPaid?'paid':isNotPaid?'notpaid':''}" id="tlcard-${s.id}">
-        <div class="tl-top">
-          <div>
-            <div class="tl-name">${s.student}</div>
-            <div class="tl-time">${fmt(s.time)} · ${s.court} · ${s.dur}</div>
-          </div>
-          <button class="tl-edit-btn" onclick="openEditLsnModal(${s.id})" title="Edit lesson">✏️</button>
+      const isPaid=s.payStatus==='paid';
+      html+=`<div class="td-lesson-card${isPaid?' paid':''}" onclick="openSessDetail(${s.id})">
+        <div class="td-lc-time">${fmt(s.time)}</div>
+        <div class="td-lc-info">
+          <div class="td-lc-name">${s.student}</div>
+          <div class="td-lc-meta">${s.court} · ${s.dur}</div>
         </div>
-
-        <!-- Paid / Not Paid toggle — always visible -->
-        <div class="tl-toggle">
-          <button class="tl-tog-btn ${isPaid?'sel-paid':''}" onclick="setPayStatus(${s.id},'paid')">✓ Paid</button>
-          <button class="tl-tog-btn ${isNotPaid?'sel-notpaid':''}" onclick="setPayStatus(${s.id},'notpaid')">Not paid</button>
-        </div>
-
-        <!-- All caught up — shown when paid -->
-        ${isPaid ? `<div class="tl-caught-up"><span>🎉</span> All caught up!</div>` : ''}
-
-        <!-- Actions — only shown when not paid is selected -->
-        ${isNotPaid ? `
-          <div class="tl-notpaid-actions">
-            <button class="tl-act-btn btn-send-inv" onclick="toggleInvPanel(${s.id})">Send Invoice</button>
-            <button class="tl-act-btn btn-remind" onclick="sendRemind(${s.id},'${s.student}')">Remind 💬</button>
-          </div>
-          <div class="inv-panel" id="invpanel-${s.id}">
-            <div class="inv-panel-title">Invoice for ${s.student}</div>
-            <div class="inv-row"><span class="inv-lbl">Lesson</span><span class="inv-val">${fmt(s.time)} · ${s.dur}</span></div>
-            <div class="inv-row"><span class="inv-lbl">Court</span><span class="inv-val">${s.court}</span></div>
-            <div class="inv-row"><span class="inv-lbl">Amount</span><span class="inv-val">$80.00</span></div>
-            <button class="inv-send-btn" onclick="sendInvoice(${s.id},'${s.student}')">Send Invoice Link 📨</button>
-          </div>
-        ` : ''}
+        <div class="td-lc-badge">${s.recur==='One-time'?'Private':'Recurring'}</div>
       </div>`;
     });
   }
+
   document.getElementById('tBody').innerHTML=html;
 }
 
@@ -945,50 +1161,124 @@ function sendRemind(id,name){
   toast(`💬 Reminder sent to ${name}!`);
 }
 
-// ══ LIVE LINK ══
-let llSelDate=new Date(today);
-function showLiveLink(){
-  llSelDate=new Date(today);
-  renderLLStrip();
-  renderLLSlots();
-  document.getElementById('llPage').classList.add('show');
-}
-function hideLiveLink(){document.getElementById('llPage').classList.remove('show');}
-function renderLLStrip(){
-  const strip=document.getElementById('llStrip'); strip.innerHTML='';
-  for(let i=0;i<7;i++){
-    const d=add(today,i), dstr=ds(d);
-    const isSel=dstr===ds(llSelDate);
-    const div=document.createElement('div');
-    div.className='ll-day'+(isSel?' active':'');
-    div.onclick=()=>{llSelDate=new Date(d);renderLLStrip();renderLLSlots();};
-    div.innerHTML=`<div class="ll-day-name">${DS_[d.getDay()]}</div><div class="ll-day-num">${d.getDate()}</div>`;
-    strip.appendChild(div);
-  }
-}
-function renderLLSlots(){
-  const dstr=ds(llSelDate);
+// ══ STUDENT CALENDAR ══
+let scSelDate=new Date(today), scIsPreview=false, scReqSlot='';
+
+function getAvailableSlots(dstr){
   const booked=SESSIONS.filter(s=>s.date===dstr);
   const slots=[];
-  for(let h=7;h<=18;h++){
+  const isToday=dstr===ds(today);
+  const nowM=isToday?(new Date().getHours()*60+new Date().getMinutes()):0;
+  for(let h=7;h<=19;h++){
     const t=`${h.toString().padStart(2,'0')}:00`;
     const tM=t2m(t);
-    const taken=booked.some(s=>{const sS=t2m(s.time),sE=sS+dm(s.dur);return tM>=sS&&tM<sE;});
-    slots.push({time:t,taken});
+    if(isToday&&tM<=nowM) continue; // skip past times for today
+    const taken=booked.some(s=>{const sS=t2m(s.time),sE=sS+dm(s.dur);return tM<sE&&tM+60>sS;});
+    if(!taken) slots.push(t);
   }
-  document.getElementById('llSlots').innerHTML=slots.map(sl=>`
-    <div class="ll-slot ${sl.taken?'taken':'avail'}">
-      <div class="ll-slot-time">${fmt(sl.time)}</div>
-      ${sl.taken
-        ? `<div class="ll-slot-status">Unavailable</div>`
-        : `<div style="display:flex;align-items:center;gap:8px"><div class="ll-slot-status">Available</div><button class="ll-req-btn" onclick="toast('Request sent for ${fmt(sl.time)}! Coach will confirm.')">Request</button></div>`
-      }
+  return slots;
+}
+
+function shareCalendar(){
+  const url='https://fixturely.app/cal/coach-alex';
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('📤 Calendar link copied to clipboard!'));}
+  else{toast('📤 Share: fixturely.app/cal/coach-alex');}
+}
+
+function showStudentView(isPreview){
+  scIsPreview=!!isPreview;
+  // Find first day in next 14 days that has available slots
+  scSelDate=null;
+  for(let i=0;i<14;i++){
+    const d=add(today,i);
+    if(getAvailableSlots(ds(d)).length>0){scSelDate=new Date(d);break;}
+  }
+  if(!scSelDate) scSelDate=new Date(today);
+  document.getElementById('scPreviewBar').style.display=isPreview?'flex':'none';
+  document.getElementById('scBackBtn').style.display=isPreview?'none':'flex';
+  renderStudentStrip();
+  renderStudentSlots();
+  document.getElementById('scPage').classList.add('show');
+}
+
+function hideStudentView(){
+  document.getElementById('scPage').classList.remove('show');
+  closeScReq();
+}
+
+function renderStudentStrip(){
+  const strip=document.getElementById('scDayStrip');
+  strip.innerHTML='';
+  for(let i=0;i<14;i++){
+    const d=add(today,i);
+    const dstr=ds(d);
+    const isSel=dstr===ds(scSelDate);
+    const hasSlots=getAvailableSlots(dstr).length>0;
+    const div=document.createElement('div');
+    div.className='sc-day'+(isSel?' active':'')+(hasSlots?' has-slots':' empty');
+    if(hasSlots){
+      div.onclick=()=>{scSelDate=new Date(d);renderStudentStrip();renderStudentSlots();};
+    }
+    const mn=MS[d.getMonth()];
+    div.innerHTML=`<div class="sc-day-name">${DS_[d.getDay()]}</div><div class="sc-day-num">${d.getDate()}</div>${hasSlots?`<div class="sc-day-dot"></div>`:''}`;
+    strip.appendChild(div);
+    // Scroll active day into view
+    if(isSel) setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}),50);
+  }
+}
+
+function renderStudentSlots(){
+  const dstr=ds(scSelDate);
+  const slots=getAvailableSlots(dstr);
+  const lbl=document.getElementById('scSlotsLbl');
+  const container=document.getElementById('scSlots');
+  if(!slots.length){
+    lbl.style.display='none';
+    container.innerHTML=`<div class="sc-empty"><div class="sc-empty-icon">📅</div><div class="sc-empty-t">No available times</div><div class="sc-empty-s">There are no open slots on this day.<br>Try another day from the strip above.</div></div>`;
+    return;
+  }
+  lbl.style.display='';
+  const d=new Date(dstr+'T00:00:00');
+  const dateStr=`${DF[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]}`;
+  container.innerHTML=slots.map(t=>`
+    <div class="sc-slot-card">
+      <div class="sc-slot-info">
+        <div class="sc-slot-time">${fmt(t)}</div>
+        <div class="sc-slot-meta">1 hour · ${dateStr}</div>
+        <div class="sc-slot-type">Private lesson</div>
+      </div>
+      <button class="sc-req-btn" onclick="openScReq('${t}','${dateStr}')">Request</button>
     </div>
   `).join('');
 }
 
+// ── Slot request modal ──
+function openScReq(time, dateStr){
+  scReqSlot=time;
+  document.getElementById('scReqForm').style.display='';
+  document.getElementById('scConfirm').classList.remove('show');
+  document.getElementById('scReqForSlot').textContent=`${fmt(time)} · ${dateStr}`;
+  document.getElementById('scReqName').value='';
+  document.getElementById('scReqContact').value='';
+  document.getElementById('scReqMsg').value='';
+  document.getElementById('scReqOvl').classList.add('open');
+  setTimeout(()=>document.getElementById('scReqName').focus(),350);
+}
+function closeScReq(){
+  document.getElementById('scReqOvl').classList.remove('open');
+}
+function handleScReqBg(e){if(e.target===document.getElementById('scReqOvl'))closeScReq();}
+function submitScReq(){
+  const name=document.getElementById('scReqName').value.trim();
+  const contact=document.getElementById('scReqContact').value.trim();
+  if(!name){document.getElementById('scReqName').classList.add('err');setTimeout(()=>document.getElementById('scReqName').classList.remove('err'),1500);return;}
+  if(!contact){document.getElementById('scReqContact').classList.add('err');setTimeout(()=>document.getElementById('scReqContact').classList.remove('err'),1500);return;}
+  document.getElementById('scReqForm').style.display='none';
+  document.getElementById('scConfirm').classList.add('show');
+}
+
 // ══ SCHEDULE ══
-let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,schedView='day';
+let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,schedView='week',todayViewDate=new Date(today);
 
 function buildDstrip(container){
   container.innerHTML='';
@@ -1005,59 +1295,17 @@ function buildDstrip(container){
   }
 }
 function renderSchedule(){
-  document.getElementById('monthLabel').textContent=MN[sel.getMonth()]+' '+sel.getFullYear();
-  buildDstrip(document.getElementById('dstrip'));
-  const dstr=ds(sel),daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
-  const term=getTerm(sel),hol=getHol(sel);
-  let termBannerHTML='';
-  if(term){
-    termBannerHTML=`<div class="term-banner" onclick="openTermModal()"><div class="tb-left"><span>📆</span><div><div class="tb-name">${term.name}</div><div class="tb-dates">${fmtD(term.start)} – ${fmtD(term.end)}</div></div></div><div class="tb-wks">${wksLeft(term.end)}w left ›</div></div>`;
-  } else {
-    termBannerHTML=`<div class="term-banner hol" onclick="openTermModal()"><div class="tb-left"><span>🏖</span><div><div class="tb-name" style="color:var(--warn)">School Holidays</div><div class="tb-dates">No term active</div></div></div><div class="tb-wks" style="color:var(--warn)">View ›</div></div>`;
-  }
-  const dayCardHTML=`<div class="day-card"><div><div class="day-full">${DF[sel.getDay()]}</div><div class="day-date">${MN[sel.getMonth()]} ${sel.getDate()}, ${sel.getFullYear()}</div><div class="day-cnt">${daySess.length} lesson${daySess.length!==1?'s':''} scheduled</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:7px"><div class="day-badge"><div class="db-n">${DS_[sel.getDay()]}</div><div class="db-d">${sel.getDate()}</div></div><button class="s-book-btn" onclick="openBookModal()">+ Book</button></div></div>`;
-  let sessHTML='';
-  if(hol) sessHTML+=`<div class="hol-notice">🏖 ${hol.name}</div>`;
-  if(!daySess.length){
-    sessHTML+=`<div class="empty"><div class="empty-icon">🎾</div><div class="empty-t">No lessons today</div><div class="empty-s">Tap + to book a session</div></div>`;
-  } else {
-    daySess.forEach(s=>{
-      const stu=STUDENTS.find(st=>st.name===s.student);
-      const credits=stu?stu.credits:0;
-      const bar=credits>0?`<div class="sess-bar"><div class="sess-bar-f" style="width:${Math.min((credits/12)*100,100)}%"></div></div><div class="cred-lbl">${credits} credits remaining</div>`:'';
-      sessHTML+=`<div class="sess-card"><div class="sess-top"><div><div class="sess-name">${s.student}</div><div class="sess-tags"><span class="stag">${s.level}</span><span class="stag">${s.recur}</span><span class="stag">${s.court}</span></div></div><button class="cx" onclick="openCancelDialog(event,${s.id})">✕</button></div><div class="sess-det"><span>⏰</span>${fmt(s.time)} – ${et(s.time,s.dur)}</div><div class="sess-det"><span>⏱</span>${s.dur}</div>${bar}</div>`;
-    });
-  }
-  const isDesk=window.innerWidth>=1024;
-  if(isDesk){
-    document.getElementById('sBody').style.display='none';
-    const split=document.getElementById('sSchedSplit');
-    split.style.display='flex'; split.style.flex='1'; split.style.overflow='hidden'; split.style.minHeight='0';
-    document.getElementById('sSchedLeft').innerHTML=`<div class="mnav"><button class="narr" onclick="changeWeek(-1)">‹</button><div class="mlbl">${MN[sel.getMonth()]+' '+sel.getFullYear()}</div><button class="narr" onclick="changeWeek(1)">›</button></div><div class="dstrip" id="dstrip2"></div>${termBannerHTML}${dayCardHTML}`;
-    buildDstrip(document.getElementById('dstrip2'));
-    const right=document.getElementById('sSchedRight');
-    right.innerHTML = schedView==='week' ? renderWeekViewHTML(ws) : renderDayViewHTML(sel, daySess, hol);
-  } else {
-    document.getElementById('sSchedSplit').style.display='none';
-    document.getElementById('sBody').style.display='';
-    document.getElementById('sBody').innerHTML = schedView==='week'
-      ? renderWeekViewHTML(ws)
-      : renderDayViewHTML(sel, daySess, hol);
-  }
+  document.getElementById('sBody').innerHTML = renderWeekViewHTML(ws);
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
 function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
-function changeWeek(n){ws=add(ws,n*7);sel=new Date(ws);renderSchedule();}
+function changeWeek(n){ws=add(ws,n*7);renderSchedule();}
+function prevDay(){sel=add(sel,-1);ws=wkStart(sel);renderSchedule();}
+function nextDay(){sel=add(sel,1);ws=wkStart(sel);renderSchedule();}
 
 // ── Schedule calendar view state ──
 const CAL_S=7,CAL_E=21,DAY_SH=56,WK_SH=48;
 
-function setSchedView(v){
-  schedView=v;
-  document.getElementById('togDay').classList.toggle('active',v==='day');
-  document.getElementById('togWeek').classList.toggle('active',v==='week');
-  renderSchedule();
-}
 
 function renderDayViewHTML(date, daySess, hol){
   const dstr=ds(date);
@@ -1105,8 +1353,10 @@ function renderDayViewHTML(date, daySess, hol){
   const holBanner=hol?`<div class="hol-notice" style="margin:12px 12px 0">🏖 ${hol.name}</div>`:'';
   const dateLabel=`${DF[date.getDay()]}, ${MN[date.getMonth()]} ${date.getDate()}`;
   const cnt=daySess.length;
+  const emptyState=cnt===0?`<div class="sv-empty"><div class="sv-empty-icon">🎾</div><div class="sv-empty-t">No lessons on this day</div><div class="sv-empty-s">Free day — or tap to book one</div><button class="sv-empty-btn" onclick="openBookModal()">+ Add Lesson</button></div>`:'';
+  if(cnt===0) return `${holBanner}<div class="sv-day-wrap"><div class="sv-day-head"><button class="sv-nav-arr" onclick="prevDay()">‹</button><div style="text-align:center"><div class="sv-day-ttl">${dateLabel}</div><div class="sv-day-cnt">No lessons</div></div><button class="sv-nav-arr" onclick="nextDay()">›</button></div>${emptyState}</div>`;
 
-  return `${holBanner}<div class="sv-day-wrap"><div class="sv-day-head"><div class="sv-day-ttl">${dateLabel}</div><div class="sv-day-cnt">${cnt} lesson${cnt!==1?'s':''}</div></div><div class="sv-grid"><div class="sv-times">${timesHTML}</div><div class="sv-cols" style="height:${totalH}px">${linesHTML}${freeSlotsHTML.join('')}${blocksHTML}${nowHTML}</div></div></div>`;
+  return `${holBanner}<div class="sv-day-wrap"><div class="sv-day-head"><button class="sv-nav-arr" onclick="prevDay()">‹</button><div style="text-align:center"><div class="sv-day-ttl">${dateLabel}</div><div class="sv-day-cnt">${cnt} lesson${cnt!==1?'s':''}</div></div><button class="sv-nav-arr" onclick="nextDay()">›</button></div><div class="sv-grid"><div class="sv-times">${timesHTML}</div><div class="sv-cols" style="height:${totalH}px">${linesHTML}${freeSlotsHTML.join('')}${blocksHTML}${nowHTML}</div></div></div>`;
 }
 
 function renderWeekViewHTML(weekStart){
@@ -1139,18 +1389,23 @@ function renderWeekViewHTML(weekStart){
     const isToday=dstr===todayStr;
     const bgLines=hours.map((h,i)=>
       `<div class="wv-hr-bg" style="top:${i*WK_SH}px"></div>`+
-      `<div class="wv-half-bg" style="top:${i*WK_SH+WK_SH/2}px"></div>`
+      `<div class="wv-half-bg" style="top:${i*WK_SH+WK_SH/2}px"></div>`+
+      (i%2===1?`<div class="wv-alt-row" style="top:${i*WK_SH}px;height:${WK_SH}px"></div>`:'')
     ).join('');
     const blocks=daySess.map(s=>{
       const startM=t2m(s.time);
       const durM=dm(s.dur);
       const top=((startM-CAL_S*60)/60)*WK_SH;
-      const height=Math.max((durM/60)*WK_SH-1,12);
+      const height=Math.max((durM/60)*WK_SH-1,18);
       if(top+height<=0||top>=totalH) return '';
       const isPaid=s.payStatus==='paid';
-      return `<div class="wv-sess${isPaid?' wv-paid':''}" style="top:${top}px;height:${height}px" onclick="selectDay(new Date('${dstr}T00:00:00'));setSchedView('day')"><div class="wv-sess-name">${s.student.split(' ')[0]}</div></div>`;
+      const courtNum=s.court.replace(/\D/g,'');
+      const courtClass=!isPaid&&courtNum?` wv-court-${(parseInt(courtNum)%4)+1}`:'';
+      const showTime=height>24;
+      const showCourt=height>34;
+      return `<div class="wv-sess${isPaid?' wv-paid':''}${courtClass}" style="top:${top}px;height:${height}px" onclick="openSessDetail(${s.id})"><div class="wv-sess-name">${s.student.split(' ')[0]}</div>${showTime?`<div class="wv-sess-time">${fmt(s.time)}</div>`:''}${showCourt?`<div class="wv-sess-court">${s.court}</div>`:''}<div class="wv-tooltip">${s.student} · ${fmt(s.time)}–${et(s.time,s.dur)}<br>${s.court} · ${s.dur}${s.recur!=='One-time'?' · '+s.recur:''}</div></div>`;
     }).join('');
-    const nowLine=isToday&&showNow?`<div class="wv-now-line" style="top:${nowTop}px"></div>`:'';
+    const nowLine=isToday&&showNow?`<div class="wv-now-line" style="top:${nowTop}px"><div class="wv-now-dot"></div></div>`:'';
     const wkSlotH=WK_SH/2;
     const wkFreeSlots=[];
     for(let h=CAL_S;h<CAL_E;h++){
@@ -1161,10 +1416,13 @@ function renderWeekViewHTML(weekStart){
         if(!busy) wkFreeSlots.push(`<div class="wv-free-slot" style="top:${slotTop}px;height:${wkSlotH}px" onclick="bookAtTime('${dstr}',${h},${half*30})"></div>`);
       }
     }
-    return `<div class="wv-col" style="height:${totalH}px">${bgLines}${wkFreeSlots.join('')}${blocks}${nowLine}</div>`;
+    return `<div class="wv-col${isToday?' wv-col-today':''}" style="height:${totalH}px">${bgLines}${wkFreeSlots.join('')}${blocks}${nowLine}</div>`;
   }).join('');
 
-  return `<div class="wv-wrap"><div class="wv-header"><div class="wv-corner"></div>${dayHdHTML}</div><div class="wv-body"><div class="wv-times">${timesHTML}</div><div class="wv-cols">${colsHTML}</div></div></div>`;
+  const weekEnd=add(weekStart,6);
+  const weekLbl=weekStart.getMonth()===weekEnd.getMonth()?`${MN[weekStart.getMonth()]} ${weekStart.getFullYear()}`:`${MN[weekStart.getMonth()].slice(0,3)}–${MN[weekEnd.getMonth()].slice(0,3)} ${weekEnd.getFullYear()}`;
+  const weekNavHTML=`<div class="sv-week-nav"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>`;
+  return `<div class="wv-wrap">${weekNavHTML}<div class="wv-header"><div class="wv-corner"></div>${dayHdHTML}</div><div class="wv-body"><div class="wv-times">${timesHTML}</div><div class="wv-cols">${colsHTML}</div></div></div>`;
 }
 
 function handleDayGridClick(e,dstr){
@@ -1376,7 +1634,14 @@ function renderStudents(){
   renderStuList(STUDENTS);
 }
 function renderStuList(list){
-  document.getElementById('stuList').innerHTML=list.map(s=>`<div class="stu-card" onclick="openStuDetail('${s.name}')"><div class="stu-av">${ini(s.name)}</div><div style="flex:1"><div class="stu-name">${s.name}</div><div class="stu-meta"><span>${s.level}</span><span>·</span><span>${s.sessions} sessions</span>${s.owing>0?`<span class="stu-ow">· $${s.owing} owing</span>`:''}</div></div><div style="text-align:right"><div class="cn">${s.credits}</div><div class="cl">credits</div><div class="cbar"><div class="cbarf" style="width:${Math.min((s.credits/12)*100,100)}%"></div></div></div></div>`).join('');
+  document.getElementById('stuList').innerHTML=list.map(s=>{
+    const upcoming=SESSIONS.filter(se=>se.student===s.name&&se.date>=ds(today)).length;
+    const metaParts=[s.level];
+    if(upcoming>0) metaParts.push(`${upcoming} upcoming`);
+    metaParts.push(`${s.sessions} completed`);
+    if(s.owing>0) metaParts.push(`<span class="stu-ow">$${s.owing} owing</span>`);
+    return `<div class="stu-card" onclick="openStuDetail('${s.name}')"><div class="stu-av">${ini(s.name)}</div><div style="flex:1"><div class="stu-name">${s.name}</div><div class="stu-meta">${metaParts.join(' · ')}</div></div><div style="text-align:right"><div class="cn">${s.credits}</div><div class="cl">credits</div><div class="cbar"><div class="cbarf" style="width:${Math.min((s.credits/12)*100,100)}%"></div></div></div></div>`;
+  }).join('');
 }
 function filterStuList(q){renderStuList(q?STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):STUDENTS);}
 function openStuDetail(name){
@@ -1517,6 +1782,7 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
 renderToday();
 renderSchedule();
 renderCourtsDateLbl();
+updateTopbar('today');
 </script>
 </body>
 </html>
