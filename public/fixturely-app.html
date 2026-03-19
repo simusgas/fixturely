@@ -129,6 +129,9 @@
   .td-onboard-step.done .td-onboard-check{background:var(--ok);border-color:var(--ok);}
   .td-onboard-step-title{font-size:14px;font-weight:800;color:var(--text);}
   .td-onboard-step-sub{font-size:12px;color:var(--muted);font-weight:600;}
+  .td-onboard-done{background:var(--ok-lt);border-color:var(--ok);}
+  .td-onboard-dismiss-btn{background:var(--ok);color:var(--white);border:none;padding:10px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .td-onboard-dismiss-btn:hover{background:#2E7049;}
 
   /* Today lesson card (legacy) */
   .tl-card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border-left:4px solid var(--t-a);transition:all 0.3s;}
@@ -253,6 +256,11 @@
   .sv-empty-s{font-size:13px;font-weight:600;color:var(--muted);text-align:center;}
   .sv-empty-btn{background:var(--s-a);color:var(--white);border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;box-shadow:0 4px 14px rgba(245,166,35,0.3);transition:background 0.15s;}
   .sv-empty-btn:hover{background:var(--s-dk);}
+  /* Schedule sharing nudge */
+  .sched-nudge{display:flex;align-items:center;justify-content:space-between;background:var(--s-pl);border:1px solid var(--s-b);border-radius:10px;padding:10px 14px;margin:0 16px 12px;gap:10px;}
+  .sched-nudge-text{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--soft);flex:1;flex-wrap:wrap;}
+  .sched-nudge-text svg{flex-shrink:0;}
+  .sched-nudge-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
   /* Week view */
   .wv-wrap{padding-bottom:10px;}
   .wv-header{display:flex;background:var(--white);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:10;}
@@ -1146,28 +1154,40 @@ function renderToday(){
   const hasLessons=SESSIONS.length>0;
   const hasShared=localStorage.getItem('fixturely_shared')==='1';
   const onboardComplete=hasStudents&&hasLessons&&hasShared;
-  if(onboardComplete&&!onboardDismissed){onboardDismissed=true;localStorage.setItem('fixturely_onboard_done','1');}
-  if(!onboardComplete&&!onboardDismissed){
-    const steps=[
-      {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
-      {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"},
-      {done:hasShared, title:'Share your schedule with students', sub:'Let students see your availability and book lessons', action:"switchTab('share',document.querySelector('[data-t=share]'))"}
-    ];
-    const doneCount=steps.filter(s=>s.done).length;
-    html+=`<div class="td-onboard">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div class="td-onboard-title">Welcome to Fixturely!</div>
-          <div class="td-onboard-sub">Let's get you set up — ${doneCount} of ${steps.length} complete</div>
+  if(!onboardDismissed){
+    if(onboardComplete){
+      // All done — show celebration with dismiss
+      html+=`<div class="td-onboard td-onboard-done">
+        <div style="text-align:center;padding:8px 0">
+          <div style="font-size:32px;margin-bottom:8px">🎉</div>
+          <div class="td-onboard-title">You're all set!</div>
+          <div class="td-onboard-sub" style="margin-bottom:14px">Your schedule is live and ready for students to book.</div>
+          <button onclick="dismissOnboarding()" class="td-onboard-dismiss-btn">Got it — let's go!</button>
         </div>
-        <button onclick="dismissOnboarding()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1" title="Dismiss">✕</button>
-      </div>
-      <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
-      ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
-        <div class="td-onboard-check">${s.done?'✓':''}</div>
-        <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
-      </div>`).join('')}
-    </div>`;
+      </div>`;
+    } else {
+      const steps=[
+        {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
+        {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"},
+        {done:hasShared, title:'Share your schedule with students', sub:'Let students see your availability and book lessons', action:"switchTab('share',document.querySelector('[data-t=share]'))"}
+      ];
+      const doneCount=steps.filter(s=>s.done).length;
+      html+=`<div class="td-onboard">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="td-onboard-title">Welcome to Fixturely!</div>
+            <div class="td-onboard-sub">Let's get you set up.</div>
+          </div>
+          <button onclick="dismissOnboarding()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1" title="Dismiss">✕</button>
+        </div>
+        <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--soft);margin-bottom:10px">${doneCount} of ${steps.length} complete</div>
+        ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
+          <div class="td-onboard-check">${s.done?'✓':''}</div>
+          <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
+        </div>`).join('')}
+      </div>`;
+    }
   }
 
   // Daily summary
@@ -1191,7 +1211,7 @@ function renderToday(){
   html+=`<div class="td-quick-actions">
     <button class="td-qa-btn" onclick="openBookModal()">+ Add Lesson</button>
     <button class="td-qa-btn" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>
-    <button class="td-qa-btn" onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="background:var(--s-pl);border-color:var(--s-b);color:var(--s-dk)">📤 Share</button>
+    <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
   </div>`;
 
   // Next up highlight
@@ -1354,7 +1374,8 @@ function renderSharePage(){
 
   // Student list for sharing
   let studentsListHTML='';
-  if(STUDENTS.length>0){
+  const hasStudentsForShare=STUDENTS.length>0;
+  if(hasStudentsForShare){
     studentsListHTML=STUDENTS.map(s=>{
       const checked=shareSelectedStudents.has(s.name);
       return `<div class="sh-stu-item" onclick="toggleShareStudent('${s.name}')">
@@ -1363,7 +1384,10 @@ function renderSharePage(){
       </div>`;
     }).join('');
   } else {
-    studentsListHTML=`<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">No students yet — add students first</div>`;
+    studentsListHTML=`<div style="text-align:center;padding:20px 16px">
+      <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:10px">No students yet</div>
+      <button onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)" style="background:var(--s-a);color:var(--white);border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">+ Add Student</button>
+    </div>`;
   }
   const selCount=shareSelectedStudents.size;
 
@@ -1390,7 +1414,7 @@ function renderSharePage(){
       <div class="sh-students-card">
         <div class="sh-students-title">Share with students</div>
         ${studentsListHTML}
-        <button class="sh-send-btn" onclick="sendToSelected()"${selCount===0?' disabled':''}>Send to ${selCount||'selected'} student${selCount!==1?'s':''}</button>
+        ${hasStudentsForShare?`<button class="sh-send-btn" onclick="sendToSelected()"${selCount===0?' disabled':''}>Send to ${selCount||'selected'} student${selCount!==1?'s':''}</button>`:''}
       </div>
       <div class="sh-manual-card">
         <div class="sh-manual-title">Or share manually</div>
@@ -1513,8 +1537,15 @@ function buildDstrip(container){
     container.appendChild(cell);
   }
 }
+let schedNudgeDismissed=localStorage.getItem('fixturely_sched_nudge_dismissed')==='1';
+function dismissSchedNudge(){schedNudgeDismissed=true;localStorage.setItem('fixturely_sched_nudge_dismissed','1');renderSchedule();}
 function renderSchedule(){
-  document.getElementById('sBody').innerHTML = renderWeekViewHTML(ws);
+  const hasShared=localStorage.getItem('fixturely_shared')==='1';
+  let nudge='';
+  if(!schedNudgeDismissed&&!hasShared){
+    nudge=`<div class="sched-nudge"><div class="sched-nudge-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Your students can view this schedule and book lessons</span><a onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="color:var(--s-dk);font-weight:900;cursor:pointer;white-space:nowrap">Share Schedule →</a></div><button onclick="dismissSchedNudge()" class="sched-nudge-close">✕</button></div>`;
+  }
+  document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
 function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
