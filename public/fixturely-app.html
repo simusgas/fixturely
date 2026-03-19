@@ -21,10 +21,6 @@
     --t-a:#E8724A; --t-b:#F09070; --t-c:#F8C0A8; --t-pl:#FEF0EB; --t-dk:#C05530;
     /* Students — sage */
     --u-a:#6B8F71; --u-b:#8FB896; --u-c:#B8D9BC; --u-pl:#E8F5EA; --u-dk:#4D6B52;
-    /* Payments — teal */
-    --p-a:#2E8B84; --p-b:#4AADA6; --p-c:#80CCC8; --p-pl:#E0F5F4; --p-dk:#1F6B65;
-    /* Radar — blue slate */
-    --r-a:#3B6B9E; --r-b:#5A8DC0; --r-c:#8AB4D8; --r-pl:#E4EFF8; --r-dk:#2A4E78;
     /* Status */
     --ok:#3D8B5E; --ok-lt:#E6F5EE;
     --warn:#C47A1E; --warn-lt:#FEF3DC;
@@ -47,14 +43,10 @@
   .ntab[data-t="today"].active   .nl{color:var(--t-dk);}
   .ntab[data-t="schedule"].active .nl{color:var(--s-dk);}
   .ntab[data-t="students"].active .nl{color:var(--u-dk);}
-  .ntab[data-t="payments"].active .nl{color:var(--p-dk);}
-  .ntab[data-t="radar"].active   .nl{color:var(--r-dk);}
   .ntab::after{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;border-radius:0 0 4px 4px;transform:scaleX(0);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
   .ntab[data-t="today"]::after   {background:var(--t-a);}
   .ntab[data-t="schedule"]::after{background:var(--s-a);}
   .ntab[data-t="students"]::after{background:var(--u-a);}
-  .ntab[data-t="payments"]::after{background:var(--p-a);}
-  .ntab[data-t="radar"]::after   {background:var(--r-a);}
   .ntab[data-t="courts"]::after  {background:var(--c-a);}
   .ntab.active::after{transform:scaleX(1);}
   .ntab[data-t="courts"].active .nl{color:var(--c-dk);}
@@ -76,19 +68,6 @@
   .t-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
   .t-hdr-btn{color:var(--t-dk);}
 
-  /* Weather strip */
-  .wx-strip{background:rgba(255,255,255,0.2);border-radius:14px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.2s;}
-  .wx-strip:hover{background:rgba(255,255,255,0.3);}
-  .wx-left{display:flex;align-items:center;gap:10px;}
-  .wx-icon{font-size:24px;}
-  .wx-temp{font-size:22px;font-weight:900;color:var(--white);}
-  .wx-desc{font-size:12px;color:rgba(255,255,255,0.8);font-weight:600;}
-  .wx-right{text-align:right;}
-  .wx-rain{font-size:13px;font-weight:800;color:var(--white);}
-  .wx-wind{font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;}
-  .wx-court-ok  {background:rgba(62,180,100,0.3);border:1px solid rgba(62,180,100,0.5);}
-  .wx-court-warn{background:rgba(220,180,60,0.3);border:1px solid rgba(220,180,60,0.5);}
-  .wx-court-bad {background:rgba(220,100,80,0.3);border:1px solid rgba(220,100,80,0.5);}
 
   .t-body{padding:16px;}
   .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
@@ -108,6 +87,9 @@
   .tl-tog-btn:first-child{border-right:1px solid var(--border);}
   .tl-tog-btn.sel-paid{background:var(--ok);color:var(--white);}
   .tl-tog-btn.sel-notpaid{background:var(--warn-lt);color:var(--warn);}
+  /* Edit button on lesson cards */
+  .tl-edit-btn{background:var(--off);border:1.5px solid var(--border);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;}
+  .tl-edit-btn:hover{background:var(--s-pl);border-color:var(--s-a);}
 
   /* All caught up state */
   .tl-caught-up{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--ok);margin-top:8px;padding:10px 14px;background:var(--ok-lt);border-radius:12px;}
@@ -207,6 +189,55 @@
   .fab{position:fixed;bottom:calc(var(--nav-h)+14px);right:calc(50% - 210px + 16px);width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;font-size:24px;cursor:pointer;box-shadow:0 5px 18px rgba(212,136,15,0.45);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;z-index:50;}
   .fab:hover{transform:scale(1.08);}
 
+  /* ── Schedule calendar views (day + week) ── */
+  .sv-toggle{display:flex;background:rgba(255,255,255,0.22);border-radius:100px;padding:3px;margin-top:10px;}
+  .sv-tog-btn{flex:1;padding:6px 0;border-radius:100px;border:none;background:none;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:rgba(28,20,7,0.5);transition:all 0.2s;}
+  .sv-tog-btn.active{background:var(--white);color:var(--s-dk);box-shadow:0 2px 6px rgba(0,0,0,0.12);}
+  /* Day view */
+  .sv-day-wrap{padding:0 0 10px;}
+  .sv-day-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
+  .sv-day-ttl{font-size:15px;font-weight:900;color:var(--text);}
+  .sv-day-cnt{font-size:12px;font-weight:700;color:var(--s-dk);}
+  .sv-grid{display:flex;padding:0 8px 0 0;}
+  .sv-times{width:52px;flex-shrink:0;}
+  .sv-time-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:8px;display:flex;align-items:flex-start;line-height:1;}
+  .sv-cols{flex:1;position:relative;cursor:pointer;}
+  .sv-hr-line{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
+  .sv-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.7);}
+  .sv-free-slot{position:absolute;left:0;right:0;z-index:1;cursor:pointer;transition:background 0.18s;}
+  .sv-free-slot:hover{background:rgba(0,0,0,0.04);}
+  .sv-sess-block{position:absolute;left:4px;right:4px;border-radius:8px;padding:5px 8px;overflow:hidden;cursor:pointer;z-index:2;background:var(--s-pl);border-left:3px solid var(--s-a);box-shadow:0 1px 5px rgba(0,0,0,0.07);transition:opacity 0.15s;}
+  .sv-sess-block.paid{background:var(--ok-lt);border-left-color:var(--ok);}
+  .sv-sess-block:hover{opacity:0.8;}
+  .sv-sb-name{font-size:12px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:3;pointer-events:none;}
+  .sv-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
+  /* Week view */
+  .wv-wrap{padding-bottom:10px;}
+  .wv-header{display:flex;background:var(--white);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:10;}
+  .wv-corner{width:40px;flex-shrink:0;}
+  .wv-day-hd{flex:1;text-align:center;padding:7px 1px;border-left:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+  .wv-day-hd:active{background:var(--off);}
+  .wv-day-name{font-size:9px;font-weight:900;color:var(--soft);text-transform:uppercase;letter-spacing:0.3px;}
+  .wv-day-num{font-size:15px;font-weight:900;color:var(--text);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
+  .wv-day-hd.wv-today .wv-day-num{background:var(--t-a);color:var(--white);}
+  .wv-day-hd.wv-sel .wv-day-num{background:var(--s-dk);color:var(--white);}
+  .wv-body{display:flex;}
+  .wv-times{width:40px;flex-shrink:0;}
+  .wv-time-lbl{font-size:9px;font-weight:800;color:var(--soft);text-align:right;padding-right:5px;display:flex;align-items:flex-start;line-height:1;}
+  .wv-cols{display:flex;flex:1;}
+  .wv-col{position:relative;flex:1;border-left:1px solid var(--border);}
+  .wv-hr-bg{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
+  .wv-half-bg{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.5);}
+  .wv-free-slot{position:absolute;left:0;right:0;z-index:1;cursor:pointer;transition:background 0.18s;}
+  .wv-free-slot:hover{background:rgba(0,0,0,0.04);}
+  .wv-sess{position:absolute;left:1px;right:1px;border-radius:3px;padding:1px 3px;overflow:hidden;cursor:pointer;background:var(--s-pl);border-left:2px solid var(--s-a);transition:opacity 0.15s;}
+  .wv-sess.wv-paid{background:var(--ok-lt);border-left-color:var(--ok);}
+  .wv-sess:hover{opacity:0.75;}
+  .wv-sess-name{font-size:9px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .wv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
+
   /* ══════════════════════
      STUDENTS
   ══════════════════════ */
@@ -250,87 +281,7 @@
   .u-inv-btn{width:100%;padding:14px;border-radius:100px;margin-top:14px;background:linear-gradient(135deg,var(--u-a),var(--u-dk));color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 13px rgba(77,107,82,0.3);transition:transform 0.15s;}
   .u-inv-btn:hover{transform:translateY(-1px);}
 
-  /* ══════════════════════
-     PAYMENTS
-  ══════════════════════ */
-  .p-hdr{background:linear-gradient(155deg,var(--p-a) 0%,var(--p-b) 55%,var(--p-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
-  .p-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
-  .p-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
-  .p-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
-  .p-hdr-btn{color:var(--p-dk);}
-  .p-body{padding:16px;}
-  .fpills{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;}
-  .fpills::-webkit-scrollbar{display:none;}
-  .fpill{padding:7px 16px;border-radius:100px;font-size:12px;font-weight:800;border:1.5px solid var(--border);background:var(--white);color:var(--soft);cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all 0.2s;}
-  .fpill.active{background:var(--p-a);color:var(--white);border-color:var(--p-a);}
-  .inv-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:11px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.2s;border-left:4px solid var(--p-b);}
-  .inv-card:hover{transform:translateY(-2px);}
-  .inv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;}
-  .inv-name{font-size:16px;font-weight:900;}
-  .inv-num{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;font-family:monospace;}
-  .inv-amt{font-size:22px;font-weight:900;text-align:right;}
-  .inv-items-l{font-size:10px;color:var(--muted);font-weight:600;}
-  .sbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;font-size:11px;font-weight:800;}
-  .sb-paid{background:var(--ok-lt);color:var(--ok);}
-  .sb-pend{background:var(--warn-lt);color:var(--warn);}
-  .sb-over{background:var(--err-lt);color:var(--err);}
-  .inv-foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:11px;border-top:1px solid var(--border);}
-  .inv-ft{font-size:12px;color:var(--soft);font-weight:600;}
-  .sl-btn{background:var(--p-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.2s;}
-  .sl-btn:hover{background:var(--p-dk);}
-  .sl-btn.sent{background:var(--ok);}
-
-  /* ══════════════════════
-     RADAR
-  ══════════════════════ */
-  .r-hdr{background:linear-gradient(155deg,var(--r-a) 0%,var(--r-b) 55%,var(--r-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
-  .r-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
-  .r-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
-  .r-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
-  .r-body{padding:16px;}
-
-  /* Court conditions banner */
-  .court-cond{border-radius:18px;padding:18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(0,0,0,0.08);}
-  .court-cond.good{background:linear-gradient(135deg,#2D7D4F,#3DA066);color:var(--white);}
-  .court-cond.warn{background:linear-gradient(135deg,#B8740A,#D4940E);color:var(--white);}
-  .court-cond.bad {background:linear-gradient(135deg,#8B3A38,#C05050);color:var(--white);}
-  .cc-icon{font-size:36px;}
-  .cc-text{}
-  .cc-title{font-size:18px;font-weight:900;margin-bottom:4px;}
-  .cc-sub{font-size:13px;opacity:0.85;font-weight:600;}
-  .cc-cancel-btn{background:rgba(255,255,255,0.25);color:var(--white);border:1.5px solid rgba(255,255,255,0.4);padding:8px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
-  .cc-cancel-btn:hover{background:rgba(255,255,255,0.35);}
-
-  /* Current weather card */
-  .wx-main{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
-  .wx-main-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-  .wx-big-icon{font-size:52px;}
-  .wx-big-temp{font-size:52px;font-weight:900;color:var(--text);line-height:1;}
-  .wx-big-feels{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
-  .wx-big-desc{font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px;}
-  .wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .wx-stat{background:var(--r-pl);border-radius:12px;padding:10px;text-align:center;}
-  .wx-stat-n{font-size:16px;font-weight:900;color:var(--r-dk);}
-  .wx-stat-l{font-size:10px;color:var(--soft);font-weight:600;margin-top:2px;}
-
-  /* Hourly forecast */
-  .hourly-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
-  .hourly-scroll::-webkit-scrollbar{display:none;}
-  .hr-item{background:var(--card);border-radius:14px;padding:10px 12px;min-width:64px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.05);flex-shrink:0;}
-  .hr-item.rain-hr{background:var(--r-pl);border:1.5px solid var(--r-b);}
-  .hr-time{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;}
-  .hr-icon{font-size:18px;margin-bottom:4px;}
-  .hr-temp{font-size:13px;font-weight:800;color:var(--text);}
-  .hr-rain{font-size:10px;font-weight:700;color:var(--r-a);margin-top:2px;}
-
-  /* Radar map */
-  .radar-map-wrap{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:14px;}
-  .radar-map-label{padding:12px 16px;font-size:13px;font-weight:800;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .radar-map-label span{font-size:11px;color:var(--muted);font-weight:600;}
-  .radar-iframe{width:100%;height:260px;border:none;display:block;}
-  .radar-note{padding:10px 14px;background:var(--r-pl);font-size:11px;color:var(--r-dk);font-weight:700;text-align:center;}
-
-  /* Loading */
+  /* Loading spinner — used by Courts tab */
   .wx-loading{text-align:center;padding:40px 20px;color:var(--muted);}
   .wx-loading-icon{font-size:32px;margin-bottom:10px;animation:spin 1.5s linear infinite;display:inline-block;}
   @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
@@ -468,10 +419,8 @@
   .dsk-split { display:contents; }
   /* Mobile defaults for desktop-split elements */
   #sSchedSplit   { display:none; }
-  #dsk-radar-split { display:none; }
-  #dsk-pay-stats { display:none; }
   /* Desktop-only panels hidden on mobile */
-  #dsk-wx-panel, #dsk-stu-placeholder { display:none; }
+  #dsk-stu-placeholder { display:none; }
 
   @media (min-width:1024px) {
     html,body { overflow:hidden; }
@@ -505,8 +454,6 @@
     .tnav-btn[data-t="today"].active    { background:var(--t-pl); color:var(--t-dk); }
     .tnav-btn[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
     .tnav-btn[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
-    .tnav-btn[data-t="payments"].active { background:var(--p-pl); color:var(--p-dk); }
-    .tnav-btn[data-t="radar"].active    { background:var(--r-pl); color:var(--r-dk); }
     .tnav-btn[data-t="courts"].active  { background:var(--c-pl); color:var(--c-dk); }
 
     /* ── Screens ── */
@@ -514,14 +461,17 @@
     .screen.active { display:flex; }
 
     /* ── Compact section headers ── */
-    .t-hdr,.s-hdr,.u-hdr,.p-hdr,.r-hdr,.c-hdr {
+    .t-hdr,.s-hdr,.u-hdr,.c-hdr {
       padding:16px 28px; border-radius:0; flex-shrink:0;
     }
-    .t-hdr-top,.s-hdr-top,.u-hdr-top,.p-hdr-top,.r-hdr-top { margin-bottom:0; }
-    .t-title,.s-title,.u-title,.p-title,.r-title { font-size:22px; }
-    .wx-strip  { display:none; }
+    .t-hdr-top,.s-hdr-top,.u-hdr-top { margin-bottom:0; }
+    .t-title,.s-title,.u-title { font-size:22px; }
     .s-hdr .mnav,.s-hdr .dstrip { display:none; }
     .hdr-stats { display:none; }
+    /* Toggle visible on desktop — compact inline style */
+    .s-hdr .sv-toggle { display:flex; max-width:180px; margin-top:10px; background:rgba(0,0,0,0.08); }
+    .s-hdr .sv-tog-btn { color:rgba(28,20,7,0.55); }
+    .s-hdr .sv-tog-btn.active { background:var(--white); color:var(--s-dk); }
 
     /* ── Two-col split wrapper ── */
     .dsk-split { display:flex; flex:1; overflow:hidden; min-height:0; }
@@ -539,11 +489,10 @@
 
     /* ── TODAY ── */
     .t-body { flex:1; overflow-y:auto; padding:20px 24px; }
-    #dsk-wx-panel { display:flex; flex-direction:column; }
 
     /* ── SCHEDULE ── */
     .s-body { display:none; }
-    #sSchedRight { flex:1; overflow-y:auto; padding:20px 24px; }
+    #sSchedRight { flex:1; overflow:auto; padding:0; }
 
     /* ── STUDENTS ── */
     #screen-students .dsk-split {
@@ -573,23 +522,6 @@
     #dsk-stu-right.has-detail #dsk-stu-placeholder { display:none; }
     #dsk-stu-right { position:relative; overflow:hidden; }
 
-    /* ── PAYMENTS ── */
-    .p-body { display:flex; flex:1; overflow:hidden; padding:0; min-height:0; }
-    #dsk-pay-inv  { flex:1; overflow-y:auto; padding:20px 24px; }
-    #dsk-pay-stats {
-      display:flex; flex-direction:column;
-      width:280px; flex-shrink:0; border-left:1px solid var(--border);
-      background:var(--off); padding:20px; overflow-y:auto;
-    }
-    .fpills { flex-wrap:wrap; overflow-x:visible; }
-
-    /* ── RADAR ── */
-    .r-body { display:none; }
-    #dsk-radar-left  { display:block; width:360px; min-width:300px; flex-shrink:0;
-                       border-right:1px solid var(--border); overflow-y:auto; padding:20px; }
-    #dsk-radar-right { display:flex; flex-direction:column; flex:1; overflow:hidden; }
-    #dsk-radar-right .radar-map-wrap  { flex:1; display:flex; flex-direction:column; border-radius:0; margin:0; }
-    #dsk-radar-right .radar-iframe    { flex:1; height:100%; min-height:400px; }
 
     /* ── Modals — centered ── */
     .overlay { align-items:center; }
@@ -607,8 +539,6 @@
       <button class="tnav-btn active" data-t="today"    onclick="switchTab('today',this)">☀️ Today</button>
       <button class="tnav-btn"        data-t="schedule" onclick="switchTab('schedule',this)">📅 Schedule</button>
       <button class="tnav-btn"        data-t="students" onclick="switchTab('students',this)">👤 Students</button>
-      <button class="tnav-btn"        data-t="payments" onclick="switchTab('payments',this)">💳 Payments</button>
-      <button class="tnav-btn"        data-t="radar"    onclick="switchTab('radar',this)">🌧 Radar</button>
       <button class="tnav-btn"        data-t="courts"   onclick="switchTab('courts',this)">🎾 Courts</button>
     </nav>
   </header>
@@ -623,27 +553,8 @@
           <button class="hdr-btn t-hdr-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">📅 Schedule</button>
         </div>
       </div>
-      <!-- Weather strip -->
-      <div class="wx-strip wx-court-ok" id="wxStrip" onclick="switchTab('radar',document.querySelector('[data-t=radar]'))">
-        <div class="wx-left">
-          <div class="wx-icon" id="wxIcon">⏳</div>
-          <div>
-            <div class="wx-temp" id="wxTemp">--°</div>
-            <div class="wx-desc" id="wxDesc">Loading…</div>
-          </div>
-        </div>
-        <div class="wx-right">
-          <div class="wx-rain" id="wxRain">--%</div>
-          <div class="wx-wind" id="wxWind">-- km/h</div>
-        </div>
-      </div>
     </div>
-    <div class="dsk-split">
-      <div class="t-body" id="tBody"></div>
-      <div class="dsk-aside" id="dsk-wx-panel">
-        <p style="color:var(--muted);font-size:13px;text-align:center;padding:30px 0">Visit Radar tab for weather</p>
-      </div>
-    </div>
+    <div class="t-body" id="tBody"></div>
   </div>
 
   <!-- ══ SCHEDULE ══ -->
@@ -662,6 +573,10 @@
         <button class="narr" onclick="changeWeek(1)">›</button>
       </div>
       <div class="dstrip" id="dstrip"></div>
+      <div class="sv-toggle">
+        <button class="sv-tog-btn active" id="togDay" onclick="setSchedView('day')">Day</button>
+        <button class="sv-tog-btn" id="togWeek" onclick="setSchedView('week')">Week</button>
+      </div>
     </div>
     <div class="s-body" id="sBody"></div>
     <div class="dsk-split" id="sSchedSplit">
@@ -676,7 +591,7 @@
     <div class="u-hdr">
       <div class="u-hdr-top">
         <div><div class="u-title">Students</div><div class="u-sub">Manage your roster</div></div>
-        <button class="hdr-btn u-hdr-btn" onclick="toast('Add student — coming soon!')">+ Add</button>
+        <button class="hdr-btn u-hdr-btn" onclick="openAddStudentModal()">+ Add</button>
       </div>
       <div class="hdr-stats" id="uStats"></div>
     </div>
@@ -706,51 +621,6 @@
           <div style="font-size:13px">Choose a student to see their details.</div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ══ PAYMENTS ══ -->
-  <div class="screen" id="screen-payments">
-    <div class="p-hdr">
-      <div class="p-hdr-top">
-        <div><div class="p-title">Payments</div><div class="p-sub">Invoices & billing</div></div>
-        <button class="hdr-btn p-hdr-btn" onclick="toast('New invoice — coming soon!')">+ Invoice</button>
-      </div>
-      <div class="hdr-stats" id="pStats"></div>
-    </div>
-    <div class="p-body">
-      <div id="dsk-pay-inv">
-        <div class="fpills">
-          <button class="fpill active" onclick="filterInv('All',this)">All</button>
-          <button class="fpill" onclick="filterInv('Paid',this)">✓ Paid</button>
-          <button class="fpill" onclick="filterInv('Pending',this)">⏳ Pending</button>
-          <button class="fpill" onclick="filterInv('Overdue',this)">⚠ Overdue</button>
-        </div>
-        <div id="invList"></div>
-      </div>
-      <div id="dsk-pay-stats"></div>
-    </div>
-  </div>
-
-  <!-- ══ RADAR ══ -->
-  <div class="screen" id="screen-radar">
-    <div class="r-hdr">
-      <div class="r-hdr-top">
-        <div><div class="r-title">🌧 Radar</div><div class="r-sub" id="rLocation">Sydney, NSW</div></div>
-        <button class="hdr-btn" style="color:var(--r-dk)" onclick="wxLoaded=false;loadWeather()">↻ Refresh</button>
-      </div>
-      <div class="hdr-stats" id="rStats">
-        <div class="hst"><div class="hst-n" id="rTemp">--°</div><div class="hst-l">Temp</div></div>
-        <div class="hst"><div class="hst-n" id="rRain">--%</div><div class="hst-l">Rain</div></div>
-        <div class="hst"><div class="hst-n" id="rWind">--</div><div class="hst-l">km/h</div></div>
-      </div>
-    </div>
-    <div class="r-body" id="rBody">
-      <div class="wx-loading"><div class="wx-loading-icon">⏳</div><div>Loading weather…</div></div>
-    </div>
-    <div id="dsk-radar-split" style="display:none;flex:1;overflow:hidden;min-height:0;">
-      <div id="dsk-radar-left"></div>
-      <div id="dsk-radar-right"></div>
     </div>
   </div>
 
@@ -786,8 +656,6 @@
     <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni">☀️</span><span class="nl">Today</span></button>
     <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni">📅</span><span class="nl">Schedule</span></button>
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni">👤</span><span class="nl">Students</span></button>
-    <button class="ntab"        data-t="payments" onclick="switchTab('payments',this)"> <span class="ni">💳</span><span class="nl">Payments</span></button>
-    <button class="ntab"        data-t="radar"    onclick="switchTab('radar',this)">    <span class="ni">🌧</span><span class="nl">Radar</span></button>
     <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni">🎾</span><span class="nl">Courts</span></button>
   </nav>
 </div>
@@ -813,6 +681,7 @@
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeBookModal()">✕</button>
     <div class="modal-title">Book New Lesson</div>
+    <div id="bookForDate" style="font-size:13px;font-weight:800;color:var(--soft);margin:-4px 0 12px;"></div>
     <div class="ow" id="owarn"><div class="ow-icon">⚠️</div><div id="owarnText"></div></div>
     <div class="field">
       <label class="field-label">Student Name</label>
@@ -829,21 +698,24 @@
     </div>
     <div class="field"><label class="field-label">Duration</label>
       <div class="pill-group" id="durPills">
-        <button class="pill" onclick="setPill(this,'dur','30 min')">30 min</button>
-        <button class="pill active" onclick="setPill(this,'dur','1 hour')">1 hour</button>
-        <button class="pill" onclick="setPill(this,'dur','1.5 hrs')">1.5 hrs</button>
-        <button class="pill" onclick="setPill(this,'dur','2 hours')">2 hours</button>
+        <button class="pill" onclick="setPill(this,'dur','30m')">30m</button>
+        <button class="pill" onclick="setPill(this,'dur','45m')">45m</button>
+        <button class="pill active" onclick="setPill(this,'dur','1h')">1h</button>
+        <button class="pill" onclick="setPill(this,'dur','custom')">Custom</button>
+      </div>
+      <div id="customDurWrap" style="display:none;margin-top:8px">
+        <input type="text" class="field-input" id="customDurIn" placeholder="e.g., 75 min" oninput="checkOverlap()" />
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Recurrence</label>
+      <div class="pill-group" id="recurPills">
+        <button class="pill" onclick="setPill(this,'recur','One-time')">One-time</button>
+        <button class="pill active" onclick="setPill(this,'recur','Weekly')">Weekly</button>
+        <button class="pill" onclick="setPill(this,'recur','Fortnightly')">Fortnightly</button>
       </div>
     </div>
     <div class="field"><label class="field-label">Court Location</label>
       <input type="text" class="field-input" id="courtIn" placeholder="e.g., Court 1" oninput="checkOverlap()" />
-    </div>
-    <div class="field"><label class="field-label">Recurrence</label>
-      <div class="pill-group" id="recurPills">
-        <button class="pill active" onclick="setPill(this,'recur','One-time')">One-time</button>
-        <button class="pill" onclick="setPill(this,'recur','Weekly')">Weekly</button>
-        <button class="pill" onclick="setPill(this,'recur','Fortnightly')">Fortnightly</button>
-      </div>
     </div>
     <div class="field"><label class="field-label">Notes <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
       <textarea class="field-input" id="notesIn" rows="3" placeholder="e.g., Focus on backhand" style="resize:none;line-height:1.5"></textarea>
@@ -878,6 +750,76 @@
   </div>
 </div>
 
+<!-- ADD STUDENT MODAL -->
+<div class="overlay" id="addStuOvl" onclick="handleAddStuBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeAddStuModal()">✕</button>
+    <div class="modal-title" style="color:var(--u-dk)">Add New Student</div>
+    <div class="field">
+      <label class="field-label">Full Name</label>
+      <input type="text" class="field-input" id="astu-name" placeholder="e.g., Sarah Johnson" />
+    </div>
+    <div class="field">
+      <label class="field-label">Phone <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
+      <input type="tel" class="field-input" id="astu-phone" placeholder="e.g., 0400 123 456" />
+    </div>
+    <div class="field">
+      <label class="field-label">Level</label>
+      <div class="pill-group" id="astu-lvl-pills">
+        <button class="pill active" onclick="setAddStuPill(this,'Beginner')">Beginner</button>
+        <button class="pill" onclick="setAddStuPill(this,'Intermediate')">Intermediate</button>
+        <button class="pill" onclick="setAddStuPill(this,'Advanced')">Advanced</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Starting Credits</label>
+      <input type="number" class="field-input" id="astu-credits" placeholder="0" min="0" value="0" />
+    </div>
+    <button class="submit-btn" style="background:linear-gradient(135deg,var(--u-a),var(--u-dk));box-shadow:0 4px 14px rgba(77,107,82,0.3)" onclick="submitAddStudent()">Add Student ✓</button>
+  </div>
+</div>
+
+<!-- EDIT LESSON MODAL -->
+<div class="overlay" id="editLsnOvl" onclick="handleEditLsnBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeEditLsnModal()">✕</button>
+    <div class="modal-title">Edit Lesson</div>
+    <div id="editLsnStu" style="background:var(--s-pl);border-radius:14px;padding:12px 15px;margin-bottom:18px;font-size:15px;font-weight:800;color:var(--s-dk)"></div>
+    <div class="field">
+      <label class="field-label">Start Time</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="time" class="field-input" id="editLsnTime" style="flex:1" oninput="updateEditAmPm()" />
+        <button type="button" id="editAmpmBtn" onclick="toggleEditAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Duration</label>
+      <div class="pill-group" id="editDurPills">
+        <button class="pill" onclick="setEditPill(this,'dur','30 min')">30 min</button>
+        <button class="pill" onclick="setEditPill(this,'dur','1 hour')">1 hour</button>
+        <button class="pill" onclick="setEditPill(this,'dur','1.5 hrs')">1.5 hrs</button>
+        <button class="pill" onclick="setEditPill(this,'dur','2 hours')">2 hours</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Court Location</label>
+      <input type="text" class="field-input" id="editLsnCourt" />
+    </div>
+    <div class="field">
+      <label class="field-label">Recurrence</label>
+      <div class="pill-group" id="editRecurPills">
+        <button class="pill" onclick="setEditPill(this,'recur','One-time')">One-time</button>
+        <button class="pill" onclick="setEditPill(this,'recur','Weekly')">Weekly</button>
+        <button class="pill" onclick="setEditPill(this,'recur','Fortnightly')">Fortnightly</button>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="saveEditLesson()">Save Changes ✓</button>
+    <button onclick="cancelFromEdit()" style="width:100%;padding:13px;border-radius:16px;margin-top:10px;background:var(--err-lt);color:var(--err);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">Cancel this lesson</button>
+  </div>
+</div>
+
 <div class="toast" id="toastEl"></div>
 
 <script>
@@ -902,7 +844,14 @@ const DS_=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 function fmt(t){const[h,m]=t.split(':').map(Number);return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
-function dm(d){return d==='30 min'?30:d==='1 hour'?60:d==='1.5 hrs'?90:120;}
+function dm(d){
+  if(d==='30m') return 30;
+  if(d==='45m') return 45;
+  if(d==='1h')  return 60;
+  if(d==='custom'){const v=document.getElementById('customDurIn');if(v){const n=parseInt(v.value);return isNaN(n)?60:n;}return 60;}
+  // legacy fallback
+  return d==='30 min'?30:d==='1 hour'?60:d==='1.5 hrs'?90:120;
+}
 function et(t,d){let m=t2m(t)+dm(d);const h=Math.floor(m/60)%24,mm=m%60;return `${h%12||12}:${mm.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 function fmtD(s){const d=new Date(s);return `${d.getDate()} ${MS[d.getMonth()]} ${d.getFullYear()}`;}
 function wkStart(d){const r=new Date(d),day=r.getDay(),diff=day===0?-6:1-day;r.setDate(r.getDate()+diff);r.setHours(0,0,0,0);return r;}
@@ -917,8 +866,6 @@ function switchTab(tab,btn){
   document.getElementById('screen-'+tab).classList.add('active');
   document.querySelectorAll(`[data-t="${tab}"]`).forEach(t=>t.classList.add('active'));
   if(tab==='students') renderStudents();
-  if(tab==='payments') renderPayments();
-  if(tab==='radar')    loadWeather();
   if(tab==='today')    renderToday();
   if(tab==='courts')   loadCourts();
 }
@@ -942,6 +889,7 @@ function renderToday(){
             <div class="tl-name">${s.student}</div>
             <div class="tl-time">${fmt(s.time)} · ${s.court} · ${s.dur}</div>
           </div>
+          <button class="tl-edit-btn" onclick="openEditLsnModal(${s.id})" title="Edit lesson">✏️</button>
         </div>
 
         <!-- Paid / Not Paid toggle — always visible -->
@@ -1040,7 +988,7 @@ function renderLLSlots(){
 }
 
 // ══ SCHEDULE ══
-let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,sentLinks=new Set();
+let ws=wkStart(today),sel=new Date(today),cancelTarget=null,selDur='1 hour',selRecur='One-time',acIdx=-1,schedView='day';
 
 function buildDstrip(container){
   container.innerHTML='';
@@ -1087,16 +1035,241 @@ function renderSchedule(){
     split.style.display='flex'; split.style.flex='1'; split.style.overflow='hidden'; split.style.minHeight='0';
     document.getElementById('sSchedLeft').innerHTML=`<div class="mnav"><button class="narr" onclick="changeWeek(-1)">‹</button><div class="mlbl">${MN[sel.getMonth()]+' '+sel.getFullYear()}</div><button class="narr" onclick="changeWeek(1)">›</button></div><div class="dstrip" id="dstrip2"></div>${termBannerHTML}${dayCardHTML}`;
     buildDstrip(document.getElementById('dstrip2'));
-    document.getElementById('sSchedRight').innerHTML=sessHTML;
+    const right=document.getElementById('sSchedRight');
+    right.innerHTML = schedView==='week' ? renderWeekViewHTML(ws) : renderDayViewHTML(sel, daySess, hol);
   } else {
-    document.getElementById('sBody').style.display='';
     document.getElementById('sSchedSplit').style.display='none';
-    document.getElementById('sBody').innerHTML=termBannerHTML+dayCardHTML+sessHTML;
+    document.getElementById('sBody').style.display='';
+    document.getElementById('sBody').innerHTML = schedView==='week'
+      ? renderWeekViewHTML(ws)
+      : renderDayViewHTML(sel, daySess, hol);
   }
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
 function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
 function changeWeek(n){ws=add(ws,n*7);sel=new Date(ws);renderSchedule();}
+
+// ── Schedule calendar view state ──
+const CAL_S=7,CAL_E=21,DAY_SH=56,WK_SH=48;
+
+function setSchedView(v){
+  schedView=v;
+  document.getElementById('togDay').classList.toggle('active',v==='day');
+  document.getElementById('togWeek').classList.toggle('active',v==='week');
+  renderSchedule();
+}
+
+function renderDayViewHTML(date, daySess, hol){
+  const dstr=ds(date);
+  const hours=[];
+  for(let h=CAL_S;h<CAL_E;h++) hours.push(h);
+  const totalH=hours.length*DAY_SH;
+  const now=new Date();
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const showNow=dstr===ds(today)&&nowMins>=CAL_S*60&&nowMins<CAL_E*60;
+  const nowTop=((nowMins-CAL_S*60)/60)*DAY_SH;
+
+  const timesHTML=hours.map(h=>{
+    const lbl=h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
+    return `<div class="sv-time-lbl" style="height:${DAY_SH}px">${lbl}</div>`;
+  }).join('');
+
+  const linesHTML=hours.map((h,i)=>
+    `<div class="sv-hr-line" style="top:${i*DAY_SH}px"></div>`+
+    `<div class="sv-half-line" style="top:${i*DAY_SH+DAY_SH/2}px"></div>`
+  ).join('');
+
+  const slotH2=DAY_SH/2;
+  const freeSlotsHTML=[];
+  for(let h=CAL_S;h<CAL_E;h++){
+    for(let half=0;half<2;half++){
+      const m=h*60+half*30;
+      const slotTop=((m-CAL_S*60)/60)*DAY_SH;
+      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
+      if(!busy) freeSlotsHTML.push(`<div class="sv-free-slot" style="top:${slotTop}px;height:${slotH2}px" onclick="bookAtTime('${dstr}',${h},${half*30})"></div>`);
+    }
+  }
+
+  const blocksHTML=daySess.map(s=>{
+    const startM=t2m(s.time);
+    const durM=dm(s.dur);
+    const top=((startM-CAL_S*60)/60)*DAY_SH;
+    const height=Math.max((durM/60)*DAY_SH-2,20);
+    if(top+height<=0||top>=totalH) return '';
+    const isPaid=s.payStatus==='paid';
+    const showInfo=height>34;
+    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail(${s.id})"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)} · ${s.court}</div>`:''}</div>`;
+  }).join('');
+
+  const nowHTML=showNow?`<div class="sv-now-line" style="top:${nowTop}px"><div class="sv-now-dot"></div></div>`:'';
+  const holBanner=hol?`<div class="hol-notice" style="margin:12px 12px 0">🏖 ${hol.name}</div>`:'';
+  const dateLabel=`${DF[date.getDay()]}, ${MN[date.getMonth()]} ${date.getDate()}`;
+  const cnt=daySess.length;
+
+  return `${holBanner}<div class="sv-day-wrap"><div class="sv-day-head"><div class="sv-day-ttl">${dateLabel}</div><div class="sv-day-cnt">${cnt} lesson${cnt!==1?'s':''}</div></div><div class="sv-grid"><div class="sv-times">${timesHTML}</div><div class="sv-cols" style="height:${totalH}px">${linesHTML}${freeSlotsHTML.join('')}${blocksHTML}${nowHTML}</div></div></div>`;
+}
+
+function renderWeekViewHTML(weekStart){
+  const days=[];
+  for(let i=0;i<7;i++) days.push(add(weekStart,i));
+  const todayStr=ds(today),selStr=ds(sel);
+  const hours=[];
+  for(let h=CAL_S;h<CAL_E;h++) hours.push(h);
+  const totalH=hours.length*WK_SH;
+  const now=new Date();
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const showNow=nowMins>=CAL_S*60&&nowMins<CAL_E*60;
+  const nowTop=((nowMins-CAL_S*60)/60)*WK_SH;
+
+  const dayHdHTML=days.map((d,i)=>{
+    const dstr=ds(d);
+    const isToday=dstr===todayStr;
+    const isSel=dstr===selStr&&!isToday;
+    return `<div class="wv-day-hd${isToday?' wv-today':''}${isSel?' wv-sel':''}" onclick="selectDay(new Date('${dstr}T00:00:00'))"><div class="wv-day-name">${DW[i]}</div><div class="wv-day-num">${d.getDate()}</div></div>`;
+  }).join('');
+
+  const timesHTML=hours.map(h=>{
+    const lbl=h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
+    return `<div class="wv-time-lbl" style="height:${WK_SH}px">${lbl}</div>`;
+  }).join('');
+
+  const colsHTML=days.map((d)=>{
+    const dstr=ds(d);
+    const daySess=SESSIONS.filter(s=>s.date===dstr);
+    const isToday=dstr===todayStr;
+    const bgLines=hours.map((h,i)=>
+      `<div class="wv-hr-bg" style="top:${i*WK_SH}px"></div>`+
+      `<div class="wv-half-bg" style="top:${i*WK_SH+WK_SH/2}px"></div>`
+    ).join('');
+    const blocks=daySess.map(s=>{
+      const startM=t2m(s.time);
+      const durM=dm(s.dur);
+      const top=((startM-CAL_S*60)/60)*WK_SH;
+      const height=Math.max((durM/60)*WK_SH-1,12);
+      if(top+height<=0||top>=totalH) return '';
+      const isPaid=s.payStatus==='paid';
+      return `<div class="wv-sess${isPaid?' wv-paid':''}" style="top:${top}px;height:${height}px" onclick="selectDay(new Date('${dstr}T00:00:00'));setSchedView('day')"><div class="wv-sess-name">${s.student.split(' ')[0]}</div></div>`;
+    }).join('');
+    const nowLine=isToday&&showNow?`<div class="wv-now-line" style="top:${nowTop}px"></div>`:'';
+    const wkSlotH=WK_SH/2;
+    const wkFreeSlots=[];
+    for(let h=CAL_S;h<CAL_E;h++){
+      for(let half=0;half<2;half++){
+        const m=h*60+half*30;
+        const slotTop=((m-CAL_S*60)/60)*WK_SH;
+        const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
+        if(!busy) wkFreeSlots.push(`<div class="wv-free-slot" style="top:${slotTop}px;height:${wkSlotH}px" onclick="bookAtTime('${dstr}',${h},${half*30})"></div>`);
+      }
+    }
+    return `<div class="wv-col" style="height:${totalH}px">${bgLines}${wkFreeSlots.join('')}${blocks}${nowLine}</div>`;
+  }).join('');
+
+  return `<div class="wv-wrap"><div class="wv-header"><div class="wv-corner"></div>${dayHdHTML}</div><div class="wv-body"><div class="wv-times">${timesHTML}</div><div class="wv-cols">${colsHTML}</div></div></div>`;
+}
+
+function handleDayGridClick(e,dstr){
+  if(e.target.closest('.sv-sess-block')) return;
+  const rect=e.currentTarget.getBoundingClientRect();
+  const y=e.clientY-rect.top;
+  const totalMins=CAL_S*60+(y/DAY_SH)*60;
+  const h=Math.floor(totalMins/60);
+  const m=Math.floor((totalMins%60)/30)*30;
+  if(h<CAL_S||h>=CAL_E) return;
+  bookAtTime(dstr,h,m);
+}
+
+function bookAtTime(dstr,h,m){
+  sel=new Date(dstr+'T00:00:00');
+  openBookModal();
+  setTimeout(()=>{
+    document.getElementById('startTime').value=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+    updateAmPmBtn();
+    checkOverlap();
+  },150);
+}
+
+function openSessDetail(id){ openEditLsnModal(id); }
+
+// ══ EDIT LESSON ══
+let editLsnTarget=null,editLsnDur='1 hour',editLsnRecur='One-time';
+function openEditLsnModal(id){
+  const s=SESSIONS.find(s=>s.id===id);
+  if(!s) return;
+  editLsnTarget=id; editLsnDur=s.dur; editLsnRecur=s.recur;
+  document.getElementById('editLsnStu').textContent=`✏️  ${s.student}`;
+  document.getElementById('editLsnTime').value=s.time;
+  updateEditAmPm();
+  document.getElementById('editLsnCourt').value=s.court;
+  document.querySelectorAll('#editDurPills .pill').forEach(p=>p.classList.toggle('active',p.textContent.trim()===editLsnDur));
+  document.querySelectorAll('#editRecurPills .pill').forEach(p=>p.classList.toggle('active',p.textContent.trim()===editLsnRecur));
+  document.getElementById('editLsnOvl').classList.add('open');
+}
+function closeEditLsnModal(){document.getElementById('editLsnOvl').classList.remove('open');editLsnTarget=null;}
+function handleEditLsnBg(e){if(e.target===document.getElementById('editLsnOvl'))closeEditLsnModal();}
+function setEditPill(btn,group,val){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  if(group==='dur') editLsnDur=val; else editLsnRecur=val;
+}
+function updateEditAmPm(){
+  const val=document.getElementById('editLsnTime').value;
+  if(!val) return;
+  document.getElementById('editAmpmBtn').textContent=parseInt(val.split(':')[0],10)<12?'AM':'PM';
+}
+function toggleEditAmPm(){
+  const inp=document.getElementById('editLsnTime');
+  const[h,m]=inp.value.split(':').map(Number);
+  inp.value=`${(h<12?h+12:h-12).toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  updateEditAmPm();
+}
+function saveEditLesson(){
+  const s=SESSIONS.find(s=>s.id===editLsnTarget);
+  if(!s) return;
+  s.time=document.getElementById('editLsnTime').value;
+  s.court=document.getElementById('editLsnCourt').value.trim()||s.court;
+  s.dur=editLsnDur; s.recur=editLsnRecur;
+  closeEditLsnModal();
+  renderSchedule(); renderToday();
+  toast('✓ Lesson updated');
+}
+function cancelFromEdit(){
+  const id=editLsnTarget;
+  closeEditLsnModal();
+  if(!id) return;
+  cancelTarget=id;
+  const s=SESSIONS.find(s=>s.id===id);
+  document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed.`;
+  document.getElementById('cancelOvl').classList.add('open');
+}
+
+// ══ ADD STUDENT ══
+let addStuLevel='Beginner';
+function openAddStudentModal(){
+  document.getElementById('astu-name').value='';
+  document.getElementById('astu-phone').value='';
+  document.getElementById('astu-credits').value='0';
+  addStuLevel='Beginner';
+  document.querySelectorAll('#astu-lvl-pills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  document.getElementById('addStuOvl').classList.add('open');
+  setTimeout(()=>document.getElementById('astu-name').focus(),400);
+}
+function closeAddStuModal(){document.getElementById('addStuOvl').classList.remove('open');}
+function handleAddStuBg(e){if(e.target===document.getElementById('addStuOvl'))closeAddStuModal();}
+function setAddStuPill(btn,val){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  addStuLevel=val;
+}
+function submitAddStudent(){
+  const name=document.getElementById('astu-name').value.trim();
+  if(!name){document.getElementById('astu-name').classList.add('err');setTimeout(()=>document.getElementById('astu-name').classList.remove('err'),1500);return;}
+  const phone=document.getElementById('astu-phone').value.trim();
+  const credits=parseInt(document.getElementById('astu-credits').value)||0;
+  STUDENTS.push({name,phone,level:addStuLevel,credits,sessions:0,owing:0});
+  closeAddStuModal();
+  renderStudents();
+  toast(`✓ ${name} added to roster`);
+}
 
 function checkOverlap(){
   const warn=document.getElementById('owarn');
@@ -1122,9 +1295,13 @@ function openBookModal(){
   updateAmPmBtn();
   document.getElementById('courtIn').value='';
   document.getElementById('notesIn').value='';
-  document.querySelectorAll('#durPills .pill').forEach((p,i)=>p.classList.toggle('active',i===1));
-  document.querySelectorAll('#recurPills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
-  selDur='1 hour';selRecur='One-time';acIdx=-1;
+  document.getElementById('customDurWrap').style.display='none';
+  document.getElementById('customDurIn').value='';
+  document.querySelectorAll('#durPills .pill').forEach((p,i)=>p.classList.toggle('active',i===2));
+  document.querySelectorAll('#recurPills .pill').forEach((p,i)=>p.classList.toggle('active',i===1));
+  selDur='1h';selRecur='Weekly';acIdx=-1;
+  const d=sel;
+  document.getElementById('bookForDate').textContent=`Booking for ${DF[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
   document.getElementById('acList').classList.remove('open');
   document.getElementById('owarn').classList.remove('show');
   document.getElementById('bookOvl').classList.add('open');
@@ -1158,14 +1335,21 @@ document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))document.
 function setPill(btn,group,val){
   btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
-  if(group==='dur'){selDur=val;checkOverlap();}else selRecur=val;
+  if(group==='dur'){
+    selDur=val;
+    const cw=document.getElementById('customDurWrap');
+    if(cw) cw.style.display=val==='custom'?'block':'none';
+    checkOverlap();
+  } else selRecur=val;
 }
 function bookLesson(){
   const name=document.getElementById('stuIn').value.trim();
   if(!name){document.getElementById('stuIn').classList.add('err');setTimeout(()=>document.getElementById('stuIn').classList.remove('err'),1500);return;}
   const time=document.getElementById('startTime').value;
   const court=document.getElementById('courtIn').value.trim()||'Court 1';
-  SESSIONS.push({id:nextId++,student:name,level:'',time,dur:selDur,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  let durLabel=selDur;
+  if(selDur==='custom'){const cv=document.getElementById('customDurIn').value.trim();durLabel=cv||'60m';}
+  SESSIONS.push({id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
   closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
 }
 
@@ -1213,174 +1397,6 @@ function closeStuDetail(){
   if(right) right.classList.remove('has-detail');
 }
 
-// ══ PAYMENTS ══
-let invFilter='All';
-function renderPayments(){
-  const paid=INVOICES.filter(i=>i.status==='Paid').reduce((a,i)=>a+i.amount,0);
-  const pend=INVOICES.filter(i=>i.status!=='Paid').reduce((a,i)=>a+i.amount,0);
-  const pc=INVOICES.filter(i=>i.status==='Paid').length;
-  document.getElementById('pStats').innerHTML=`<div class="hst"><div class="hst-n">$${paid}</div><div class="hst-l">Collected</div></div><div class="hst"><div class="hst-n">$${pend}</div><div class="hst-l">Pending</div></div><div class="hst"><div class="hst-n">${pc}</div><div class="hst-l">Paid</div></div>`;
-  renderInvList();
-  const el=document.getElementById('dsk-pay-stats');
-  if(el&&window.innerWidth>=1024){
-    el.innerHTML=`
-      <div style="font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Summary</div>
-      <div style="background:var(--ok-lt);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">
-        <div style="font-size:24px;font-weight:900;color:var(--ok)">$${paid}</div>
-        <div style="font-size:11px;font-weight:700;color:var(--ok);margin-top:3px">Collected</div>
-      </div>
-      <div style="background:var(--warn-lt);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">
-        <div style="font-size:24px;font-weight:900;color:var(--warn)">$${pend}</div>
-        <div style="font-size:11px;font-weight:700;color:var(--warn);margin-top:3px">Pending / Overdue</div>
-      </div>
-      <div style="background:var(--p-pl);border-radius:14px;padding:16px;text-align:center">
-        <div style="font-size:24px;font-weight:900;color:var(--p-dk)">${pc} / ${INVOICES.length}</div>
-        <div style="font-size:11px;font-weight:700;color:var(--p-dk);margin-top:3px">Invoices Paid</div>
-      </div>`;
-  }
-}
-function renderInvList(){
-  const list=invFilter==='All'?INVOICES:INVOICES.filter(i=>i.status===invFilter);
-  document.getElementById('invList').innerHTML=list.map(inv=>{
-    const sc=inv.status==='Paid'?'sb-paid':inv.status==='Pending'?'sb-pend':'sb-over';
-    const si=inv.status==='Paid'?'✓':inv.status==='Pending'?'⏳':'⚠';
-    const isSent=sentLinks.has(inv.id);
-    const btn=inv.status!=='Paid'?`<button class="sl-btn${isSent?' sent':''}" onclick="sendLink(event,'${inv.id}','${inv.student}')">${isSent?'✓ Sent':'Send Link'}</button>`:`<span style="font-size:12px;color:var(--ok);font-weight:700">✓ Paid ${inv.date}</span>`;
-    return `<div class="inv-card"><div class="inv-top"><div><div class="inv-name">${inv.student}</div><div class="inv-num">${inv.id}</div></div><div style="text-align:right"><div class="inv-amt">$${inv.amount}</div><div class="inv-items-l">${inv.items}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center"><span class="sbadge ${sc}">${si} ${inv.status}</span><span style="font-size:11px;color:var(--muted);font-weight:600">${inv.date}</span></div><div class="inv-foot"><span class="inv-ft">${inv.items}</span>${btn}</div></div>`;
-  }).join('');
-}
-function filterInv(status,btn){invFilter=status;document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('active'));btn.classList.add('active');renderInvList();}
-function sendLink(e,id,name){e.stopPropagation();sentLinks.add(id);renderInvList();toast(`💸 Payment link sent to ${name}!`);}
-
-// ══ WEATHER (OpenWeatherMap — free API, works for Australia) ══
-let wxLoaded=false;
-async function loadWeather(){
-  if(wxLoaded) return;
-  // Using Open-Meteo — completely free, no API key, great for Australia
-  try {
-    // Default to Sydney — in production this would use geolocation
-    const lat=-33.8688, lon=151.2093, city='Sydney, NSW';
-    document.getElementById('rLocation').textContent=city;
-
-    // Current + hourly forecast
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&timezone=Australia%2FSydney&forecast_days=1`;
-    const res=await fetch(url);
-    const data=await res.json();
-
-    const cur=data.current;
-    const temp=Math.round(cur.temperature_2m);
-    const feels=Math.round(cur.apparent_temperature);
-    const rainPct=cur.precipitation_probability||0;
-    const wind=Math.round(cur.wind_speed_10m);
-    const wcode=cur.weather_code||0;
-    const icon=wxIcon(wcode);
-    const desc=wxDesc(wcode);
-
-    // Court condition
-    let condClass='good',condTitle='Good to play',condSub='Conditions look great on court today.';
-    if(rainPct>=70){condClass='bad';condTitle='Rain likely';condSub='Consider cancelling outdoor sessions today.';}
-    else if(rainPct>=40){condClass='warn';condTitle='Might be wet';condSub='Keep an eye on conditions before heading out.';}
-
-    // Weather strip on Today tab
-    const stripEl=document.getElementById('wxStrip');
-    stripEl.className=`wx-strip wx-court-${condClass==='good'?'ok':condClass==='warn'?'warn':'bad'}`;
-    document.getElementById('wxIcon').textContent=icon;
-    document.getElementById('wxTemp').textContent=`${temp}°`;
-    document.getElementById('wxDesc').textContent=desc;
-    document.getElementById('wxRain').textContent=`${rainPct}% rain`;
-    document.getElementById('wxWind').textContent=`${wind} km/h`;
-
-    // Radar header stats
-    document.getElementById('rTemp').textContent=`${temp}°`;
-    document.getElementById('rRain').textContent=`${rainPct}%`;
-    document.getElementById('rWind').textContent=wind;
-
-    // Hourly
-    const hours=data.hourly;
-    const now=new Date().getHours();
-    let hourlyHTML='';
-    for(let i=now;i<Math.min(now+12,24);i++){
-      const ht=Math.round(hours.temperature_2m[i]);
-      const hr=hours.precipitation_probability[i]||0;
-      const hc=hours.weather_code[i]||0;
-      const isRainHr=hr>=50;
-      hourlyHTML+=`<div class="hr-item${isRainHr?' rain-hr':''}"><div class="hr-time">${i%12||12}${i>=12?'pm':'am'}</div><div class="hr-icon">${wxIcon(hc)}</div><div class="hr-temp">${ht}°</div><div class="hr-rain">${hr}%</div></div>`;
-    }
-
-    const courtCondHTML=`<div class="court-cond ${condClass}"><div class="cc-icon">${condClass==='good'?'🎾':condClass==='warn'?'⚠️':'🌧'}</div><div class="cc-text"><div class="cc-title">${condTitle}</div><div class="cc-sub">${condSub}</div></div>${condClass==='bad'?`<button class="cc-cancel-btn" onclick="toast('All today\\'s lessons cancelled — students notified!')">Cancel all</button>`:''}</div>`;
-    const wxMainHTML=`<div class="wx-main"><div class="wx-main-top"><div style="font-size:52px">${icon}</div><div><div class="wx-big-temp">${temp}°</div><div class="wx-big-feels">Feels like ${feels}°</div></div></div><div class="wx-big-desc">${desc}</div><div class="wx-grid"><div class="wx-stat"><div class="wx-stat-n">${rainPct}%</div><div class="wx-stat-l">Rain chance</div></div><div class="wx-stat"><div class="wx-stat-n">${wind}</div><div class="wx-stat-l">km/h wind</div></div><div class="wx-stat"><div class="wx-stat-n">${cur.relative_humidity_2m}%</div><div class="wx-stat-l">Humidity</div></div></div></div>`;
-    const hourlyWrapHTML=`<div style="font-size:12px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Hourly Forecast</div><div class="hourly-scroll">${hourlyHTML}</div>`;
-    const radarMapHTML=`<div class="radar-map-wrap"><div class="radar-map-label">BOM Rain Radar — Sydney <span>Live</span></div><iframe class="radar-iframe" src="https://www.rainviewer.com/map.html?loc=-33.8688,151.2093,9&oFa=0&oC=1&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=3&o=83&lm=1&layer=radar&sm=1&sn=1" allowfullscreen></iframe><div class="radar-note">🌧 Live radar via RainViewer · Tap map to interact</div></div>`;
-
-    const isDesk=window.innerWidth>=1024;
-    if(isDesk){
-      document.getElementById('rBody').style.display='none';
-      const split=document.getElementById('dsk-radar-split');
-      split.style.display='flex';
-      document.getElementById('dsk-radar-left').innerHTML=courtCondHTML+wxMainHTML+hourlyWrapHTML;
-      document.getElementById('dsk-radar-right').innerHTML=radarMapHTML;
-    } else {
-      document.getElementById('rBody').style.display='';
-      document.getElementById('dsk-radar-split').style.display='none';
-      document.getElementById('rBody').innerHTML=courtCondHTML+wxMainHTML+hourlyWrapHTML+radarMapHTML;
-    }
-    // Populate Today weather sidebar
-    renderDskWxPanel(icon,temp,feels,desc,rainPct,wind,condClass);
-    wxLoaded=true;
-  } catch(err){
-    document.getElementById('rBody').innerHTML=`<div class="wx-loading"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;color:var(--soft)">Weather data unavailable.<br>Check your connection and try refreshing.</div></div>`;
-    // Still show something on the today strip
-    document.getElementById('wxDesc').textContent='Tap Radar tab for weather';
-    wxLoaded=false;
-  }
-}
-
-function renderDskWxPanel(icon,temp,feels,desc,rain,wind,condClass){
-  const el=document.getElementById('dsk-wx-panel');
-  if(!el) return;
-  const condColors={good:'var(--ok)',warn:'var(--warn)',bad:'var(--err)'};
-  const condLabels={good:'Good to play',warn:'Might be wet',bad:'Rain likely'};
-  el.innerHTML=`
-    <div style="text-align:center;padding:20px 0 10px">
-      <div style="font-size:52px">${icon}</div>
-      <div style="font-size:36px;font-weight:900;color:var(--text);line-height:1">${temp}°</div>
-      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px">Feels like ${feels}°</div>
-      <div style="font-size:14px;font-weight:800;color:var(--text);margin-top:8px">${desc}</div>
-    </div>
-    <div style="background:var(--off);border-radius:12px;padding:12px;margin:10px 0;display:flex;justify-content:space-between">
-      <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:var(--r-dk)">${rain}%</div><div style="font-size:10px;color:var(--soft);font-weight:600">Rain</div></div>
-      <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:var(--r-dk)">${wind}</div><div style="font-size:10px;color:var(--soft);font-weight:600">km/h</div></div>
-    </div>
-    <div style="background:var(--r-pl);border-radius:12px;padding:10px 14px;text-align:center;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:800;color:${condColors[condClass]}">${condLabels[condClass]}</div>
-    </div>
-    <button onclick="switchTab('radar',document.querySelector('[data-t=radar]'))" style="width:100%;padding:10px;border-radius:100px;background:var(--r-pl);color:var(--r-dk);border:none;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">View Radar →</button>`;
-}
-
-function wxIcon(code){
-  if(code===0) return '☀️';
-  if(code<=2) return '⛅';
-  if(code<=3) return '☁️';
-  if(code<=49) return '🌫';
-  if(code<=59) return '🌦';
-  if(code<=69) return '🌧';
-  if(code<=79) return '🌨';
-  if(code<=84) return '🌧';
-  if(code<=99) return '⛈';
-  return '🌤';
-}
-function wxDesc(code){
-  if(code===0) return 'Clear sky';
-  if(code<=2) return 'Partly cloudy';
-  if(code<=3) return 'Overcast';
-  if(code<=49) return 'Foggy';
-  if(code<=59) return 'Light drizzle';
-  if(code<=69) return 'Rain';
-  if(code<=79) return 'Snow';
-  if(code<=84) return 'Rain showers';
-  if(code<=99) return 'Thunderstorm';
-  return 'Mixed conditions';
-}
 
 // ══ AM/PM TOGGLE ══
 function updateAmPmBtn(){
@@ -1500,7 +1516,6 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
 // ══ INIT ══
 renderToday();
 renderSchedule();
-loadWeather();
 renderCourtsDateLbl();
 </script>
 </body>
