@@ -1214,6 +1214,20 @@ function renderToday(){
     <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
   </div>`;
 
+  // Booking link card (always visible)
+  html+=`<div class="td-booking-link">
+    <div class="td-bl-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <span>Your Booking Link</span>
+    </div>
+    <div class="td-bl-desc">Students use this link to see your availability and book lessons</div>
+    <div class="td-bl-url-row">
+      <div class="td-bl-url">${BOOKING_URL.replace('https://','')}</div>
+      <button class="td-bl-copy" onclick="copyBookingLink()">Copy Link</button>
+      <button class="td-bl-share" onclick="switchTab('share',document.querySelector('[data-t=share]'))">Share</button>
+    </div>
+  </div>`;
+
   // Next up highlight
   if(cnt>0){
     const now=new Date();
@@ -1540,9 +1554,8 @@ function buildDstrip(container){
 let schedNudgeDismissed=localStorage.getItem('fixturely_sched_nudge_dismissed')==='1';
 function dismissSchedNudge(){schedNudgeDismissed=true;localStorage.setItem('fixturely_sched_nudge_dismissed','1');renderSchedule();}
 function renderSchedule(){
-  const hasShared=localStorage.getItem('fixturely_shared')==='1';
   let nudge='';
-  if(!schedNudgeDismissed&&!hasShared){
+  if(!schedNudgeDismissed){
     nudge=`<div class="sched-nudge"><div class="sched-nudge-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Your students can view this schedule and book lessons</span><a onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="color:var(--s-dk);font-weight:900;cursor:pointer;white-space:nowrap">Share Schedule →</a></div><button onclick="dismissSchedNudge()" class="sched-nudge-close">✕</button></div>`;
   }
   document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
@@ -2029,6 +2042,11 @@ function requestCourtSlot(court, startMins, date) {
 function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 // ══ INIT ══
+console.log('[Fixturely debug] localStorage state:', {
+  fixturely_onboard_done: localStorage.getItem('fixturely_onboard_done'),
+  fixturely_sched_nudge_dismissed: localStorage.getItem('fixturely_sched_nudge_dismissed'),
+  fixturely_shared: localStorage.getItem('fixturely_shared')
+});
 renderToday();
 renderSchedule();
 renderCourtsDateLbl();
