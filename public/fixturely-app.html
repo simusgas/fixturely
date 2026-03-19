@@ -539,8 +539,8 @@
     .sb-item[data-t="schedule"].active { background:var(--s-pl); color:var(--s-dk); }
     .sb-item[data-t="students"].active { background:var(--u-pl); color:var(--u-dk); }
     .sb-item[data-t="courts"].active   { background:var(--c-pl); color:var(--c-dk); }
-    .sb-share-item { color:var(--s-dk) !important; }
-    .sb-share-item:hover { background:var(--s-pl) !important; }
+    .sb-item[data-t="share"] { color:var(--s-dk); }
+    .sb-item[data-t="share"]:hover { background:var(--s-pl); }
 
     /* ── Main column (right of sidebar) ── */
     .main-col { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; min-width:0; }
@@ -576,7 +576,7 @@
     .screen.active { display:flex; }
 
     /* ── Hide colored mobile headers on desktop ── */
-    .t-hdr,.s-hdr,.u-hdr,.c-hdr { display:none; }
+    .t-hdr,.s-hdr,.u-hdr,.c-hdr,.sh-hdr { display:none; }
     .hdr-stats { display:none; }
 
     /* ── Two-col split wrapper ── */
@@ -621,11 +621,74 @@
     #dsk-stu-right.has-detail #dsk-stu-placeholder { display:none; }
     #dsk-stu-right { position:relative; overflow:hidden; }
 
+    /* ── SHARE SCHEDULE ── */
+    .sh-hdr { display:none; }
+    .sh-body { flex:1; overflow-y:auto; padding:24px; }
+    .sh-split { flex-direction:row; gap:24px; max-width:1100px; }
+    .sh-split-left { flex:3; min-width:0; width:auto; }
+    .sh-split-right { flex:2; min-width:280px; width:auto; }
+    .sb-item[data-t="share"].active { background:var(--s-pl); color:var(--s-dk); }
+
     /* ── Modals — centered ── */
     .overlay { align-items:center; }
     .modal   { border-radius:24px; max-width:520px; max-height:85vh; }
     .modal-handle { display:none; }
   }
+
+  /* ══════════════════════
+     SHARE SCHEDULE
+  ══════════════════════ */
+  .sh-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 20px;border-radius:0 0 28px 28px;}
+  .sh-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .sh-title{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
+  .sh-sub{font-size:13px;font-weight:700;color:var(--s-dk);margin-top:2px;}
+  .sh-body{padding:16px;}
+
+  /* Share page — preview frame */
+  .sh-preview-frame{background:var(--white);border-radius:20px;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:20px;}
+  .sh-preview-bar{background:var(--off);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;}
+  .sh-preview-dots{display:flex;gap:5px;}
+  .sh-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .sh-preview-url{flex:1;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sh-preview-label{font-size:12px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;text-align:center;}
+  .sh-preview-content{max-height:500px;overflow-y:auto;}
+  .sh-preview-empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .sh-preview-empty-icon{font-size:36px;margin-bottom:10px;}
+  .sh-preview-empty-t{font-size:14px;font-weight:800;color:var(--soft);margin-bottom:6px;}
+  .sh-preview-empty-s{font-size:12px;font-weight:600;line-height:1.5;}
+
+  /* Share page — controls */
+  .sh-link-card{background:var(--s-pl);border:1.5px solid var(--s-b);border-radius:16px;padding:16px;margin-bottom:20px;}
+  .sh-link-title{font-size:15px;font-weight:900;color:var(--s-dk);margin-bottom:4px;}
+  .sh-link-sub{font-size:12px;color:var(--soft);font-weight:600;margin-bottom:12px;}
+  .sh-link-url-row{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);margin-bottom:10px;}
+  .sh-link-url{flex:1;font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sh-link-copy{background:var(--s-a);color:var(--white);border:none;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .sh-link-copy:hover{background:var(--s-dk);}
+
+  /* Share with students list */
+  .sh-students-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .sh-students-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:12px;}
+  .sh-stu-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .sh-stu-item:last-child{border-bottom:none;}
+  .sh-stu-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;transition:all 0.15s;background:var(--white);color:transparent;}
+  .sh-stu-check.checked{background:var(--s-a);border-color:var(--s-a);color:var(--white);}
+  .sh-stu-name{font-size:14px;font-weight:700;color:var(--text);}
+  .sh-stu-level{font-size:11px;color:var(--muted);font-weight:600;}
+  .sh-send-btn{width:100%;padding:12px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:10px;box-shadow:0 4px 14px rgba(245,166,35,0.3);transition:all 0.15s;}
+  .sh-send-btn:hover{background:var(--s-dk);}
+  .sh-send-btn:disabled{opacity:0.5;cursor:default;}
+
+  /* Manual share options */
+  .sh-manual-card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .sh-manual-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:12px;}
+  .sh-manual-btns{display:flex;flex-direction:column;gap:8px;}
+  .sh-manual-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text);transition:all 0.15s;}
+  .sh-manual-btn:hover{background:var(--off);border-color:var(--s-b);}
+  .sh-manual-icon{font-size:18px;width:28px;text-align:center;}
+  /* Mobile: share page stacked */
+  .sh-split{display:flex;flex-direction:column;gap:16px;}
+  .sh-split-left,.sh-split-right{width:100%;}
 
   /* ── Tooltips ── */
   .tb-has-tip{position:relative;}
@@ -646,7 +709,7 @@
       <button class="sb-item"        data-t="students" onclick="switchTab('students',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Students</span></button>
       <button class="sb-item"        data-t="courts"   onclick="switchTab('courts',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>Courts</span></button>
       <div style="border-top:1px solid var(--border);margin:8px 10px;"></div>
-      <button class="sb-item sb-share-item" onclick="shareCalendar()"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span>Share Schedule</span></button>
+      <button class="sb-item" data-t="share" onclick="switchTab('share',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span>Share Schedule</span></button>
     </nav>
   </aside>
   <div class="main-col">
@@ -677,8 +740,6 @@
       </div>
       <div class="s-hdr-acts">
         <button class="hdr-btn s-add-btn" onclick="openBookModal()">+ Add Lesson</button>
-        <button class="hdr-btn s-add-btn tb-has-tip" onclick="shareCalendar()">📤 Share<span class="tb-tip">Share your schedule link with students</span></button>
-        <button class="hdr-btn s-hdr-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button>
         <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
       </div>
     </div>
@@ -748,6 +809,16 @@
     <div class="courts-outer" id="cBody">
       <div style="text-align:center;padding:60px 20px;color:var(--muted)">Select the Courts tab to load availability</div>
     </div>
+  </div>
+
+  <!-- ══ SHARE SCHEDULE ══ -->
+  <div class="screen" id="screen-share">
+    <div class="sh-hdr">
+      <div class="sh-hdr-top">
+        <div><div class="sh-title">Share Schedule</div><div class="sh-sub">Let students book with you</div></div>
+      </div>
+    </div>
+    <div class="sh-body" id="shBody"></div>
   </div>
 
   <!-- ══ BOTTOM NAV ══ -->
@@ -1009,22 +1080,25 @@ function switchTab(tab,btn){
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
   if(tab==='courts')   loadCourts();
+  if(tab==='share')    renderSharePage();
 }
 
 function updateTopbar(tab){
   const titleEl=document.getElementById('topnavTitle');
   const actsEl=document.getElementById('topnavActs');
   if(!titleEl||!actsEl) return;
-  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts'};
+  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule'};
   titleEl.textContent=titles[tab]||tab;
   if(tab==='today'){
     actsEl.innerHTML=``;
   } else if(tab==='schedule'){
-    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn tb-btn-primary tb-has-tip" onclick="shareCalendar()">📤 Share Schedule<span class="tb-tip">Share your schedule link with students</span></button><button class="tb-btn tb-has-tip" onclick="showStudentView(true)">👁 Preview<span class="tb-tip">See how students view your schedule</span></button><button class="tb-btn" onclick="goToday()">Today</button>`;
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="goToday()">Today</button>`;
   } else if(tab==='students'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
   } else if(tab==='courts'){
     actsEl.innerHTML=`<button class="tb-btn" onclick="courtsDate=ds(today);renderCourtsDateLbl();loadCourts()">Today</button>`;
+  } else if(tab==='share'){
+    actsEl.innerHTML=``;
   } else {
     actsEl.innerHTML='';
   }
@@ -1117,21 +1191,7 @@ function renderToday(){
   html+=`<div class="td-quick-actions">
     <button class="td-qa-btn" onclick="openBookModal()">+ Add Lesson</button>
     <button class="td-qa-btn" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>
-    <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
-  </div>`;
-
-  // Booking link card
-  html+=`<div class="td-booking-link">
-    <div class="td-bl-header">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <span>Your Booking Link</span>
-    </div>
-    <div class="td-bl-desc">Students use this link to see your availability and book lessons</div>
-    <div class="td-bl-url-row">
-      <div class="td-bl-url">${BOOKING_URL.replace('https://','')}</div>
-      <button class="td-bl-copy" onclick="copyBookingLink()">Copy</button>
-      <button class="td-bl-share" onclick="shareCalendar()">Share</button>
-    </div>
+    <button class="td-qa-btn" onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="background:var(--s-pl);border-color:var(--s-b);color:var(--s-dk)">📤 Share</button>
   </div>`;
 
   // Next up highlight
@@ -1217,13 +1277,7 @@ function getAvailableSlots(dstr){
 
 const BOOKING_URL='https://fixturely.app/coach/yourname';
 function shareCalendar(){
-  if(navigator.share){
-    navigator.share({title:'Book a lesson with me',text:'See my availability and book a tennis lesson',url:BOOKING_URL}).catch(()=>{});
-    markShared();
-  } else {
-    copyBookingLink();
-    markShared();
-  }
+  switchTab('share',document.querySelector('[data-t=share]'));
 }
 function copyBookingLink(){
   if(navigator.clipboard){navigator.clipboard.writeText(BOOKING_URL).then(()=>toast('📤 Booking link copied to clipboard!'));}
@@ -1232,6 +1286,122 @@ function copyBookingLink(){
 function markShared(){
   localStorage.setItem('fixturely_shared','1');
   renderToday();
+}
+
+// ══ SHARE SCHEDULE PAGE ══
+let shareSelectedStudents=new Set();
+function toggleShareStudent(name){
+  if(shareSelectedStudents.has(name)) shareSelectedStudents.delete(name);
+  else shareSelectedStudents.add(name);
+  renderSharePage();
+}
+function sendToSelected(){
+  const names=[...shareSelectedStudents];
+  if(!names.length) return;
+  const msg=`Hey! You can view my coaching schedule and book a lesson here: ${BOOKING_URL}`;
+  if(navigator.share){
+    navigator.share({title:'Book a lesson with me',text:msg}).catch(()=>{});
+  } else {
+    copyBookingLink();
+  }
+  markShared();
+  toast(`📤 Link shared with ${names.length} student${names.length>1?'s':''}`);
+  shareSelectedStudents.clear();
+  renderSharePage();
+}
+function shareViaChannel(channel){
+  const msg=encodeURIComponent(`Hey! You can view my coaching schedule and book a lesson here: ${BOOKING_URL}`);
+  const url=BOOKING_URL;
+  if(channel==='text'){window.open(`sms:?body=${msg}`,'_blank');}
+  else if(channel==='email'){window.open(`mailto:?subject=${encodeURIComponent('Book a tennis lesson')}&body=${msg}`,'_blank');}
+  else if(channel==='whatsapp'){window.open(`https://wa.me/?text=${msg}`,'_blank');}
+  markShared();
+}
+function renderSharePage(){
+  const body=document.getElementById('shBody');
+
+  // Build the student-view preview
+  let previewHTML='';
+  const hasAnySessions=SESSIONS.length>0;
+  if(hasAnySessions){
+    // Build a mini version of the student calendar view
+    const previewDays=[];
+    for(let i=0;i<7;i++){
+      const d=add(today,i);
+      const dstr=ds(d);
+      const slots=getAvailableSlots(dstr);
+      previewDays.push({d,dstr,slots,dayName:DS_[d.getDay()],num:d.getDate()});
+    }
+    const dayStrip=previewDays.map(pd=>{
+      const hasSlots=pd.slots.length>0;
+      return `<div style="display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:12px;min-width:44px;${hasSlots?'border:1.5px solid var(--s-b);background:var(--white)':'border:1.5px solid var(--border);opacity:0.4;background:var(--off)'}"><div style="font-size:9px;font-weight:800;color:${hasSlots?'var(--s-dk)':'var(--muted)'};text-transform:uppercase">${pd.dayName}</div><div style="font-size:15px;font-weight:900;color:var(--text)">${pd.num}</div></div>`;
+    }).join('');
+    const firstAvail=previewDays.find(pd=>pd.slots.length>0);
+    let slotCards='';
+    if(firstAvail){
+      slotCards=firstAvail.slots.slice(0,3).map(t=>`<div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:900;color:var(--text)">${fmt(t)}</div><div style="font-size:11px;color:var(--soft);font-weight:600">1 hour · Tennis lesson</div></div><div style="background:var(--s-a);color:var(--white);padding:8px 14px;border-radius:100px;font-size:12px;font-weight:800">Book</div></div>`).join('');
+      if(firstAvail.slots.length>3) slotCards+=`<div style="text-align:center;font-size:12px;color:var(--muted);font-weight:600;padding:4px">+${firstAvail.slots.length-3} more slots</div>`;
+    }
+    previewHTML=`<div style="padding:20px">
+      <div style="text-align:center;margin-bottom:16px"><div style="font-size:24px;margin-bottom:4px">🎾</div><div style="font-size:18px;font-weight:900;color:var(--text)">Coach Alex</div><div style="font-size:12px;color:var(--soft);font-weight:600">Tennis Coach · Sydney</div></div>
+      <div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Choose a day</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px">${dayStrip}</div>
+      ${firstAvail?`<div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Available times</div>${slotCards}`:''}
+    </div>`;
+  } else {
+    previewHTML=`<div class="sh-preview-empty"><div class="sh-preview-empty-icon">📅</div><div class="sh-preview-empty-t">Your schedule is empty</div><div class="sh-preview-empty-s">Add some lessons first and your students<br>will see your availability here</div></div>`;
+  }
+
+  // Student list for sharing
+  let studentsListHTML='';
+  if(STUDENTS.length>0){
+    studentsListHTML=STUDENTS.map(s=>{
+      const checked=shareSelectedStudents.has(s.name);
+      return `<div class="sh-stu-item" onclick="toggleShareStudent('${s.name}')">
+        <div class="sh-stu-check${checked?' checked':''}">${checked?'✓':''}</div>
+        <div style="flex:1"><div class="sh-stu-name">${s.name}</div><div class="sh-stu-level">${s.level}</div></div>
+      </div>`;
+    }).join('');
+  } else {
+    studentsListHTML=`<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">No students yet — add students first</div>`;
+  }
+  const selCount=shareSelectedStudents.size;
+
+  body.innerHTML=`<div class="sh-split">
+    <div class="sh-split-left">
+      <div class="sh-preview-label">This is how students see your schedule</div>
+      <div class="sh-preview-frame">
+        <div class="sh-preview-bar">
+          <div class="sh-preview-dots"><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div></div>
+          <div class="sh-preview-url">${BOOKING_URL.replace('https://','')}</div>
+        </div>
+        <div class="sh-preview-content">${previewHTML}</div>
+      </div>
+    </div>
+    <div class="sh-split-right">
+      <div class="sh-link-card">
+        <div class="sh-link-title">Your Booking Link</div>
+        <div class="sh-link-sub">Students use this link to see your availability and book lessons</div>
+        <div class="sh-link-url-row">
+          <div class="sh-link-url">${BOOKING_URL.replace('https://','')}</div>
+          <button class="sh-link-copy" onclick="copyBookingLink();markShared()">Copy Link</button>
+        </div>
+      </div>
+      <div class="sh-students-card">
+        <div class="sh-students-title">Share with students</div>
+        ${studentsListHTML}
+        <button class="sh-send-btn" onclick="sendToSelected()"${selCount===0?' disabled':''}>Send to ${selCount||'selected'} student${selCount!==1?'s':''}</button>
+      </div>
+      <div class="sh-manual-card">
+        <div class="sh-manual-title">Or share manually</div>
+        <div class="sh-manual-btns">
+          <button class="sh-manual-btn" onclick="shareViaChannel('text')"><span class="sh-manual-icon">💬</span>Send via Text</button>
+          <button class="sh-manual-btn" onclick="shareViaChannel('email')"><span class="sh-manual-icon">📧</span>Send via Email</button>
+          <button class="sh-manual-btn" onclick="shareViaChannel('whatsapp')"><span class="sh-manual-icon">📱</span>Send via WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 function showStudentView(isPreview){
