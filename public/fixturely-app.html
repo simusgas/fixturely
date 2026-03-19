@@ -1032,6 +1032,7 @@ function updateTopbar(tab){
 
 // ══ TODAY ══
 let onboardDismissed=localStorage.getItem('fixturely_onboard_done')==='1';
+function dismissOnboarding(){onboardDismissed=true;localStorage.setItem('fixturely_onboard_done','1');renderToday();}
 let coachRate=localStorage.getItem('fixturely_hourly_rate')?parseInt(localStorage.getItem('fixturely_hourly_rate')):null;
 function setCoachRate(){
   const val=prompt('Set your hourly rate ($):','80');
@@ -1076,32 +1077,22 @@ function renderToday(){
     const steps=[
       {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
       {done:hasLessons, title:'Schedule your first lesson', sub:'Book a session', action:"switchTab('schedule',document.querySelector('[data-t=schedule]'));setTimeout(()=>openBookModal(),300)"},
-      {done:hasShared, title:'Share your schedule', sub:'Send your booking link to students', action:'', isShare:true}
+      {done:hasShared, title:'Share your schedule with students', sub:'Let students see your availability and book lessons', action:"switchTab('share',document.querySelector('[data-t=share]'))"}
     ];
     const doneCount=steps.filter(s=>s.done).length;
-    const bookingUrl='fixturely.app/coach/yourname';
     html+=`<div class="td-onboard">
-      <div class="td-onboard-title">Welcome to Fixturely!</div>
-      <div class="td-onboard-sub">Let's get you set up — ${doneCount} of ${steps.length} complete</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="td-onboard-title">Welcome to Fixturely!</div>
+          <div class="td-onboard-sub">Let's get you set up — ${doneCount} of ${steps.length} complete</div>
+        </div>
+        <button onclick="dismissOnboarding()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1" title="Dismiss">✕</button>
+      </div>
       <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
-      ${steps.map(s=>{
-        if(s.isShare&&!s.done&&hasStudents&&hasLessons){
-          return `<div class="td-onboard-step" style="flex-direction:column;align-items:stretch;gap:10px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div class="td-onboard-check"></div>
-              <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
-            </div>
-            <div style="background:var(--off);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--border)">
-              <span style="flex:1;font-size:13px;font-weight:700;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${bookingUrl}</span>
-              <button onclick="copyBookingLink();markShared()" style="background:var(--s-a);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap">Copy Link</button>
-            </div>
-          </div>`;
-        }
-        return `<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
-          <div class="td-onboard-check">${s.done?'✓':''}</div>
-          <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
-        </div>`;
-      }).join('')}
+      ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
+        <div class="td-onboard-check">${s.done?'✓':''}</div>
+        <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
+      </div>`).join('')}
     </div>`;
   }
 
