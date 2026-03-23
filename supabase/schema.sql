@@ -58,3 +58,27 @@ alter table public.invoices enable row level security;
 create policy "coaches_own_invoices" on public.invoices
   for all using (auth.uid() = coach_id)
   with check (auth.uid() = coach_id);
+
+-- ── Court Bookings ───────────────────────────────────────────────────────────
+create table if not exists public.court_bookings (
+  id              uuid    primary key default gen_random_uuid(),
+  coach_id        uuid    not null references auth.users(id) on delete cascade,
+  clubspark_ref   text,                           -- booking reference from ClubSpark
+  court_name      text    not null,                -- e.g. "Court 13"
+  resource_id     text,                            -- ClubSpark Resource GUID
+  date            text    not null,                -- YYYY-MM-DD
+  start_mins      integer not null,                -- minutes from midnight
+  end_mins        integer not null,                -- minutes from midnight
+  duration_mins   integer not null default 60,
+  status          text    not null default 'pending', -- pending | confirmed | failed | cancelled
+  error_message   text,
+  amount_cents    integer,                         -- price in cents (for future Stripe)
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+
+alter table public.court_bookings enable row level security;
+
+create policy "coaches_own_bookings" on public.court_bookings
+  for all using (auth.uid() = coach_id)
+  with check (auth.uid() = coach_id);

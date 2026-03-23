@@ -1039,6 +1039,39 @@
   </div>
 </div>
 
+<!-- COURT BOOKING MODAL -->
+<div class="overlay" id="courtBookOvl" onclick="if(event.target===this)closeCourtBookModal()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeCourtBookModal()">✕</button>
+    <div class="modal-title" style="color:var(--c-dk)">Book Court</div>
+    <div id="cbCourtLabel" style="background:var(--c-pl);border-radius:14px;padding:12px 15px;margin-bottom:18px;font-size:15px;font-weight:800;color:var(--c-dk)"></div>
+    <div class="field">
+      <label class="field-label">Date</label>
+      <div class="field-input" id="cbDate" style="background:var(--off);color:var(--soft)"></div>
+    </div>
+    <div class="field">
+      <label class="field-label">Start Time</label>
+      <div class="field-input" id="cbStartTime" style="background:var(--off);color:var(--soft)"></div>
+    </div>
+    <div class="field">
+      <label class="field-label">Duration</label>
+      <div class="pill-group" id="cbDurPills">
+        <button class="pill" onclick="setCbDur(this,30)">30 min</button>
+        <button class="pill active" onclick="setCbDur(this,60)">1 hour</button>
+        <button class="pill" onclick="setCbDur(this,90)">1.5 hrs</button>
+        <button class="pill" onclick="setCbDur(this,120)">2 hours</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">End Time</label>
+      <div class="field-input" id="cbEndTime" style="background:var(--off);color:var(--soft)"></div>
+    </div>
+    <div id="cbError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
+    <button class="submit-btn" id="cbSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="submitCourtBooking()">Book Court ✓</button>
+  </div>
+</div>
+
 <div class="toast" id="toastEl"></div>
 
 <script>
@@ -1971,8 +2004,14 @@ async function loadCourts() {
   const body = document.getElementById('cBody');
   body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><div class="wx-loading-icon">⏳</div><div style="margin-top:8px;font-size:13px">Loading court availability…</div></div>';
   try {
-    const res = await fetch(`/api/courts?date=${courtsDate}`);
+    // Fetch availability and coach's bookings in parallel
+    const [res, bkRes] = await Promise.all([
+      fetch(`/api/courts?date=${courtsDate}`),
+      fetch(`/api/courts/bookings?date=${courtsDate}`).catch(()=>({ok:false}))
+    ]);
     const data = await res.json();
+    let myBookings = [];
+    if (bkRes.ok) { try { myBookings = (await bkRes.json()).bookings || []; } catch {} }
     const SLOT_H = 60;
     const GRID_S = data.EarliestStartTime || 360;
     const GRID_E = data.LatestEndTime || 1350;
@@ -2007,7 +2046,7 @@ async function loadCourts() {
       const freeCells = slots.map((m,i) => {
         const isBusy = busy.some(s => s.StartTime < m+30 && s.EndTime > m);
         if (isBusy) return '';
-        return `<div class="cg-slot-free" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}',${m},'${courtsDate}')">Request</button></div>`;
+        return `<div class="cg-slot-free" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}','${r.Id||''}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.Id||''}',${m},'${courtsDate}')">Book</button></div>`;
       }).join('');
 
       // Session blocks (on top, pointer-events:none so hover passes through to free cells)
@@ -2021,7 +2060,15 @@ async function loadCourts() {
         return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div></div>`;
       }).join('');
 
-      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}</div>`;
+      // Coach's own bookings overlay (green highlight)
+      const myBlocks = myBookings.filter(b => b.court_name === r.Name).map(b => {
+        const top = Math.max(0, (b.start_mins - GRID_S) / 30 * SLOT_H);
+        const h = Math.max((b.end_mins - b.start_mins) / 30 * SLOT_H - 2, 14);
+        const statusLabel = b.status === 'confirmed' ? 'Booked' : b.status === 'pending' ? 'Booking...' : '';
+        return `<div style="position:absolute;top:${top}px;height:${h}px;left:2px;right:2px;border-radius:4px;background:rgba(61,139,94,0.15);border:2px solid var(--ok);pointer-events:none;z-index:5;display:flex;align-items:center;justify-content:center"><span style="font-size:9px;font-weight:900;color:var(--ok);background:var(--ok-lt);padding:2px 8px;border-radius:100px">${statusLabel}</span></div>`;
+      }).join('');
+
+      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${myBlocks}</div>`;
     });
 
     html += `</div></div></div>`;
@@ -2030,12 +2077,75 @@ async function loadCourts() {
     body.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;font-weight:700">Could not load court data</div></div>`;
   }
 }
-function requestCourtSlot(court, startMins, date) {
-  const h = Math.floor(startMins/60)%24, mn = startMins%60;
-  const endMins = startMins + 30;
-  const eh = Math.floor(endMins/60)%24, emn = endMins%60;
-  const fmt12 = (hh,mm) => `${hh%12||12}:${mm.toString().padStart(2,'0')}${hh>=12?'pm':'am'}`;
-  toast(`📋 Request sent — ${court}, ${fmt12(h,mn)}–${fmt12(eh,emn)} on ${date}`);
+// ══ COURT BOOKING ══
+let cbCourt='',cbResourceId='',cbStartMins=0,cbDate='',cbDuration=60;
+function courtFmt12(mins){const h=Math.floor(mins/60)%24,m=mins%60;return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
+
+function requestCourtSlot(court, resourceId, startMins, date) {
+  cbCourt=court; cbResourceId=resourceId; cbStartMins=startMins; cbDate=date; cbDuration=60;
+  document.getElementById('cbCourtLabel').textContent=`🎾 ${court}`;
+  const d=new Date(date+'T00:00:00');
+  document.getElementById('cbDate').textContent=`${DF[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('cbStartTime').textContent=courtFmt12(startMins);
+  document.querySelectorAll('#cbDurPills .pill').forEach(p=>p.classList.toggle('active',p.textContent.trim()==='1 hour'));
+  updateCbEndTime();
+  document.getElementById('cbError').style.display='none';
+  document.getElementById('cbSubmitBtn').disabled=false;
+  document.getElementById('cbSubmitBtn').textContent='Book Court ✓';
+  document.getElementById('courtBookOvl').classList.add('open');
+}
+
+function setCbDur(btn,mins){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  cbDuration=mins;
+  updateCbEndTime();
+}
+
+function updateCbEndTime(){
+  document.getElementById('cbEndTime').textContent=courtFmt12(cbStartMins+cbDuration);
+}
+
+function closeCourtBookModal(){
+  document.getElementById('courtBookOvl').classList.remove('open');
+}
+
+async function submitCourtBooking(){
+  const btn=document.getElementById('cbSubmitBtn');
+  const errEl=document.getElementById('cbError');
+  btn.disabled=true;
+  btn.textContent='Booking...';
+  errEl.style.display='none';
+
+  try {
+    const res=await fetch('/api/courts/book',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        courtName:cbCourt,
+        resourceId:cbResourceId||undefined,
+        date:cbDate,
+        startMins:cbStartMins,
+        durationMins:cbDuration
+      })
+    });
+    const data=await res.json();
+    if(data.success){
+      closeCourtBookModal();
+      toast(`✅ ${cbCourt} booked — ${courtFmt12(cbStartMins)} to ${courtFmt12(cbStartMins+cbDuration)}`);
+      loadCourts(); // refresh grid
+    } else {
+      errEl.textContent=data.error||'Booking failed. Please try again.';
+      errEl.style.display='block';
+      btn.disabled=false;
+      btn.textContent='Book Court ✓';
+    }
+  } catch(e) {
+    errEl.textContent='Network error — check your connection and try again.';
+    errEl.style.display='block';
+    btn.disabled=false;
+    btn.textContent='Book Court ✓';
+  }
 }
 
 // ══ TOAST ══
