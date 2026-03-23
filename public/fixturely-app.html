@@ -21,7 +21,7 @@
     --soft:      #7A6840;
     --muted:     #BBA87A;
     --border:    #EEE8DC;
-    --nav-h:     calc(70px + env(safe-area-inset-bottom));
+    --nav-h:     calc(56px + env(safe-area-inset-bottom));
     /* Schedule — amber */
     --s-a:#F5A623; --s-b:#FDC75A; --s-c:#FDE68A; --s-pl:#FEF0C7; --s-dk:#D4880F;
     /* Today — warm coral */
@@ -38,12 +38,12 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;background:#EDE4D4;font-family:'Nunito',sans-serif;color:var(--text);overflow:hidden;}
   .phone{max-width:420px;margin:0 auto;height:100vh;background:var(--off);position:relative;display:flex;flex-direction:column;overflow:hidden;}
-  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h)+8px);display:none;}
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:var(--nav-h);display:none;}
   .screen.active{display:block;}
 
   /* ── NAV ── */
-  .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,0.06);z-index:90;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom);}
-  .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:6px 2px;position:relative;}
+  .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -2px 12px rgba(0,0,0,0.06);z-index:90;border-radius:0;padding-bottom:env(safe-area-inset-bottom);}
+  .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:4px 2px;position:relative;}
   .ntab .ni{font-size:20px;transition:transform 0.2s;display:flex;align-items:center;justify-content:center;}
   .ntab .ni svg{width:22px;height:22px;color:var(--muted);}
   .ntab.active .ni svg{color:inherit;}
@@ -254,7 +254,14 @@
   .sv-free-slot:hover{background:rgba(0,0,0,0.04);}
   .sv-sess-block{position:absolute;left:4px;right:4px;border-radius:8px;padding:5px 8px;overflow:hidden;cursor:pointer;z-index:2;background:var(--s-pl);border-left:3px solid var(--s-a);box-shadow:0 1px 5px rgba(0,0,0,0.07);transition:opacity 0.15s;}
   .sv-sess-block.paid{background:var(--ok-lt);border-left-color:var(--ok);}
-  .sv-sess-block:hover{opacity:0.8;}
+  .sv-sess-block:hover{opacity:1;}
+  .sv-hover-btns{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:3;background:rgba(255,255,255,0.82);border-radius:8px;}
+  .sv-sess-block:hover .sv-hover-btns{opacity:1;pointer-events:auto;}
+  .sv-hbtn{padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .sv-hbtn-edit{background:var(--s-a);color:#fff;box-shadow:0 2px 6px rgba(212,136,15,0.35);}
+  .sv-hbtn-edit:hover{background:var(--s-dk);}
+  .sv-hbtn-del{background:var(--white);color:var(--err);border:1.5px solid var(--err);}
+  .sv-hbtn-del:hover{background:var(--err-lt);}
   .sv-sb-name{font-size:12px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
   .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
   .sv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:3;pointer-events:none;}
@@ -299,8 +306,15 @@
   .wv-sess-time{font-size:8px;font-weight:700;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1px;}
   .wv-sess-court{font-size:7px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
   /* Week view tooltip */
-  .wv-sess .wv-tooltip{display:none;position:absolute;left:50%;top:100%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,0.2);pointer-events:none;margin-top:4px;}
+  .wv-sess .wv-tooltip{display:none;position:absolute;left:50%;top:100%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,0.2);pointer-events:auto;margin-top:4px;}
   .wv-sess:hover .wv-tooltip{display:block;}
+  .wv-hover-btns{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:3px;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:3;background:rgba(255,255,255,0.85);border-radius:6px;}
+  .wv-sess:hover .wv-hover-btns{opacity:1;pointer-events:auto;}
+  .wv-hbtn{padding:2px 7px;border-radius:100px;border:none;font-size:9px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
+  .wv-hbtn-edit{background:var(--s-a);color:#fff;}
+  .wv-hbtn-edit:hover{background:var(--s-dk);}
+  .wv-hbtn-del{background:var(--white);color:var(--err);border:1px solid var(--err);}
+  .wv-hbtn-del:hover{background:var(--err-lt);}
   .wv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
   .wv-now-dot{width:8px;height:8px;border-radius:50%;background:var(--t-a);position:absolute;left:-4px;top:-3px;}
   .wv-col.wv-col-today{background:rgba(232,114,74,0.04);}
@@ -452,6 +466,14 @@
   .ow strong{font-weight:900;}
   .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;border-radius:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 14px rgba(212,136,15,0.3);transition:transform 0.15s;margin-top:6px;}
   .submit-btn:hover{transform:translateY(-1px);}
+  /* Compact booking modal */
+  #bookOvl .modal{padding:18px 18px 28px;}
+  #bookOvl .modal-title{font-size:18px;margin-bottom:14px;}
+  #bookOvl .field{margin-bottom:11px;}
+  #bookOvl .field-label{margin-bottom:4px;font-size:12px;}
+  #bookOvl .field-input{padding:9px 13px;font-size:14px;}
+  #bookOvl .pill{padding:6px 12px;font-size:12px;}
+  #bookOvl .submit-btn{padding:13px;font-size:15px;margin-top:4px;}
   .term-modal-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:4px;}
   .term-modal-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:20px;}
   .term-item{background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:10px;}
@@ -532,6 +554,10 @@
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
 
+  /* ── Mobile profile avatar (top-right) ── */
+  .mob-pf-btn{position:fixed;top:12px;right:12px;z-index:85;width:36px;height:36px;border-radius:50%;background:var(--white);border:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--soft);font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .mob-pf-btn:hover{transform:scale(1.08);}
+
   /* ── Desktop-only elements: hidden on mobile ── */
   .topnav { display:none; }
   .sidebar { display:none; }
@@ -547,6 +573,7 @@
     /* ── Shell: sidebar layout ── */
     .phone { max-width:100%; height:100vh; flex-direction:row; overflow:hidden; }
     .bnav  { display:none !important; }
+    .mob-pf-btn { display:none !important; }
 
     /* ── Sidebar ── */
     .sidebar {
@@ -936,12 +963,12 @@
   </div>
 
   <!-- ══ BOTTOM NAV ══ -->
+  <button class="mob-pf-btn" id="mobPfBtn" onclick="switchTab('profile',this)">?</button>
   <nav class="bnav">
     <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Today</span></button>
     <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Schedule</span></button>
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="nl">Students</span></button>
     <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nl">Courts</span></button>
-    <button class="ntab"        data-t="profile"  onclick="switchTab('profile',this)"> <span class="ni"><div class="pf-avatar-sm" id="bnAvatar">?</div></span><span class="nl">Profile</span></button>
   </nav>
   </div><!-- /main-col -->
 </div>
@@ -1044,7 +1071,7 @@
       <input type="text" class="field-input" id="courtIn" placeholder="e.g., Court 1" oninput="checkOverlap()" />
     </div>
     <div class="field"><label class="field-label">Notes <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
-      <textarea class="field-input" id="notesIn" rows="3" placeholder="e.g., Focus on backhand" style="resize:none;line-height:1.5"></textarea>
+      <textarea class="field-input" id="notesIn" rows="2" placeholder="e.g., Focus on backhand" style="resize:none;line-height:1.4"></textarea>
     </div>
     <button class="submit-btn" onclick="bookLesson()">Book Lesson ✓</button>
   </div>
@@ -1089,14 +1116,6 @@
     <div class="field">
       <label class="field-label">Phone <span style="color:var(--muted);font-weight:500">(Optional)</span></label>
       <input type="tel" class="field-input" id="astu-phone" placeholder="e.g., 0400 123 456" />
-    </div>
-    <div class="field">
-      <label class="field-label">Level</label>
-      <div class="pill-group" id="astu-lvl-pills">
-        <button class="pill active" onclick="setAddStuPill(this,'Beginner')">Beginner</button>
-        <button class="pill" onclick="setAddStuPill(this,'Intermediate')">Intermediate</button>
-        <button class="pill" onclick="setAddStuPill(this,'Advanced')">Advanced</button>
-      </div>
     </div>
     <div class="field">
       <label class="field-label">Starting Credits</label>
@@ -1545,7 +1564,7 @@ function renderToday(){
 }
 
 function setPayStatus(id, status){
-  const s=SESSIONS.find(s=>s.id===id);
+  const s=SESSIONS.find(s=>s.id==id);
   if(!s) return;
   // Toggle off if clicking same status again
   s.payStatus = s.payStatus===status ? 'unpaid' : status;
@@ -1887,7 +1906,7 @@ function renderDayViewHTML(date, daySess, hol){
     if(top+height<=0||top>=totalH) return '';
     const isPaid=s.payStatus==='paid';
     const showInfo=height>34;
-    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail(${s.id})"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)} · ${s.court}</div>`:''}</div>`;
+    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px"><div class="sv-hover-btns"><button class="sv-hbtn sv-hbtn-edit" onclick="event.stopPropagation();openSessDetail('${s.id}')">Edit</button><button class="sv-hbtn sv-hbtn-del" onclick="event.stopPropagation();confirmRemove('${s.id}')">Remove</button></div><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)} · ${s.court}</div>`:''}</div>`;
   }).join('');
 
   const nowHTML=showNow?`<div class="sv-now-line" style="top:${nowTop}px"><div class="sv-now-dot"></div></div>`:'';
@@ -1944,7 +1963,7 @@ function renderWeekViewHTML(weekStart){
       const courtClass=!isPaid&&courtNum?` wv-court-${(parseInt(courtNum)%4)+1}`:'';
       const showTime=height>24;
       const showCourt=height>34;
-      return `<div class="wv-sess${isPaid?' wv-paid':''}${courtClass}" style="top:${top}px;height:${height}px" onclick="openSessDetail(${s.id})"><div class="wv-sess-name">${s.student.split(' ')[0]}</div>${showTime?`<div class="wv-sess-time">${fmt(s.time)}</div>`:''}${showCourt?`<div class="wv-sess-court">${s.court}</div>`:''}<div class="wv-tooltip">${s.student} · ${fmt(s.time)}–${et(s.time,s.dur)}<br>${s.court} · ${s.dur}${s.recur!=='One-time'?' · '+s.recur:''}</div></div>`;
+      return `<div class="wv-sess${isPaid?' wv-paid':''}${courtClass}" style="top:${top}px;height:${height}px"><div class="wv-sess-name">${s.student.split(' ')[0]}</div>${showTime?`<div class="wv-sess-time">${fmt(s.time)}</div>`:''}${showCourt?`<div class="wv-sess-court">${s.court}</div>`:''}<div class="wv-hover-btns"><button class="wv-hbtn wv-hbtn-edit" onclick="event.stopPropagation();openSessDetail('${s.id}')">Edit</button><button class="wv-hbtn wv-hbtn-del" onclick="event.stopPropagation();confirmRemove('${s.id}')">✕</button></div><div class="wv-tooltip">${s.student} · ${fmt(s.time)}–${et(s.time,s.dur)}<br>${s.court} · ${s.dur}${s.recur!=='One-time'?' · '+s.recur:''}</div></div>`;
     }).join('');
     const nowLine=isToday&&showNow?`<div class="wv-now-line" style="top:${nowTop}px"><div class="wv-now-dot"></div></div>`:'';
     const wkSlotH=WK_SH/2;
@@ -1992,7 +2011,7 @@ function openSessDetail(id){ openEditLsnModal(id); }
 // ══ EDIT LESSON ══
 let editLsnTarget=null,editLsnDur='1 hour',editLsnRecur='One-time';
 function openEditLsnModal(id){
-  const s=SESSIONS.find(s=>s.id===id);
+  const s=SESSIONS.find(s=>s.id==id);
   if(!s) return;
   editLsnTarget=id; editLsnDur=s.dur; editLsnRecur=s.recur;
   document.getElementById('editLsnStu').textContent=`✏️  ${s.student}`;
@@ -2022,7 +2041,7 @@ function toggleEditAmPm(){
   updateEditAmPm();
 }
 function saveEditLesson(){
-  const s=SESSIONS.find(s=>s.id===editLsnTarget);
+  const s=SESSIONS.find(s=>s.id==editLsnTarget);
   if(!s) return;
   s.time=document.getElementById('editLsnTime').value;
   s.court=document.getElementById('editLsnCourt').value.trim()||s.court;
@@ -2030,6 +2049,7 @@ function saveEditLesson(){
   closeEditLsnModal();
   renderSchedule(); renderToday();
   toast('✓ Lesson updated');
+  if(s.id) dbUpdate('sessions',s.id,{time:s.time,court:s.court,dur:s.dur,recur:s.recur});
 }
 function cancelFromEdit(){
   const id=editLsnTarget;
@@ -2042,13 +2062,12 @@ function cancelFromEdit(){
 }
 
 // ══ ADD STUDENT ══
-let addStuLevel='Beginner';
+let addStuLevel='';
 function openAddStudentModal(){
   document.getElementById('astu-name').value='';
   document.getElementById('astu-phone').value='';
   document.getElementById('astu-credits').value='0';
-  addStuLevel='Beginner';
-  document.querySelectorAll('#astu-lvl-pills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  addStuLevel='';
   document.getElementById('addStuOvl').classList.add('open');
   setTimeout(()=>document.getElementById('astu-name').focus(),400);
 }
@@ -2158,9 +2177,16 @@ async function bookLesson(){
   if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; }
 }
 
-function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id===id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
+function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id==id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
 function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;}
-function confirmCancel(){const s=SESSIONS.find(s=>s.id===cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!==cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);}
+function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);}
+function confirmRemove(id){
+  const s=SESSIONS.find(s=>s.id==id);
+  if(!s) return;
+  cancelTarget=id;
+  document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed. Are you sure?`;
+  document.getElementById('cancelOvl').classList.add('open');
+}
 
 function openTermModal(){
   const td=ds(today);
@@ -2417,6 +2443,8 @@ function updateProfileWidgets(){
   const sbEm=document.getElementById('sbEmail'); if(sbEm) sbEm.textContent=coachEmail;
   // Bottom nav
   const bnAv=document.getElementById('bnAvatar'); if(bnAv) bnAv.textContent=ini;
+  // Mobile profile button
+  const mobPf=document.getElementById('mobPfBtn'); if(mobPf) mobPf.textContent=ini;
 }
 // Fetch user info (including full name) on load
 (async function loadUserInfo(){
