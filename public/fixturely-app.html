@@ -83,6 +83,28 @@
 
 
   .t-body{padding:16px;}
+  .hk-board{display:flex;gap:12px;min-height:0;height:calc(100vh - 260px);height:calc(100dvh - 260px);}
+  .hk-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
+  .hk-col-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+  .hk-col-hd{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.8px;color:var(--soft);padding:0 2px 6px;border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--off);z-index:1;}
+  .hk-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.15s;}
+  .hk-card:hover{transform:translateY(-1px);}
+  .hk-card-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:3px;}
+  .hk-card-meta{font-size:12px;font-weight:600;color:var(--soft);}
+  .hk-card-cd{font-size:11px;font-weight:800;color:var(--t-dk);margin-top:6px;}
+  .hk-card.hk-hero{border-left:4px solid var(--t-a);padding:16px;}
+  .hk-card.hk-hero .hk-card-name{font-size:18px;}
+  .hk-card.hk-hero .hk-card-cd{font-size:13px;}
+  .hk-card.hk-tmrw{border-left:4px solid var(--s-a);}
+  .hk-card.hk-tmrw .hk-card-cd{color:var(--s-dk);}
+  .hk-card.hk-paid{border-left:3px solid var(--ok);}
+  .hk-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .hk-stat{background:var(--card);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+  .hk-stat-n{font-size:20px;font-weight:900;color:var(--text);}
+  .hk-stat-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+  .hk-action{width:100%;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);transition:background 0.15s;}
+  .hk-action:hover{background:var(--off);}
+  .hk-empty{text-align:center;padding:20px 10px;color:var(--muted);font-size:13px;font-weight:600;}
   .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
 
   /* Today dashboard */
@@ -256,14 +278,7 @@
   .sv-free-slot:hover{background:rgba(0,0,0,0.04);}
   .sv-sess-block{position:absolute;left:4px;right:4px;border-radius:8px;padding:5px 8px;overflow:hidden;cursor:pointer;z-index:2;background:var(--s-pl);border-left:3px solid var(--s-a);box-shadow:0 1px 5px rgba(0,0,0,0.07);transition:opacity 0.15s;}
   .sv-sess-block.paid{background:var(--ok-lt);border-left-color:var(--ok);}
-  .sv-sess-block:hover{opacity:1;}
-  .sv-hover-btns{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:3;background:rgba(255,255,255,0.82);border-radius:8px;}
-  .sv-sess-block:hover .sv-hover-btns{opacity:1;pointer-events:auto;}
-  .sv-hbtn{padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
-  .sv-hbtn-edit{background:var(--s-a);color:#fff;box-shadow:0 2px 6px rgba(212,136,15,0.35);}
-  .sv-hbtn-edit:hover{background:var(--s-dk);}
-  .sv-hbtn-del{background:var(--white);color:var(--err);border:1.5px solid var(--err);}
-  .sv-hbtn-del:hover{background:var(--err-lt);}
+  .sv-sess-block:hover{opacity:0.85;}
   .sv-sb-name{font-size:12px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
   .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
   .sv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:3;pointer-events:none;}
@@ -279,48 +294,48 @@
   .sched-nudge-text{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--soft);flex:1;flex-wrap:wrap;}
   .sched-nudge-text svg{flex-shrink:0;}
   .sched-nudge-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
-  /* Week view */
-  .wv-wrap{padding-bottom:10px;}
-  .wv-header{display:flex;background:var(--white);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:10;}
-  .wv-corner{width:40px;flex-shrink:0;}
-  .wv-day-hd{flex:1;text-align:center;padding:7px 1px;border-left:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
-  .wv-day-hd:active{background:var(--off);}
-  .wv-day-name{font-size:9px;font-weight:900;color:var(--soft);text-transform:uppercase;letter-spacing:0.3px;}
-  .wv-day-num{font-size:15px;font-weight:900;color:var(--text);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
-  .wv-day-hd.wv-today .wv-day-num{background:var(--t-a);color:var(--white);}
-  .wv-day-hd.wv-sel .wv-day-num{background:var(--s-dk);color:var(--white);}
-  .wv-body{display:flex;}
-  .wv-times{width:40px;flex-shrink:0;}
-  .wv-time-lbl{font-size:9px;font-weight:800;color:var(--soft);text-align:right;padding-right:5px;display:flex;align-items:flex-start;line-height:1;}
-  .wv-cols{display:flex;flex:1;}
-  .wv-col{position:relative;flex:1;border-left:1px solid var(--border);}
-  .wv-hr-bg{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
-  .wv-half-bg{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.5);}
-  .wv-free-slot{position:absolute;left:0;right:0;z-index:1;cursor:pointer;transition:background 0.18s;}
-  .wv-free-slot:hover{background:rgba(0,0,0,0.04);}
-  .wv-sess{position:absolute;left:2px;right:2px;border-radius:6px;padding:3px 5px;overflow:hidden;cursor:pointer;background:var(--s-pl);border-left:3px solid var(--s-a);transition:all 0.15s;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:2;}
-  .wv-sess.wv-paid{background:var(--ok-lt);border-left-color:var(--ok);}
-  .wv-sess.wv-court-2{background:#FEF0EB;border-left-color:#E8724A;}
-  .wv-sess.wv-court-3{background:#F5EDE0;border-left-color:#A68B5B;}
-  .wv-sess.wv-court-4{background:#FEF3DC;border-left-color:#C47A1E;}
-  .wv-sess:hover{transform:scale(1.03);box-shadow:0 3px 10px rgba(0,0,0,0.12);z-index:3;}
-  .wv-sess-name{font-size:9px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-  .wv-sess-time{font-size:8px;font-weight:700;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1px;}
-  .wv-sess-court{font-size:7px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
-  /* Week view tooltip */
-  .wv-sess .wv-tooltip{display:none;position:absolute;left:50%;top:100%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,0.2);pointer-events:auto;margin-top:4px;}
-  .wv-sess:hover .wv-tooltip{display:block;}
-  .wv-hover-btns{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:3px;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:3;background:rgba(255,255,255,0.85);border-radius:6px;}
-  .wv-sess:hover .wv-hover-btns{opacity:1;pointer-events:auto;}
-  .wv-hbtn{padding:2px 7px;border-radius:100px;border:none;font-size:9px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;}
-  .wv-hbtn-edit{background:var(--s-a);color:#fff;}
-  .wv-hbtn-edit:hover{background:var(--s-dk);}
-  .wv-hbtn-del{background:var(--white);color:var(--err);border:1px solid var(--err);}
-  .wv-hbtn-del:hover{background:var(--err-lt);}
-  .wv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
-  .wv-now-dot{width:8px;height:8px;border-radius:50%;background:var(--t-a);position:absolute;left:-4px;top:-3px;}
-  .wv-col.wv-col-today{background:rgba(232,114,74,0.04);}
-  .wv-alt-row{position:absolute;left:0;right:0;background:rgba(0,0,0,0.015);pointer-events:none;}
+  /* ── Schedule Grid (mirrors Courts grid with amber palette) ── */
+  .sg-wrap{display:flex;flex-direction:column;width:100%;}
+  .sg-header{position:sticky;top:0;z-index:20;display:flex;width:100%;background:white;border-bottom:2px solid var(--border);}
+  .sg-corner{width:52px;flex-shrink:0;position:sticky;left:0;z-index:21;background:white;}
+  .sg-day-hd{flex:1;text-align:center;font-size:13px;font-weight:900;color:var(--text);padding:10px 4px;border-left:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+  .sg-day-hd:hover{background:var(--off);}
+  .sg-day-hd .sg-day-name{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted);}
+  .sg-day-hd .sg-day-num{font-size:15px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
+  .sg-day-hd.sg-today .sg-day-num{background:var(--s-a);color:#fff;}
+  .sg-day-hd.sg-sel:not(.sg-today) .sg-day-num{background:var(--s-dk);color:#fff;}
+  .sg-body{display:flex;width:100%;}
+  .sg-times{width:56px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
+  .sg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
+  .sg-cols{display:flex;flex:1;}
+  .sg-col{position:relative;flex:1;border-right:1px solid var(--border);}
+  .sg-col.sg-col-today{background:rgba(245,166,35,0.04);}
+  .sg-sess{position:absolute;left:2px;right:2px;border-radius:10px;overflow:hidden;padding:6px 9px;background:#F5C542;display:flex;flex-direction:column;justify-content:flex-start;z-index:2;cursor:pointer;transition:opacity 0.15s;box-shadow:0 1px 5px rgba(180,120,10,0.18);}
+  .sg-sess.sg-paid{background:#5CB85C;color:#fff;}
+  .sg-sess.sg-paid .sg-sess-name{color:#fff;}
+  .sg-sess.sg-paid .sg-sess-time{color:rgba(255,255,255,0.8);}
+  .sg-sess.sg-paid .sg-sess-court{color:rgba(255,255,255,0.65);}
+  .sg-sess-name{font-size:17px;font-weight:900;color:#5A3E00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .sg-sess-time{font-size:14px;font-weight:800;color:#7A5500;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .sg-sess-court{font-size:13px;font-weight:700;color:#7A5500;opacity:0.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sg-sess:hover{opacity:0.85;}
+  .sg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
+  .sg-slot-free:hover{background:rgba(0,0,0,0.045);}
+  .sg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
+  .sg-slot-free:hover .sg-slot-time{opacity:1;}
+  .sg-book-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;box-shadow:0 2px 6px rgba(212,136,15,0.35);min-height:36px;min-width:44px;}
+  .sg-slot-free:hover .sg-book-btn{opacity:1;pointer-events:auto;}
+  .sg-hr-line{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
+  .sg-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.7);}
+  .sg-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
+  .sg-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
+  /* Working hours control */
+  .wh-ctrl{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--soft);cursor:pointer;padding:4px 10px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);transition:background 0.15s;white-space:nowrap;}
+  .wh-ctrl:hover{background:var(--off);}
+  .wh-edit{display:none;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 0;}
+  .wh-edit.open{display:flex;}
+  .wh-edit select{padding:6px 8px;border-radius:10px;border:1.5px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;background:var(--white);color:var(--text);}
+  .wh-edit button{padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;}
 
   /* ══════════════════════
      STUDENTS
@@ -548,7 +563,7 @@
   .cg-sel-badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--c-a);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1;}
   .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
   .cg-slot-free:hover .cg-slot-time{opacity:1;}
-  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;}
+  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;min-height:36px;min-width:44px;}
   .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
   .cg-sel-btn{background:var(--white);color:var(--c-dk);border:1.5px solid var(--c-a);}
   .cg-slot-free:hover .cg-req-btn,.cg-slot-free:hover .cg-sel-btn{opacity:1;pointer-events:auto;}
@@ -657,7 +672,8 @@
       overflow-y:auto; padding:20px;
     }
     /* ── TODAY ── */
-    .t-body { flex:1; overflow-y:auto; padding:20px 24px; }
+    .t-body { flex:1; overflow:hidden; padding:20px 24px; }
+    .hk-board { height:100%; }
 
     /* ── SCHEDULE ── */
     .s-body { flex:1; overflow-y:auto; }
@@ -801,7 +817,7 @@
       <div style="overflow:hidden"><div class="sb-profile-name" id="sbName">Coach</div><div class="sb-profile-email" id="sbEmail"></div></div>
     </div>
     <nav class="sb-nav">
-      <button class="sb-item active" data-t="today"    onclick="switchTab('today',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span>Today</span></button>
+      <button class="sb-item active" data-t="today"    onclick="switchTab('today',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span>Home</span></button>
       <button class="sb-item"        data-t="schedule" onclick="switchTab('schedule',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></span><span>Schedule</span></button>
       <button class="sb-item"        data-t="students" onclick="switchTab('students',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Students</span></button>
       <button class="sb-item"        data-t="courts"   onclick="switchTab('courts',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>Courts</span></button>
@@ -837,6 +853,7 @@
       </div>
       <div class="s-hdr-acts">
         <button class="hdr-btn s-add-btn" onclick="openBookModal()">+ Add Lesson</button>
+        <button class="hdr-btn s-hdr-btn" onclick="openIcsImport()">📥 Import</button>
         <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
       </div>
     </div>
@@ -891,6 +908,8 @@
           <button class="hdr-btn" style="color:var(--c-dk)" onclick="courtsDate=ds(today);renderCourtsDayStrip();loadCourts()">Today</button>
         </div>
       </div>
+      <div style="padding:6px 0 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="wh-ctrl" onclick="document.getElementById('whEditC').classList.toggle('open')" style="color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.12)" id="whCtrlC"></span></div>
+      <div class="wh-edit" id="whEditC" style="padding:6px 0"></div>
       <div class="c-day-strip" id="cDayStrip"></div>
       <div class="c-legend">
         <div class="c-leg-item"><div class="c-leg-dot" style="background:#fcfabd"></div>Booking</div>
@@ -970,7 +989,7 @@
   <!-- ══ BOTTOM NAV ══ -->
   <button class="mob-pf-btn" id="mobPfBtn" onclick="switchTab('profile',this)">?</button>
   <nav class="bnav">
-    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Today</span></button>
+    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Home</span></button>
     <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Schedule</span></button>
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="nl">Students</span></button>
     <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nl">Courts</span></button>
@@ -1170,6 +1189,36 @@
   </div>
 </div>
 
+<!-- ICS IMPORT MODAL -->
+<style>
+.ics-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.ics-item label{flex:1;cursor:pointer;}
+.ics-item-name{font-size:14px;font-weight:800;color:var(--text);}
+.ics-item-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
+.ics-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--s-a);flex-shrink:0;margin-top:2px;}
+.ics-skip{font-size:11px;color:var(--muted);font-weight:600;padding:6px 0;}
+</style>
+<div class="overlay" id="icsOvl" onclick="if(event.target===this)closeIcsImport()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeIcsImport()">✕</button>
+    <div class="modal-title">Import from Calendar</div>
+    <p style="font-size:13px;color:var(--soft);font-weight:600;margin:-12px 0 16px">Upload an .ics file from iOS, Google Calendar, or Outlook</p>
+    <div class="field">
+      <input type="file" accept=".ics,text/calendar" id="icsFileIn" class="field-input" onchange="parseIcsFile(this.files[0])" style="padding:10px" />
+    </div>
+    <div id="icsPreview"></div>
+    <div id="icsActions" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <label style="font-size:13px;font-weight:700;color:var(--soft);cursor:pointer;display:flex;align-items:center;gap:6px"><input type="checkbox" id="icsSelectAll" onchange="toggleIcsAll(this.checked)" checked style="width:16px;height:16px;accent-color:var(--s-a)" /> Select all</label>
+        <span id="icsCount" style="font-size:12px;font-weight:800;color:var(--s-dk)"></span>
+      </div>
+      <div id="icsList" style="max-height:320px;overflow-y:auto"></div>
+      <button class="submit-btn" onclick="importSelectedIcs()" id="icsImportBtn" style="margin-top:14px">Import Selected ✓</button>
+    </div>
+  </div>
+</div>
+
 <!-- COURT BOOKING MODAL -->
 <style>
 @keyframes cb-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
@@ -1322,7 +1371,26 @@ async function loadAllData(){
     HOLIDAYS=d.holidays||[];
     INVOICES=d.invoices||[];
     renderSchedule(); renderToday(); renderStudents();
+    saveCache();
   } catch(e){ console.error('Failed to load data',e); }
+}
+function saveCache(){
+  try { localStorage.setItem('fixturely_data',JSON.stringify({
+    students:STUDENTS,sessions:SESSIONS,terms:TERMS,holidays:HOLIDAYS,invoices:INVOICES,ts:Date.now()
+  })); } catch(e){}
+}
+function loadCachedData(){
+  try {
+    const raw=localStorage.getItem('fixturely_data');
+    if(!raw) return false;
+    const d=JSON.parse(raw);
+    STUDENTS=d.students||[];
+    SESSIONS=d.sessions||[];
+    TERMS=d.terms||[];
+    HOLIDAYS=d.holidays||[];
+    INVOICES=d.invoices||[];
+    return true;
+  } catch(e){ return false; }
 }
 async function dbInsert(table,record){
   try {
@@ -1382,7 +1450,7 @@ function switchTab(tab,btn,skipHash){
   if(!skipHash && location.hash!=='#'+tab) history.replaceState(null,'','#'+tab);
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
-  if(tab==='courts' && !courtsLoaded) { courtsLoaded=true; loadCourts(); }
+  if(tab==='courts') { updateCourtsHoursCtrl(); if(!courtsLoaded){ courtsLoaded=true; loadCourts(); } }
   if(tab==='share')    renderSharePage();
   if(tab==='profile')  renderProfile();
 }
@@ -1395,12 +1463,12 @@ function updateTopbar(tab){
   const titleEl=document.getElementById('topnavTitle');
   const actsEl=document.getElementById('topnavActs');
   if(!titleEl||!actsEl) return;
-  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule',profile:'Profile'};
+  const titles={today:'Home',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule',profile:'Profile'};
   titleEl.textContent=titles[tab]||tab;
   if(tab==='today'){
     actsEl.innerHTML=``;
   } else if(tab==='schedule'){
-    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="goToday()">Today</button>`;
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="openIcsImport()">📥 Import</button><button class="tb-btn" onclick="goToday()">Today</button>`;
   } else if(tab==='students'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
   } else if(tab==='courts'){
@@ -1426,7 +1494,31 @@ function setCoachRate(){
     toast('Rate set to $'+coachRate+'/hr');
   }
 }
+let homeCountdownInterval=null;
+function fmtCountdown(mins){
+  if(mins<=0) return 'now';
+  if(mins<60) return `in ${mins}m`;
+  const h=Math.floor(mins/60),m=mins%60;
+  return m>0?`in ${h}h ${m}m`:`in ${h}h`;
+}
+function updateHomeCountdowns(){
+  const now=new Date(),nowM=now.getHours()*60+now.getMinutes();
+  const el1=document.getElementById('hc-next');
+  if(el1){
+    const m=parseInt(el1.dataset.mins);
+    if(!isNaN(m)) el1.textContent=fmtCountdown(m-nowM);
+  }
+  const el2=document.getElementById('hc-tmrw');
+  if(el2){
+    const minsLeft=parseInt(el2.dataset.mins);
+    if(!isNaN(minsLeft)){
+      const minsToMidnight=(24*60)-nowM;
+      el2.textContent=fmtCountdown(minsToMidnight+minsLeft);
+    }
+  }
+}
 function renderToday(){
+  if(homeCountdownInterval){clearInterval(homeCountdownInterval);homeCountdownInterval=null;}
   const dstr=ds(today);
   document.getElementById('todayTitle').textContent=DF[today.getDay()];
   document.getElementById('todaySub').textContent=`${MN[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
@@ -1437,7 +1529,7 @@ function renderToday(){
   const hasRate=coachRate!==null;
   const earnings=hasRate?Math.round(totalMins/60*coachRate):0;
 
-  // Weekly snapshot
+  // Weekly snapshot data
   const weekS=wkStart(today);
   let weekLessons=0,weekStudentsSet=new Set(),weekMins=0;
   for(let i=0;i<7;i++){
@@ -1449,23 +1541,16 @@ function renderToday(){
   const weekEarnings=hasRate?Math.round(weekMins/60*coachRate):0;
 
   let html='';
+  const now=new Date(),nowM=now.getHours()*60+now.getMinutes();
 
-  // Onboarding check
+  // Onboarding (above the board if not dismissed)
   const hasStudents=STUDENTS.length>0;
   const hasLessons=SESSIONS.length>0;
   const hasShared=localStorage.getItem('fixturely_shared')==='1';
   const onboardComplete=hasStudents&&hasLessons&&hasShared;
   if(!onboardDismissed){
     if(onboardComplete){
-      // All done — show celebration with dismiss
-      html+=`<div class="td-onboard td-onboard-done">
-        <div style="text-align:center;padding:8px 0">
-          <div style="font-size:32px;margin-bottom:8px">🎉</div>
-          <div class="td-onboard-title">You're all set!</div>
-          <div class="td-onboard-sub" style="margin-bottom:14px">Your schedule is live and ready for students to book.</div>
-          <button onclick="dismissOnboarding()" class="td-onboard-dismiss-btn">Got it — let's go!</button>
-        </div>
-      </div>`;
+      html+=`<div class="td-onboard td-onboard-done" style="margin-bottom:12px"><div style="text-align:center;padding:8px 0"><div style="font-size:32px;margin-bottom:8px">🎉</div><div class="td-onboard-title">You're all set!</div><div class="td-onboard-sub" style="margin-bottom:14px">Your schedule is live and ready for students to book.</div><button onclick="dismissOnboarding()" class="td-onboard-dismiss-btn">Got it — let's go!</button></div></div>`;
     } else {
       const steps=[
         {done:hasStudents, title:'Add your first student', sub:'Build your roster', action:"switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)"},
@@ -1473,99 +1558,84 @@ function renderToday(){
         {done:hasShared, title:'Share your schedule with students', sub:'Let students see your availability and book lessons', action:"switchTab('share',document.querySelector('[data-t=share]'))"}
       ];
       const doneCount=steps.filter(s=>s.done).length;
-      html+=`<div class="td-onboard">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div class="td-onboard-title">Welcome to Fixturely!</div>
-            <div class="td-onboard-sub">Let's get you set up.</div>
-          </div>
-          <button onclick="dismissOnboarding()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1" title="Dismiss">✕</button>
-        </div>
-        <div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div>
-        <div style="font-size:12px;font-weight:700;color:var(--soft);margin-bottom:10px">${doneCount} of ${steps.length} complete</div>
-        ${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}">
-          <div class="td-onboard-check">${s.done?'✓':''}</div>
-          <div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div>
-        </div>`).join('')}
-      </div>`;
+      html+=`<div class="td-onboard" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="td-onboard-title">Welcome to Fixturely!</div><div class="td-onboard-sub">Let's get you set up.</div></div><button onclick="dismissOnboarding()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1" title="Dismiss">✕</button></div><div class="td-onboard-progress"><div class="td-onboard-bar" style="width:${(doneCount/steps.length)*100}%"></div></div><div style="font-size:12px;font-weight:700;color:var(--soft);margin-bottom:10px">${doneCount} of ${steps.length} complete</div>${steps.map(s=>`<div class="td-onboard-step${s.done?' done':''}" onclick="${s.done?'':s.action}"><div class="td-onboard-check">${s.done?'✓':''}</div><div><div class="td-onboard-step-title">${s.title}</div><div class="td-onboard-step-sub">${s.sub}</div></div></div>`).join('')}</div>`;
     }
   }
 
-  // Daily summary
-  html+=`<div class="td-summary">
-    <div class="td-stat"><div class="td-stat-n">${cnt}</div><div class="td-stat-l">Lessons</div></div>
-    <div class="td-stat"><div class="td-stat-n">${totalHrs}h</div><div class="td-stat-l">Coaching</div></div>
-    <div class="td-stat"${!hasRate?' style="cursor:pointer" onclick="setCoachRate()"':''}><div class="td-stat-n">${hasRate?'$'+earnings:'—'}</div><div class="td-stat-l">${hasRate?'Earnings':'<span style="color:var(--t-dk)">Set rate</span>'}</div></div>
-  </div>`;
+  // ── Data for columns ──
+  const upcoming=todaySess.filter(s=>t2m(s.time)>nowM);
+  const nextLesson=upcoming.length>0?upcoming[0]:null;
+  const tmrwStr=ds(add(today,1));
+  const tmrwSess=SESSIONS.filter(s=>s.date===tmrwStr).sort((a,b)=>a.time.localeCompare(b.time));
 
-  // Weekly snapshot
-  html+=`<div class="td-week-snap">
-    <div class="td-week-title">This Week</div>
-    <div class="td-week-row">
-      <div class="td-week-item"><div class="td-week-n">${weekLessons}</div><div class="td-week-l">Lessons</div></div>
-      <div class="td-week-item"><div class="td-week-n">${weekStudentsSet.size}</div><div class="td-week-l">Students</div></div>
-      <div class="td-week-item"><div class="td-week-n">${hasRate?'$'+weekEarnings:'—'}</div><div class="td-week-l">${hasRate?'Revenue':'<span style="cursor:pointer;color:var(--t-dk)" onclick="setCoachRate()">Set rate</span>'}</div></div>
-    </div>
-  </div>`;
+  // ═══ KANBAN BOARD ═══
+  html+=`<div class="hk-board">`;
 
-  // Quick actions
-  html+=`<div class="td-quick-actions">
-    <button class="td-qa-btn" onclick="openBookModal()">+ Add Lesson</button>
-    <button class="td-qa-btn" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>
-    <button class="td-qa-btn" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>
-  </div>`;
-
-  // Booking link card (always visible)
-  html+=`<div class="td-booking-link">
-    <div class="td-bl-header">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <span>Your Booking Link</span>
-    </div>
-    <div class="td-bl-desc">Students use this link to see your availability and book lessons</div>
-    <div class="td-bl-url-row">
-      <div class="td-bl-url">${BOOKING_URL.replace('https://','')}</div>
-      <button class="td-bl-copy" onclick="copyBookingLink()">Copy Link</button>
-      <button class="td-bl-share" onclick="switchTab('share',document.querySelector('[data-t=share]'))">Share</button>
-    </div>
-  </div>`;
-
-  // Next up highlight
-  if(cnt>0){
-    const now=new Date();
-    const nowM=now.getHours()*60+now.getMinutes();
-    const upcoming=todaySess.filter(s=>t2m(s.time)>nowM);
-    if(upcoming.length>0){
-      const next=upcoming[0];
-      const minsUntil=t2m(next.time)-nowM;
-      const countdown=minsUntil<60?`in ${minsUntil} min${minsUntil!==1?'s':''}`:`in ${Math.floor(minsUntil/60)}h ${minsUntil%60>0?minsUntil%60+'m':''}`;
-      html+=`<div class="td-next-up" onclick="openSessDetail(${next.id})">
-        <div class="td-next-label">Next Up</div>
-        <div class="td-next-name">${next.student}</div>
-        <div class="td-next-detail">${fmt(next.time)} · ${next.court} · ${next.dur}</div>
-        <div class="td-next-countdown">${countdown}</div>
-      </div>`;
-    }
+  // ── Column 1: Today ──
+  html+=`<div class="hk-col"><div class="hk-col-hd">Today · ${cnt}</div><div class="hk-col-scroll">`;
+  // Hero card for next upcoming
+  if(nextLesson){
+    const minsUntil=t2m(nextLesson.time)-nowM;
+    html+=`<div class="hk-card hk-hero" onclick="openSessDetail('${nextLesson.id}')">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--t-dk);margin-bottom:4px">Next Up</div>
+      <div class="hk-card-name">${nextLesson.student}</div>
+      <div class="hk-card-meta">${fmt(nextLesson.time)} – ${et(nextLesson.time,nextLesson.dur)}${nextLesson.court?' · '+nextLesson.court:''}</div>
+      <div class="hk-card-cd" id="hc-next" data-mins="${t2m(nextLesson.time)}">${fmtCountdown(minsUntil)}</div>
+    </div>`;
   }
-
-  // Lesson list or empty state
+  // All today's lessons
   if(cnt===0){
-    html+=`<div class="t-empty"><div class="t-empty-icon">🎾</div><div class="t-empty-t">No lessons today</div><div class="t-empty-s">Enjoy your day off!</div></div>`;
+    html+=`<div class="hk-empty">🎾 No lessons today</div>`;
   } else {
-    html+=`<div class="td-section-lbl">Today's Lessons</div>`;
     todaySess.forEach(s=>{
+      if(s===nextLesson) return; // already shown as hero
       const isPaid=s.payStatus==='paid';
-      html+=`<div class="td-lesson-card${isPaid?' paid':''}" onclick="openSessDetail(${s.id})">
-        <div class="td-lc-time">${fmt(s.time)}</div>
-        <div class="td-lc-info">
-          <div class="td-lc-name">${s.student}</div>
-          <div class="td-lc-meta">${s.court} · ${s.dur}</div>
-        </div>
-        <div class="td-lc-badge">${s.recur==='One-time'?'Private':'Recurring'}</div>
+      const past=t2m(s.time)+dm(s.dur)<=nowM;
+      html+=`<div class="hk-card${isPaid?' hk-paid':''}" onclick="openSessDetail('${s.id}')"${past?' style="opacity:0.6"':''}>
+        <div class="hk-card-name">${s.student}</div>
+        <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
       </div>`;
     });
   }
+  html+=`</div></div>`;
+
+  // ── Column 2: Tomorrow ──
+  html+=`<div class="hk-col"><div class="hk-col-hd">Tomorrow · ${tmrwSess.length}</div><div class="hk-col-scroll">`;
+  if(tmrwSess.length===0){
+    html+=`<div class="hk-empty">No lessons tomorrow</div>`;
+  } else {
+    const minsToMidnight=(24*60)-nowM;
+    tmrwSess.forEach((s,i)=>{
+      const tmrwMins=t2m(s.time);
+      const cdId=i===0?'hc-tmrw':'';
+      html+=`<div class="hk-card hk-tmrw" onclick="openSessDetail('${s.id}')">
+        <div class="hk-card-name">${s.student}</div>
+        <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
+        ${i===0?`<div class="hk-card-cd" id="hc-tmrw" data-mins="${tmrwMins}">${fmtCountdown(minsToMidnight+tmrwMins)}</div>`:''}
+      </div>`;
+    });
+  }
+  html+=`</div></div>`;
+
+  // ── Column 3: Stats & Actions ──
+  html+=`<div class="hk-col"><div class="hk-col-hd">Dashboard</div><div class="hk-col-scroll">`;
+  // Stats
+  html+=`<div class="hk-stat-grid">
+    <div class="hk-stat"><div class="hk-stat-n">${cnt}</div><div class="hk-stat-l">Today</div></div>
+    <div class="hk-stat"><div class="hk-stat-n">${weekLessons}</div><div class="hk-stat-l">This Week</div></div>
+    <div class="hk-stat"><div class="hk-stat-n">${totalHrs}h</div><div class="hk-stat-l">Hours</div></div>
+    <div class="hk-stat"${!hasRate?' style="cursor:pointer" onclick="setCoachRate()"':''}><div class="hk-stat-n">${hasRate?'$'+earnings:'—'}</div><div class="hk-stat-l">${hasRate?'Earnings':'Set rate'}</div></div>
+  </div>`;
+  // Actions
+  html+=`<button class="hk-action" onclick="openBookModal()">+ Add Lesson</button>`;
+  html+=`<button class="hk-action" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>`;
+  html+=`<button class="hk-action" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>`;
+  html+=`</div></div>`;
+
+  html+=`</div>`; // close hk-board
 
   document.getElementById('tBody').innerHTML=html;
+  homeCountdownInterval=setInterval(updateHomeCountdowns,60000);
 }
 
 function setPayStatus(id, status){
@@ -1576,6 +1646,7 @@ function setPayStatus(id, status){
   renderToday();
   if(s.payStatus==='paid') toast('🎉 All caught up!');
   if(s.id) dbUpdate('sessions',s.id,{payStatus:s.payStatus});
+  saveCache();
 }
 
 function toggleInvPanel(id){
@@ -1855,6 +1926,43 @@ function buildDstrip(container){
 }
 let schedNudgeDismissed=localStorage.getItem('fixturely_sched_nudge_dismissed')==='1';
 function dismissSchedNudge(){schedNudgeDismissed=true;localStorage.setItem('fixturely_sched_nudge_dismissed','1');renderSchedule();}
+function fmtHour(h){return h===0?'12am':h<12?h+'am':h===12?'12pm':(h-12)+'pm';}
+function whCtrlHTML(){
+  return `<span class="wh-ctrl" onclick="toggleHoursEditor()">🕐 ${fmtHour(CAL_S)} – ${fmtHour(CAL_E)}</span><div class="wh-edit" id="whEdit">${whSelectHTML('whStart',CAL_S)} <span style="font-weight:800;color:var(--soft)">to</span> ${whSelectHTML('whEnd',CAL_E)} <button onclick="saveWorkingHours()">Apply</button></div>`;
+}
+function whSelectHTML(id,val){
+  let o='';for(let h=0;h<24;h++) o+=`<option value="${h}"${h===val?' selected':''}>${fmtHour(h)}</option>`;
+  return `<select id="${id}">${o}</select>`;
+}
+function toggleHoursEditor(){document.getElementById('whEdit').classList.toggle('open');}
+function updateCourtsHoursCtrl(){
+  const lbl=document.getElementById('whCtrlC');
+  if(lbl) lbl.textContent=`🕐 ${fmtHour(CAL_S)} – ${fmtHour(CAL_E)}`;
+  const ed=document.getElementById('whEditC');
+  if(ed) ed.innerHTML=`${whSelectHTML('whStartC',CAL_S)} <span style="font-weight:800;color:var(--soft)">to</span> ${whSelectHTML('whEndC',CAL_E)} <button onclick="saveCourtsHours()" style="padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--c-a);color:#fff">Apply</button>`;
+}
+async function saveCourtsHours(){
+  const s=parseInt(document.getElementById('whStartC').value);
+  const e=parseInt(document.getElementById('whEndC').value);
+  if(s>=e){toast('Start must be before end');return;}
+  CAL_S=s;CAL_E=e;
+  loadCourts();renderSchedule();
+  const el=document.getElementById('whEditC');if(el)el.classList.remove('open');
+  updateCourtsHoursCtrl();
+  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({workStart:s,workEnd:e})}).catch(()=>{});
+  toast(`Hours: ${fmtHour(s)} – ${fmtHour(e)}`);
+}
+async function saveWorkingHours(){
+  const s=parseInt(document.getElementById('whStart').value);
+  const e=parseInt(document.getElementById('whEnd').value);
+  if(s>=e){toast('Start must be before end');return;}
+  CAL_S=s;CAL_E=e;
+  renderSchedule();
+  if(typeof courtsLoaded!=='undefined'&&courtsLoaded) loadCourts();
+  const el=document.getElementById('whEdit');if(el)el.classList.remove('open');
+  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({workStart:s,workEnd:e})}).catch(()=>{});
+  toast(`Hours: ${fmtHour(s)} – ${fmtHour(e)}`);
+}
 function renderSchedule(){
   let nudge='';
   if(!schedNudgeDismissed){
@@ -1869,7 +1977,8 @@ function prevDay(){sel=add(sel,-1);ws=wkStart(sel);renderSchedule();}
 function nextDay(){sel=add(sel,1);ws=wkStart(sel);renderSchedule();}
 
 // ── Schedule calendar view state ──
-const CAL_S=7,CAL_E=21,DAY_SH=56,WK_SH=48;
+let CAL_S=6,CAL_E=22;
+const DAY_SH=56,WK_SH=48,SG_SH=45;
 
 
 function renderDayViewHTML(date, daySess, hol){
@@ -1911,7 +2020,7 @@ function renderDayViewHTML(date, daySess, hol){
     if(top+height<=0||top>=totalH) return '';
     const isPaid=s.payStatus==='paid';
     const showInfo=height>34;
-    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px"><div class="sv-hover-btns"><button class="sv-hbtn sv-hbtn-edit" onclick="event.stopPropagation();openSessDetail('${s.id}')">Edit</button><button class="sv-hbtn sv-hbtn-del" onclick="event.stopPropagation();confirmRemove('${s.id}')">Remove</button></div><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)} · ${s.court}</div>`:''}</div>`;
+    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}</div>`;
   }).join('');
 
   const nowHTML=showNow?`<div class="sv-now-line" style="top:${nowTop}px"><div class="sv-now-dot"></div></div>`:'';
@@ -1928,66 +2037,63 @@ function renderWeekViewHTML(weekStart){
   const days=[];
   for(let i=0;i<7;i++) days.push(add(weekStart,i));
   const todayStr=ds(today),selStr=ds(sel);
-  const hours=[];
-  for(let h=CAL_S;h<CAL_E;h++) hours.push(h);
-  const totalH=hours.length*WK_SH;
+  const slots=[];
+  for(let m=CAL_S*60;m<CAL_E*60;m+=30) slots.push(m);
+  const totalH=slots.length*SG_SH;
   const now=new Date();
   const nowMins=now.getHours()*60+now.getMinutes();
   const showNow=nowMins>=CAL_S*60&&nowMins<CAL_E*60;
-  const nowTop=((nowMins-CAL_S*60)/60)*WK_SH;
+  const nowTop=((nowMins-CAL_S*60)/30)*SG_SH;
 
   const dayHdHTML=days.map((d,i)=>{
     const dstr=ds(d);
     const isToday=dstr===todayStr;
     const isSel=dstr===selStr&&!isToday;
-    return `<div class="wv-day-hd${isToday?' wv-today':''}${isSel?' wv-sel':''}" onclick="selectDay(new Date('${dstr}T00:00:00'))"><div class="wv-day-name">${DW[i]}</div><div class="wv-day-num">${d.getDate()}</div></div>`;
+    return `<div class="sg-day-hd${isToday?' sg-today':''}${isSel?' sg-sel':''}" onclick="selectDay(new Date('${dstr}T00:00:00'))"><div class="sg-day-name">${DW[i]}</div><div class="sg-day-num">${d.getDate()}</div></div>`;
   }).join('');
 
-  const timesHTML=hours.map(h=>{
-    const lbl=h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
-    return `<div class="wv-time-lbl" style="height:${WK_SH}px">${lbl}</div>`;
+  const timesHTML=slots.map(m=>{
+    const lbl=m%60===0?(m/60===0?'12am':m/60<12?`${m/60}am`:m/60===12?'12pm':`${m/60-12}pm`):'';
+    return `<div class="sg-time" style="height:${SG_SH}px">${lbl}</div>`;
   }).join('');
 
-  const colsHTML=days.map((d)=>{
+  const colsHTML=days.map(d=>{
     const dstr=ds(d);
     const daySess=SESSIONS.filter(s=>s.date===dstr);
     const isToday=dstr===todayStr;
-    const bgLines=hours.map((h,i)=>
-      `<div class="wv-hr-bg" style="top:${i*WK_SH}px"></div>`+
-      `<div class="wv-half-bg" style="top:${i*WK_SH+WK_SH/2}px"></div>`+
-      (i%2===1?`<div class="wv-alt-row" style="top:${i*WK_SH}px;height:${WK_SH}px"></div>`:'')
-    ).join('');
-    const blocks=daySess.map(s=>{
+
+    const linesHTML=slots.map((m,i)=>
+      `<div class="sg-hr-line" style="top:${i*SG_SH}px"></div>`+
+      (m%60===0?'':`<div class="sg-half-line" style="top:${i*SG_SH}px"></div>`)
+    ).join('')+`<div class="sg-hr-line" style="top:${totalH}px"></div>`;
+
+    const freeHTML=slots.map((m,i)=>{
+      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
+      if(busy) return '';
+      const h=Math.floor(m/60),mn=m%60;
+      const lbl=`${h%12||12}:${mn.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;
+      return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button></div>`;
+    }).join('');
+
+    const blocksHTML=daySess.map(s=>{
       const startM=t2m(s.time);
       const durM=dm(s.dur);
-      const top=((startM-CAL_S*60)/60)*WK_SH;
-      const height=Math.max((durM/60)*WK_SH-1,18);
+      const top=((startM-CAL_S*60)/30)*SG_SH;
+      const height=Math.max((durM/30)*SG_SH-2,20);
       if(top+height<=0||top>=totalH) return '';
       const isPaid=s.payStatus==='paid';
-      const courtNum=s.court.replace(/\D/g,'');
-      const courtClass=!isPaid&&courtNum?` wv-court-${(parseInt(courtNum)%4)+1}`:'';
-      const showTime=height>24;
-      const showCourt=height>34;
-      return `<div class="wv-sess${isPaid?' wv-paid':''}${courtClass}" style="top:${top}px;height:${height}px"><div class="wv-sess-name">${s.student.split(' ')[0]}</div>${showTime?`<div class="wv-sess-time">${fmt(s.time)}</div>`:''}${showCourt?`<div class="wv-sess-court">${s.court}</div>`:''}<div class="wv-hover-btns"><button class="wv-hbtn wv-hbtn-edit" onclick="event.stopPropagation();openSessDetail('${s.id}')">Edit</button><button class="wv-hbtn wv-hbtn-del" onclick="event.stopPropagation();confirmRemove('${s.id}')">✕</button></div><div class="wv-tooltip">${s.student} · ${fmt(s.time)}–${et(s.time,s.dur)}<br>${s.court} · ${s.dur}${s.recur!=='One-time'?' · '+s.recur:''}</div></div>`;
+      const showTime=height>34;
+      return `<div class="sg-sess${isPaid?' sg-paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')"><div class="sg-sess-name">${s.student}</div>${showTime?`<div class="sg-sess-time">${fmt(s.time)}–${et(s.time,s.dur)}</div>`:''}`+(showTime&&s.court?`<div class="sg-sess-court">${s.court}</div>`:'')+`</div>`;
     }).join('');
-    const nowLine=isToday&&showNow?`<div class="wv-now-line" style="top:${nowTop}px"><div class="wv-now-dot"></div></div>`:'';
-    const wkSlotH=WK_SH/2;
-    const wkFreeSlots=[];
-    for(let h=CAL_S;h<CAL_E;h++){
-      for(let half=0;half<2;half++){
-        const m=h*60+half*30;
-        const slotTop=((m-CAL_S*60)/60)*WK_SH;
-        const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
-        if(!busy) wkFreeSlots.push(`<div class="wv-free-slot" style="top:${slotTop}px;height:${wkSlotH}px" onclick="bookAtTime('${dstr}',${h},${half*30})"></div>`);
-      }
-    }
-    return `<div class="wv-col${isToday?' wv-col-today':''}" style="height:${totalH}px">${bgLines}${wkFreeSlots.join('')}${blocks}${nowLine}</div>`;
+
+    const nowLine=isToday&&showNow?`<div class="sg-now-line" style="top:${nowTop}px"><div class="sg-now-dot"></div></div>`:'';
+    return `<div class="sg-col${isToday?' sg-col-today':''}" style="height:${totalH}px">${linesHTML}${freeHTML}${blocksHTML}${nowLine}</div>`;
   }).join('');
 
   const weekEnd=add(weekStart,6);
   const weekLbl=weekStart.getMonth()===weekEnd.getMonth()?`${MN[weekStart.getMonth()]} ${weekStart.getFullYear()}`:`${MN[weekStart.getMonth()].slice(0,3)}–${MN[weekEnd.getMonth()].slice(0,3)} ${weekEnd.getFullYear()}`;
-  const weekNavHTML=`<div class="sv-week-nav"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>`;
-  return `<div class="wv-wrap">${weekNavHTML}<div class="wv-header"><div class="wv-corner"></div>${dayHdHTML}</div><div class="wv-body"><div class="wv-times">${timesHTML}</div><div class="wv-cols">${colsHTML}</div></div></div>`;
+  const weekNavHTML=`<div class="sv-week-nav" style="flex-wrap:wrap;gap:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>${whCtrlHTML()}</div>`;
+  return `<div class="sg-wrap">${weekNavHTML}<div class="sg-header"><div class="sg-corner"></div>${dayHdHTML}</div><div class="sg-body"><div class="sg-times">${timesHTML}</div><div class="sg-cols">${colsHTML}</div></div></div>`;
 }
 
 function handleDayGridClick(e,dstr){
@@ -2055,6 +2161,7 @@ function saveEditLesson(){
   renderSchedule(); renderToday();
   toast('✓ Lesson updated');
   if(s.id) dbUpdate('sessions',s.id,{time:s.time,court:s.court,dur:s.dur,recur:s.recur});
+  saveCache();
 }
 function cancelFromEdit(){
   const id=editLsnTarget;
@@ -2095,6 +2202,7 @@ async function submitAddStudent(){
   toast(`✓ ${name} added to roster`);
   const saved=await dbInsert('students',{name,phone:phone||'',level:addStuLevel,credits,sessions:0,owing:0});
   if(saved) { const idx=STUDENTS.indexOf(stu); if(idx>=0) STUDENTS[idx]=Object.assign(stu,{id:saved.id}); }
+  saveCache();
 }
 
 function checkOverlap(){
@@ -2172,7 +2280,7 @@ async function bookLesson(){
   const name=document.getElementById('stuIn').value.trim();
   if(!name){document.getElementById('stuIn').classList.add('err');setTimeout(()=>document.getElementById('stuIn').classList.remove('err'),1500);return;}
   const time=document.getElementById('startTime').value;
-  const court=document.getElementById('courtIn').value.trim()||'Court 1';
+  const court=document.getElementById('courtIn').value.trim();
   let durLabel=selDur;
   if(selDur==='custom'){const cv=document.getElementById('customDurIn').value.trim();durLabel=cv||'60m';}
   const sess={id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'};
@@ -2180,11 +2288,12 @@ async function bookLesson(){
   closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
   const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
   if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; }
+  saveCache();
 }
 
 function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id==id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
 function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;}
-function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);}
+function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);saveCache();}
 function confirmRemove(id){
   const s=SESSIONS.find(s=>s.id==id);
   if(!s) return;
@@ -2331,8 +2440,8 @@ async function loadCourts() {
     // Clear optimistic bookings for this date now that server data is loaded
     optimisticBookings = optimisticBookings.filter(ob => ob.date !== courtsDate);
     const SLOT_H = 60;
-    const GRID_S = data.EarliestStartTime || 360;
-    const GRID_E = data.LatestEndTime || 1350;
+    const GRID_S = Math.max(data.EarliestStartTime || 360, CAL_S * 60);
+    const GRID_E = Math.min(data.LatestEndTime || 1350, CAL_E * 60);
     const resources = (data.Resources || [])
       .filter(r => { const n = parseInt(r.Name.replace(/\D/g,'')); return n >= 13 && n <= 18; })
       .sort((a,b) => (parseInt(a.Name.replace(/\D/g,''))||0) - (parseInt(b.Name.replace(/\D/g,''))||0));
@@ -2455,7 +2564,14 @@ function updateProfileWidgets(){
 (async function loadUserInfo(){
   try {
     const r=await fetch('/api/user');
-    if(r.ok){ const d=await r.json(); coachFullName=d.fullName||''; coachEmail=d.email||''; updateProfileWidgets(); }
+    if(r.ok){
+      const d=await r.json();
+      coachFullName=d.fullName||''; coachEmail=d.email||'';
+      if(d.workStart!==undefined) CAL_S=d.workStart;
+      if(d.workEnd!==undefined) CAL_E=d.workEnd;
+      updateProfileWidgets();
+      renderSchedule(); renderToday();
+    }
   } catch{}
 })();
 
@@ -2922,10 +3038,152 @@ async function executeMultiBook(){
   },successes===total?2000:4000);
 }
 
+// ══ ICS IMPORT ══
+let icsEvents=[];
+function openIcsImport(){
+  document.getElementById('icsFileIn').value='';
+  document.getElementById('icsPreview').innerHTML='';
+  document.getElementById('icsActions').style.display='none';
+  icsEvents=[];
+  document.getElementById('icsOvl').classList.add('open');
+}
+function closeIcsImport(){document.getElementById('icsOvl').classList.remove('open');}
+
+function parseIcsDt(val){
+  if(!val) return null;
+  const clean=val.replace(/[^0-9T]/g,'');
+  const m=clean.match(/^(\d{4})(\d{2})(\d{2})T?(\d{2})?(\d{2})?/);
+  if(!m) return null;
+  return {date:`${m[1]}-${m[2]}-${m[3]}`,hour:parseInt(m[4]||'0'),min:parseInt(m[5]||'0')};
+}
+function icsDurToMins(startDt,endDt){
+  if(!startDt||!endDt) return 60;
+  return ((endDt.hour*60+endDt.min)-(startDt.hour*60+startDt.min))||60;
+}
+function minsToFmtDur(m){
+  if(m===30) return '30m'; if(m===45) return '45m'; if(m===60) return '1h';
+  return m+'m';
+}
+function getIcsProp(block,prop){
+  const re=new RegExp('^'+prop+'[;:](.*)','m');
+  const m=block.match(re);
+  if(!m) return '';
+  let val=m[1];
+  // Handle property parameters like DTSTART;TZID=...:20260325T090000
+  const colonIdx=val.indexOf(':');
+  if(prop.startsWith('DT')&&colonIdx>-1) val=val.substring(colonIdx+1);
+  return val.trim();
+}
+
+function parseIcsFile(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    // Unfold long lines (ICS spec: continuation lines start with space/tab)
+    const unfolded=text.replace(/\r\n[ \t]/g,'').replace(/\n[ \t]/g,'');
+    const blocks=unfolded.split('BEGIN:VEVENT');
+    icsEvents=[];
+    let skipped=0;
+    for(let i=1;i<blocks.length;i++){
+      const block=blocks[i].split('END:VEVENT')[0];
+      const summary=getIcsProp(block,'SUMMARY');
+      const dtStartRaw=getIcsProp(block,'DTSTART');
+      const dtEndRaw=getIcsProp(block,'DTEND');
+      const location=getIcsProp(block,'LOCATION');
+      const startDt=parseIcsDt(dtStartRaw);
+      const endDt=parseIcsDt(dtEndRaw);
+      if(!startDt){skipped++;continue;}
+      // Skip all-day events (no time component)
+      if(!dtStartRaw.includes('T')){skipped++;continue;}
+      const durMins=icsDurToMins(startDt,endDt);
+      if(durMins<=0||durMins>480){skipped++;continue;}
+      // Duplicate check
+      const timeStr=`${String(startDt.hour).padStart(2,'0')}:${String(startDt.min).padStart(2,'0')}`;
+      const isDup=SESSIONS.some(s=>s.date===startDt.date&&s.time===timeStr&&s.student===(summary||'Imported'));
+      icsEvents.push({
+        name:summary||'Imported Lesson',
+        date:startDt.date,
+        time:timeStr,
+        dur:minsToFmtDur(durMins),
+        durMins,
+        court:location||'',
+        checked:!isDup,
+        isDup,
+      });
+    }
+    icsEvents.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+    renderIcsPreview(skipped);
+  };
+  reader.onerror=function(){
+    document.getElementById('icsPreview').innerHTML='<div style="color:var(--err);font-size:13px;font-weight:700;padding:10px 0">Could not read this file</div>';
+  };
+  reader.readAsText(file);
+}
+
+function renderIcsPreview(skipped){
+  const prev=document.getElementById('icsPreview');
+  const acts=document.getElementById('icsActions');
+  if(icsEvents.length===0){
+    prev.innerHTML='<div style="text-align:center;padding:20px 0;color:var(--muted);font-weight:700">No events found in this file'+(skipped>0?`<br><span class="ics-skip">${skipped} all-day or invalid events skipped</span>`:'')+'</div>';
+    acts.style.display='none';
+    return;
+  }
+  prev.innerHTML=skipped>0?`<div class="ics-skip">${skipped} all-day/invalid events skipped</div>`:'';
+  acts.style.display='block';
+  let html='';
+  icsEvents.forEach((ev,i)=>{
+    const d=new Date(ev.date+'T00:00:00');
+    const dateLabel=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+    html+=`<div class="ics-item">
+      <input type="checkbox" id="ics-${i}" ${ev.checked?'checked':''} onchange="icsEvents[${i}].checked=this.checked;updateIcsCount()">
+      <label for="ics-${i}">
+        <div class="ics-item-name">${ev.name}${ev.isDup?' <span style="color:var(--warn);font-size:11px">(duplicate)</span>':''}</div>
+        <div class="ics-item-meta">${dateLabel} · ${fmt(ev.time)} · ${ev.dur}${ev.court?' · '+ev.court:''}</div>
+      </label>
+    </div>`;
+  });
+  document.getElementById('icsList').innerHTML=html;
+  document.getElementById('icsSelectAll').checked=icsEvents.filter(e=>e.checked).length===icsEvents.length;
+  updateIcsCount();
+}
+function toggleIcsAll(checked){
+  icsEvents.forEach((ev,i)=>{ev.checked=checked;const cb=document.getElementById('ics-'+i);if(cb)cb.checked=checked;});
+  updateIcsCount();
+}
+function updateIcsCount(){
+  const n=icsEvents.filter(e=>e.checked).length;
+  document.getElementById('icsCount').textContent=`${n} of ${icsEvents.length} selected`;
+  document.getElementById('icsImportBtn').textContent=`Import ${n} Lesson${n!==1?'s':''} ✓`;
+}
+
+async function importSelectedIcs(){
+  const selected=icsEvents.filter(e=>e.checked);
+  if(selected.length===0){toast('No events selected');return;}
+  const btn=document.getElementById('icsImportBtn');
+  btn.disabled=true;
+  let imported=0;
+  for(const ev of selected){
+    btn.textContent=`Importing ${imported+1}/${selected.length}...`;
+    const sess={id:nextId++,student:ev.name,level:'',time:ev.time,dur:ev.dur,court:ev.court,recur:'One-time',date:ev.date,payStatus:'unpaid'};
+    SESSIONS.push(sess);
+    const saved=await dbInsert('sessions',{student:ev.name,level:'',time:ev.time,dur:ev.dur,court:ev.court,recur:'One-time',date:ev.date,payStatus:'unpaid'});
+    if(saved){const idx=SESSIONS.indexOf(sess);if(idx>=0) SESSIONS[idx].id=saved.id;}
+    imported++;
+  }
+  saveCache();
+  renderSchedule();renderToday();
+  closeIcsImport();
+  toast(`✓ ${imported} lesson${imported!==1?'s':''} imported`);
+  btn.disabled=false;
+  btn.textContent='Import Selected ✓';
+}
+
 // ══ TOAST ══
 function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 // ══ INIT ══
+loadCachedData();
 renderSchedule();
 renderCourtsDayStrip();
 const initTab=location.hash.replace('#','');
