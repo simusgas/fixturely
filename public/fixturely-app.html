@@ -478,37 +478,46 @@
   .c-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .c-title{font-size:26px;font-weight:900;color:var(--white);letter-spacing:-0.5px;}
   .c-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:2px;}
-  .c-date-nav{display:flex;align-items:center;gap:10px;}
-  .c-date-arr{background:rgba(255,255,255,0.25);border:none;color:var(--white);width:32px;height:32px;border-radius:50%;font-size:20px;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background 0.2s;}
-  .c-date-arr:hover{background:rgba(255,255,255,0.4);}
-  .c-date-lbl{font-size:14px;font-weight:800;color:var(--white);min-width:120px;text-align:center;}
-  .c-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .c-day-strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
+  .c-day-strip::-webkit-scrollbar{display:none;}
+  .c-day{display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:14px;cursor:pointer;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.12);min-width:48px;transition:all 0.2s;flex-shrink:0;}
+  .c-day:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);}
+  .c-day.active{background:var(--white);border-color:var(--white);box-shadow:0 2px 10px rgba(0,0,0,0.12);}
+  .c-day.is-today:not(.active){border-color:rgba(255,255,255,0.7);}
+  .c-day-name{font-size:9px;font-weight:800;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;}
+  .c-day-num{font-size:17px;font-weight:900;color:var(--white);line-height:1.1;}
+  .c-day.active .c-day-name{color:var(--c-a);}
+  .c-day.active .c-day-num{color:var(--c-dk);}
+  .c-day-month{font-size:8px;font-weight:700;color:rgba(255,255,255,0.55);margin-top:1px;}
+  .c-day.active .c-day-month{color:var(--c-b);}
+  .c-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;}
   .c-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);}
   .c-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
   .courts-outer{flex:1;min-height:0;overflow:auto;}
   .cg-wrap{display:flex;flex-direction:column;width:100%;}
   .cg-header{position:sticky;top:0;z-index:20;display:flex;width:100%;background:white;border-bottom:2px solid var(--border);}
   .cg-corner{width:52px;flex-shrink:0;position:sticky;left:0;z-index:21;background:white;}
-  .cg-court-hd{flex:1;text-align:center;font-size:14px;font-weight:900;color:var(--text);padding:12px 4px;border-left:1px solid var(--border);}
+  .cg-court-hd{flex:1;text-align:center;font-size:13px;font-weight:900;color:var(--text);padding:14px 4px;border-left:1px solid var(--border);}
   .cg-body{display:flex;width:100%;}
-  .cg-times{width:52px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
-  .cg-time{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:6px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:3px;}
+  .cg-times{width:56px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
+  .cg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
   .cg-courts{display:flex;flex:1;}
   .cg-court{position:relative;flex:1;border-right:1px solid var(--border);}
-  .cg-sess{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:3px 6px;pointer-events:none;}
-  .cg-sess-name{font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .cg-mine{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;pointer-events:none;z-index:5;background:var(--c-pl);border-left:3px solid var(--c-a);display:flex;flex-direction:column;justify-content:center;padding:3px 6px;}
-  .cg-mine-name{font-size:9px;font-weight:900;color:var(--c-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .cg-mine-time{font-size:8px;font-weight:700;color:var(--c-a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-sess{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:5px 8px;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-start;}
+  .cg-sess-name{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-sess-time{font-size:11px;font-weight:700;opacity:0.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .cg-mine{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;pointer-events:none;z-index:5;background:var(--c-pl);border-left:3px solid var(--c-a);display:flex;flex-direction:column;justify-content:flex-start;padding:5px 8px;}
+  .cg-mine-name{font-size:13px;font-weight:900;color:var(--c-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-mine-time{font-size:11px;font-weight:700;color:var(--c-a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
   .cg-mine.cg-pending{background:repeating-linear-gradient(135deg,var(--c-pl),var(--c-pl) 6px,rgba(74,124,89,0.08) 6px,rgba(74,124,89,0.08) 12px);border-left-style:dashed;}
   .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
   .cg-slot-free:hover{background:rgba(0,0,0,0.045);}
   .cg-slot-free.cg-selected{background:rgba(74,124,89,0.12);border:1.5px solid var(--c-a);border-radius:3px;z-index:3;}
   .cg-slot-free.cg-selected .cg-slot-time{opacity:1;color:var(--c-dk);}
   .cg-sel-badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--c-a);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1;}
-  .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:9px;font-weight:700;color:var(--soft);position:absolute;top:4px;left:5px;pointer-events:none;}
+  .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
   .cg-slot-free:hover .cg-slot-time{opacity:1;}
-  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:4px 8px;border-radius:100px;border:none;font-size:9px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;}
+  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;}
   .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
   .cg-sel-btn{background:var(--white);color:var(--c-dk);border:1.5px solid var(--c-a);}
   .cg-slot-free:hover .cg-req-btn,.cg-slot-free:hover .cg-sel-btn{opacity:1;pointer-events:auto;}
@@ -838,21 +847,18 @@
     <div class="c-hdr">
       <div class="c-hdr-top">
         <div><div class="c-title">🎾 Courts</div><div class="c-sub">Claremont Lawn Tennis Club</div></div>
-        <button class="hdr-btn" style="color:var(--c-dk)" onclick="courtsDate=ds(today);renderCourtsDateLbl();loadCourts()">Today</button>
+        <div style="display:flex;gap:6px">
+          <button class="hdr-btn" style="color:var(--c-dk)" onclick="loadCourts()">↻</button>
+          <button class="hdr-btn" style="color:var(--c-dk)" onclick="courtsDate=ds(today);renderCourtsDayStrip();loadCourts()">Today</button>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
-        <div class="c-date-nav">
-          <button class="c-date-arr" onclick="changeCourtsDate(-1)">‹</button>
-          <div class="c-date-lbl" id="courtsDateLbl"></div>
-          <button class="c-date-arr" onclick="changeCourtsDate(1)">›</button>
-        </div>
-        <div class="c-legend">
-          <div class="c-leg-item"><div class="c-leg-dot" style="background:#fcfabd"></div>Booking</div>
-          <div class="c-leg-item"><div class="c-leg-dot" style="background:#e1e2ff"></div>Coaching</div>
-          <div class="c-leg-item"><div class="c-leg-dot" style="background:#fdd4ff"></div>League</div>
-          <div class="c-leg-item"><div class="c-leg-dot" style="background:#cdfdff"></div>Events</div>
-          <div class="c-leg-item"><div class="c-leg-dot" style="background:#d1d1d1"></div>Closed</div>
-        </div>
+      <div class="c-day-strip" id="cDayStrip"></div>
+      <div class="c-legend">
+        <div class="c-leg-item"><div class="c-leg-dot" style="background:#fcfabd"></div>Booking</div>
+        <div class="c-leg-item"><div class="c-leg-dot" style="background:#e1e2ff"></div>Coaching</div>
+        <div class="c-leg-item"><div class="c-leg-dot" style="background:#fdd4ff"></div>League</div>
+        <div class="c-leg-item"><div class="c-leg-dot" style="background:#cdfdff"></div>Events</div>
+        <div class="c-leg-item"><div class="c-leg-dot" style="background:#d1d1d1"></div>Closed</div>
       </div>
     </div>
     <div class="courts-outer" id="cBody">
@@ -1306,7 +1312,7 @@ function switchTab(tab,btn,skipHash){
   if(!skipHash && location.hash!=='#'+tab) history.replaceState(null,'','#'+tab);
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
-  if(tab==='courts')   loadCourts();
+  if(tab==='courts' && !courtsLoaded) { courtsLoaded=true; loadCourts(); }
   if(tab==='share')    renderSharePage();
   if(tab==='profile')  renderProfile();
 }
@@ -1328,7 +1334,8 @@ function updateTopbar(tab){
   } else if(tab==='students'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
   } else if(tab==='courts'){
-    actsEl.innerHTML=`<button class="tb-btn" onclick="courtsDate=ds(today);renderCourtsDateLbl();loadCourts()">Today</button>`;
+    actsEl.innerHTML=`<div style="display:flex;align-items:center;gap:6px"><button class="tb-btn" onclick="changeCourtsDate(-1)" style="padding:7px 10px">‹</button><span id="topCourtsDateLbl" style="font-size:13px;font-weight:800;color:var(--text);min-width:100px;text-align:center"></span><button class="tb-btn" onclick="changeCourtsDate(1)" style="padding:7px 10px">›</button></div><button class="tb-btn" onclick="courtsDate=ds(today);renderCourtsDayStrip();loadCourts()">Today</button><button class="tb-btn" onclick="loadCourts()" title="Refresh">↻</button>`;
+    renderCourtsDayStrip();
   } else if(tab==='share'){
     actsEl.innerHTML=``;
   } else {
@@ -2168,17 +2175,46 @@ function toggleAmPm(){
 
 // ══ COURTS ══
 let courtsDate = ds(today);
+let courtsLoaded = false;
 
-function renderCourtsDateLbl() {
-  const d = new Date(courtsDate + 'T00:00:00');
-  document.getElementById('courtsDateLbl').textContent =
-    `${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+const COURTS_DAY_COUNT = 14;
+function renderCourtsDayStrip() {
+  const strip = document.getElementById('cDayStrip');
+  if (!strip) return;
+  let html = '';
+  for (let i = 0; i < COURTS_DAY_COUNT; i++) {
+    const d = add(today, i);
+    const dateStr = ds(d);
+    const isActive = dateStr === courtsDate;
+    const isToday = i === 0;
+    const cls = 'c-day' + (isActive ? ' active' : '') + (isToday ? ' is-today' : '');
+    html += `<div class="${cls}" onclick="selectCourtsDate('${dateStr}')" id="cd-${dateStr}">` +
+      `<div class="c-day-name">${DS_[d.getDay()]}</div>` +
+      `<div class="c-day-num">${d.getDate()}</div>` +
+      `<div class="c-day-month">${MS[d.getMonth()]}</div>` +
+      `</div>`;
+  }
+  strip.innerHTML = html;
+  // Scroll active day into view
+  const activeEl = document.getElementById('cd-' + courtsDate);
+  if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  // Update desktop topbar label
+  const topLbl = document.getElementById('topCourtsDateLbl');
+  if (topLbl) {
+    const d = new Date(courtsDate + 'T00:00:00');
+    topLbl.textContent = `${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+  }
+}
+function selectCourtsDate(dateStr) {
+  courtsDate = dateStr;
+  renderCourtsDayStrip();
+  loadCourts();
 }
 function changeCourtsDate(n) {
   const d = new Date(courtsDate + 'T00:00:00');
   d.setDate(d.getDate() + n);
   courtsDate = ds(d);
-  renderCourtsDateLbl();
+  renderCourtsDayStrip();
   loadCourts();
 }
 function minsToTimeLbl(m) {
@@ -2203,6 +2239,13 @@ async function loadCourts() {
     const data = await res.json();
     let myBookings = [];
     if (bkRes.ok) { try { myBookings = (await bkRes.json()).bookings || []; } catch {} }
+    // Merge optimistic bookings (instant feedback) — only for slots not already covered by server data
+    optimisticBookings.filter(ob => ob.date === courtsDate).forEach(ob => {
+      const alreadyInServer = myBookings.some(b => b.court_name === ob.court_name && b.start_mins < ob.end_mins && b.end_mins > ob.start_mins);
+      if (!alreadyInServer) myBookings.push(ob);
+    });
+    // Clear optimistic bookings for this date now that server data is loaded
+    optimisticBookings = optimisticBookings.filter(ob => ob.date !== courtsDate);
     const SLOT_H = 60;
     const GRID_S = data.EarliestStartTime || 360;
     const GRID_E = data.LatestEndTime || 1350;
@@ -2252,17 +2295,17 @@ async function loadCourts() {
         const h = Math.max((s.EndTime - s.StartTime) / 30 * SLOT_H - 2, 14);
         // Check if this ClubSpark session matches one of our Supabase bookings
         const mine = myBooked.find(b => b.start_mins < s.EndTime && b.end_mins > s.StartTime);
+        const timeStr = `${slotFmt(s.StartTime)} – ${slotFmt(s.EndTime)}`;
         if (mine) {
           const isPending = mine.status === 'pending';
           const pendingClass = isPending ? ' cg-pending' : '';
           const nameLabel = isPending ? 'Booking...' : 'Your Booking';
-          const timeStr = `${slotFmt(s.StartTime)} – ${slotFmt(s.EndTime)}`;
-          return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 28 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
+          return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 36 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
         }
         const color = sessColor(s);
         const label = (s.Name && !s.Name.includes('-')) ? s.Name : (s.Category === 8000 ? 'Closed' : '');
         const tc = sessTextCol(color);
-        return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div></div>`;
+        return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div>${h > 36 ? `<div class="cg-sess-time" style="color:${tc}">${timeStr}</div>` : ''}</div>`;
       }).join('');
 
       // Pending bookings not yet reflected in ClubSpark (bot still processing)
@@ -2304,6 +2347,7 @@ let cbCourt='',cbResourceId='',cbStartMins=0,cbDate='',cbDuration=60;
 let cbMode='book'; // 'book' or 'select'
 let coachFullName='';
 let mbSlots=[]; // multi-book queue: [{key,court,resourceId,startMins,date,duration}]
+let optimisticBookings=[]; // instant visual feedback before server confirms
 function courtFmt12(mins){const h=Math.floor(mins/60)%24,m=mins%60;return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 
 let coachEmail='';
@@ -2558,6 +2602,18 @@ async function submitCourtBooking(){
     const data=await res.json();
     if(data.success){
       finishCbLoading(true);
+      // Optimistic update: add to local array so grid shows it instantly
+      optimisticBookings.push({
+        id:'opt-'+Date.now(),
+        court_name:cbCourt,
+        resource_id:cbResourceId,
+        date:cbDate,
+        start_mins:cbStartMins,
+        end_mins:cbStartMins+cbDuration,
+        duration_mins:cbDuration,
+        status:'confirmed',
+        created_at:new Date().toISOString(),
+      });
       setTimeout(()=>{
         closeCourtBookModal();
         toast(`✅ ${cbCourt} booked — ${courtFmt12(cbStartMins)} to ${courtFmt12(cbStartMins+cbDuration)}`);
@@ -2742,6 +2798,19 @@ async function executeMultiBook(){
     } catch(e){ err='Network error'; }
 
     results.push({...s,ok,err});
+    if(ok){
+      optimisticBookings.push({
+        id:'opt-'+Date.now()+'-'+i,
+        court_name:s.court,
+        resource_id:s.resourceId,
+        date:s.date,
+        start_mins:s.startMins,
+        end_mins:s.startMins+s.duration,
+        duration_mins:s.duration,
+        status:'confirmed',
+        created_at:new Date().toISOString(),
+      });
+    }
     const icon=ok?'✅':'❌';
     resultList.innerHTML+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;font-weight:700;color:${ok?'var(--c-dk)':'var(--err)'}">${icon} ${s.court} · ${courtFmt12(s.startMins)}${ok?'':' — '+err}</div>`;
   }
@@ -2772,7 +2841,7 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
 
 // ══ INIT ══
 renderSchedule();
-renderCourtsDateLbl();
+renderCourtsDayStrip();
 const initTab=location.hash.replace('#','');
 switchTab(VALID_TABS.includes(initTab)?initTab:'today',null,true);
 </script>
