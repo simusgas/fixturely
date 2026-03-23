@@ -853,7 +853,7 @@
       </div>
       <div class="s-hdr-acts">
         <button class="hdr-btn s-add-btn" onclick="openBookModal()">+ Add Lesson</button>
-        <button class="hdr-btn s-hdr-btn" onclick="openIcsImport()">📥 Import</button>
+        <button class="hdr-btn s-hdr-btn" onclick="openCalConnect()">📅 Connect</button>
         <button class="hdr-btn s-hdr-btn" onclick="goToday()">Today</button>
       </div>
     </div>
@@ -980,6 +980,11 @@
           <button class="pf-save-btn" id="pfSavePassBtn" onclick="saveProfilePassword()">Update Password</button>
           <div id="pfPassMsg"></div>
         </div>
+      </div>
+
+      <div class="pf-section">
+        <div class="pf-section-title">Connected Calendars</div>
+        <div id="pfCalendars"></div>
       </div>
 
       <button class="pf-logout-btn" onclick="logOut()">Log Out</button>
@@ -1189,21 +1194,87 @@
   </div>
 </div>
 
-<!-- ICS IMPORT MODAL -->
+<!-- CONNECT CALENDAR MODAL -->
 <style>
-.ics-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
-.ics-item label{flex:1;cursor:pointer;}
-.ics-item-name{font-size:14px;font-weight:800;color:var(--text);}
-.ics-item-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
-.ics-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--s-a);flex-shrink:0;margin-top:2px;}
-.ics-skip{font-size:11px;color:var(--muted);font-weight:600;padding:6px 0;}
+.cc-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.cc-item label{flex:1;cursor:pointer;}
+.cc-item-name{font-size:14px;font-weight:800;color:var(--text);}
+.cc-item-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
+.cc-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--s-a);flex-shrink:0;margin-top:2px;}
+.cc-provider{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.cc-provider-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--text);transition:all 0.15s;}
+.cc-provider-btn:hover{background:var(--off);border-color:var(--s-a);}
+.cc-provider-btn.disabled{opacity:0.5;cursor:default;pointer-events:none;}
+.cc-provider-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.cc-provider-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+.cc-cal-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;margin-bottom:8px;}
+.cc-cal-item:hover{border-color:var(--s-a);background:var(--s-pl);}
+.cc-cal-item.selected{border-color:var(--s-a);background:var(--s-pl);}
+.cc-cal-name{font-size:14px;font-weight:800;color:var(--text);}
+.cc-cal-badge{font-size:10px;font-weight:700;color:var(--s-dk);background:var(--s-pl);padding:2px 8px;border-radius:100px;margin-left:auto;}
+.cc-step{display:none;}
+.cc-step.active{display:block;}
+.cc-loading{text-align:center;padding:30px 0;color:var(--muted);font-size:13px;font-weight:700;}
 </style>
+<div class="overlay" id="ccOvl" onclick="if(event.target===this)closeCalConnect()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeCalConnect()">✕</button>
+    <div class="modal-title" id="ccTitle">Connect Calendar</div>
+
+    <!-- Step 1: Choose provider -->
+    <div class="cc-step active" id="ccStep1">
+      <p style="font-size:13px;color:var(--soft);font-weight:600;margin:-8px 0 16px">Import lessons from an external calendar</p>
+      <div class="cc-provider">
+        <button class="cc-provider-btn" onclick="startGcalAuth()">
+          <div class="cc-provider-icon" style="background:#fff">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          </div>
+          <div><div>Google Calendar</div><div class="cc-provider-sub">Sign in with your Google account</div></div>
+        </button>
+        <button class="cc-provider-btn disabled">
+          <div class="cc-provider-icon" style="background:#f5f5f5;font-size:20px">🍎</div>
+          <div><div>Apple Calendar</div><div class="cc-provider-sub">Coming soon</div></div>
+        </button>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px">
+        <button class="cc-provider-btn" onclick="closeCalConnect();openIcsImport()">
+          <div class="cc-provider-icon" style="background:var(--off);font-size:16px">📄</div>
+          <div><div>Import .ics file</div><div class="cc-provider-sub">Upload an exported calendar file</div></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Loading -->
+    <div class="cc-step" id="ccStep2">
+      <div class="cc-loading"><div style="font-size:28px;margin-bottom:10px">🔄</div>Loading your calendars...</div>
+    </div>
+
+    <!-- Step 3: Pick calendar -->
+    <div class="cc-step" id="ccStep3">
+      <p style="font-size:13px;color:var(--soft);font-weight:600;margin:-8px 0 14px">Choose which calendar to import from</p>
+      <div id="ccCalList"></div>
+      <button class="submit-btn" onclick="confirmCalendarSelection()" id="ccCalBtn" style="margin-top:10px" disabled>Use This Calendar</button>
+    </div>
+
+    <!-- Step 4: Preview events -->
+    <div class="cc-step" id="ccStep4">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <label style="font-size:13px;font-weight:700;color:var(--soft);cursor:pointer;display:flex;align-items:center;gap:6px"><input type="checkbox" id="ccSelectAll" onchange="toggleCcAll(this.checked)" checked style="width:16px;height:16px;accent-color:var(--s-a)" /> Select all</label>
+        <span id="ccCount" style="font-size:12px;font-weight:800;color:var(--s-dk)"></span>
+      </div>
+      <div id="ccEventList" style="max-height:320px;overflow-y:auto"></div>
+      <button class="submit-btn" onclick="importSelectedGcal()" id="ccImportBtn" style="margin-top:14px">Import Selected ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ICS IMPORT MODAL (kept for file import) -->
 <div class="overlay" id="icsOvl" onclick="if(event.target===this)closeIcsImport()">
   <div class="modal" style="max-width:480px">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeIcsImport()">✕</button>
-    <div class="modal-title">Import from Calendar</div>
-    <p style="font-size:13px;color:var(--soft);font-weight:600;margin:-12px 0 16px">Upload an .ics file from iOS, Google Calendar, or Outlook</p>
+    <div class="modal-title">Import .ics File</div>
     <div class="field">
       <input type="file" accept=".ics,text/calendar" id="icsFileIn" class="field-input" onchange="parseIcsFile(this.files[0])" style="padding:10px" />
     </div>
@@ -1468,7 +1539,7 @@ function updateTopbar(tab){
   if(tab==='today'){
     actsEl.innerHTML=``;
   } else if(tab==='schedule'){
-    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="openIcsImport()">📥 Import</button><button class="tb-btn" onclick="goToday()">Today</button>`;
+    actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="openCalConnect()">📅 Connect</button><button class="tb-btn" onclick="goToday()">Today</button>`;
   } else if(tab==='students'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openAddStudentModal()">+ Add Student</button>`;
   } else if(tab==='courts'){
@@ -2572,6 +2643,11 @@ function updateProfileWidgets(){
       updateProfileWidgets();
       renderSchedule(); renderToday();
     }
+    // Check Google Calendar connection
+    try{
+      const gr=await fetch('/api/gcal/calendars');
+      if(gr.ok) gcalConnected=true;
+    }catch{}
   } catch{}
 })();
 
@@ -2858,6 +2934,15 @@ function renderProfile(){
   document.getElementById('pfPassConfirm').value='';
   document.getElementById('pfInfoMsg').innerHTML='';
   document.getElementById('pfPassMsg').innerHTML='';
+  // Connected calendars section
+  const ccEl=document.getElementById('pfCalendars');
+  if(ccEl){
+    if(gcalConnected){
+      ccEl.innerHTML=`<div style="background:var(--card);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05)"><div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:18px">📅</div><div><div style="font-size:14px;font-weight:800;color:var(--text)">Google Calendar</div><div style="font-size:12px;font-weight:600;color:var(--soft)">Connected</div></div></div><button onclick="disconnectGcal()" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--err);background:var(--white);color:var(--err);font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">Disconnect</button></div></div>`;
+    } else {
+      ccEl.innerHTML=`<button onclick="openCalConnect()" style="width:100%;padding:14px;border-radius:14px;border:1.5px dashed var(--border);background:var(--off);color:var(--soft);font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--s-a)'" onmouseout="this.style.borderColor='var(--border)'">📅 Connect Google Calendar</button>`;
+    }
+  }
 }
 async function saveProfileInfo(){
   const btn=document.getElementById('pfSaveInfoBtn');
@@ -3037,6 +3122,136 @@ async function executeMultiBook(){
     loadCourts();
   },successes===total?2000:4000);
 }
+
+// ══ CONNECT CALENDAR ══
+let gcalConnected=false,gcalCalendarId=null,gcalCalendarName=null,gcalEvents=[];
+let ccSelectedCalId=null;
+
+function openCalConnect(){
+  ccShowStep(1);
+  document.getElementById('ccOvl').classList.add('open');
+}
+function closeCalConnect(){document.getElementById('ccOvl').classList.remove('open');}
+function ccShowStep(n){
+  document.querySelectorAll('.cc-step').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('ccStep'+n);
+  if(el) el.classList.add('active');
+  const titles={1:'Connect Calendar',2:'Connecting...',3:'Choose Calendar',4:'Select Events'};
+  document.getElementById('ccTitle').textContent=titles[n]||'Connect Calendar';
+}
+
+async function startGcalAuth(){
+  try{
+    const r=await fetch('/api/gcal/auth');
+    const d=await r.json();
+    if(d.url) window.location.href=d.url;
+    else toast(d.error||'Could not start Google sign-in');
+  }catch(e){toast('Network error');}
+}
+
+async function loadGcalCalendars(){
+  ccShowStep(2);
+  try{
+    const r=await fetch('/api/gcal/calendars');
+    if(!r.ok){const d=await r.json();toast(d.error||'Failed to load calendars');ccShowStep(1);return;}
+    const d=await r.json();
+    gcalConnected=true;
+    const list=d.calendars||[];
+    let html='';
+    list.forEach(c=>{
+      const sel=c.id===(d.selectedId||null);
+      html+=`<div class="cc-cal-item${sel?' selected':''}" onclick="pickCcCal(this,'${c.id.replace(/'/g,"\\'")}')"><div class="cc-cal-name">${c.name}</div>${c.primary?'<div class="cc-cal-badge">Primary</div>':''}</div>`;
+      if(sel) ccSelectedCalId=c.id;
+    });
+    document.getElementById('ccCalList').innerHTML=html;
+    document.getElementById('ccCalBtn').disabled=!ccSelectedCalId;
+    ccShowStep(3);
+  }catch(e){toast('Network error');ccShowStep(1);}
+}
+
+function pickCcCal(el,id){
+  document.querySelectorAll('.cc-cal-item').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  ccSelectedCalId=id;
+  document.getElementById('ccCalBtn').disabled=false;
+}
+
+async function confirmCalendarSelection(){
+  if(!ccSelectedCalId) return;
+  ccShowStep(2);
+  document.querySelector('#ccStep2 .cc-loading').innerHTML='<div style="font-size:28px;margin-bottom:10px">📅</div>Loading events...';
+  try{
+    const r=await fetch(`/api/gcal/events?calendarId=${encodeURIComponent(ccSelectedCalId)}`);
+    if(!r.ok){const d=await r.json();toast(d.error||'Failed to load events');ccShowStep(3);return;}
+    const d=await r.json();
+    gcalEvents=(d.events||[]).map(e=>{
+      const isDup=SESSIONS.some(s=>s.date===e.date&&s.time===e.time&&s.student===e.name);
+      return {...e,checked:!isDup,isDup,dur:minsToFmtDur(e.durMins)};
+    });
+    renderGcalPreview();
+    ccShowStep(4);
+  }catch(e){toast('Network error');ccShowStep(3);}
+}
+
+function renderGcalPreview(){
+  let html='';
+  gcalEvents.forEach((ev,i)=>{
+    const d=new Date(ev.date+'T00:00:00');
+    const dateLabel=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+    html+=`<div class="cc-item"><input type="checkbox" id="cc-${i}" ${ev.checked?'checked':''} onchange="gcalEvents[${i}].checked=this.checked;updateCcCount()"><label for="cc-${i}"><div class="cc-item-name">${ev.name}${ev.isDup?' <span style="color:var(--warn);font-size:11px">(duplicate)</span>':''}</div><div class="cc-item-meta">${dateLabel} · ${fmt(ev.time)} · ${ev.dur}${ev.location?' · '+ev.location:''}</div></label></div>`;
+  });
+  if(gcalEvents.length===0) html='<div style="text-align:center;padding:20px;color:var(--muted);font-weight:700">No events found in this calendar</div>';
+  document.getElementById('ccEventList').innerHTML=html;
+  document.getElementById('ccSelectAll').checked=gcalEvents.filter(e=>e.checked).length===gcalEvents.length;
+  updateCcCount();
+}
+function toggleCcAll(checked){gcalEvents.forEach((ev,i)=>{ev.checked=checked;const cb=document.getElementById('cc-'+i);if(cb)cb.checked=checked;});updateCcCount();}
+function updateCcCount(){
+  const n=gcalEvents.filter(e=>e.checked).length;
+  document.getElementById('ccCount').textContent=`${n} of ${gcalEvents.length} selected`;
+  document.getElementById('ccImportBtn').textContent=`Import ${n} Lesson${n!==1?'s':''} ✓`;
+}
+
+async function importSelectedGcal(){
+  const selected=gcalEvents.filter(e=>e.checked);
+  if(selected.length===0){toast('No events selected');return;}
+  const btn=document.getElementById('ccImportBtn');
+  btn.disabled=true;
+  let imported=0;
+  for(const ev of selected){
+    btn.textContent=`Importing ${imported+1}/${selected.length}...`;
+    const sess={id:nextId++,student:ev.name,level:'',time:ev.time,dur:ev.dur,court:ev.location||'',recur:'One-time',date:ev.date,payStatus:'unpaid'};
+    SESSIONS.push(sess);
+    const saved=await dbInsert('sessions',{student:ev.name,level:'',time:ev.time,dur:ev.dur,court:ev.location||'',recur:'One-time',date:ev.date,payStatus:'unpaid'});
+    if(saved){const idx=SESSIONS.indexOf(sess);if(idx>=0) SESSIONS[idx].id=saved.id;}
+    imported++;
+  }
+  saveCache();renderSchedule();renderToday();
+  closeCalConnect();
+  toast(`✓ ${imported} lesson${imported!==1?'s':''} imported from Google Calendar`);
+  btn.disabled=false;btn.textContent='Import Selected ✓';
+}
+
+async function disconnectGcal(){
+  if(!confirm('Disconnect Google Calendar? Imported lessons will remain.')) return;
+  try{
+    await fetch('/api/gcal/disconnect',{method:'DELETE'});
+    gcalConnected=false;gcalCalendarId=null;gcalCalendarName=null;
+    toast('Google Calendar disconnected');
+    renderProfile();
+  }catch(e){toast('Failed to disconnect');}
+}
+
+// Check for OAuth callback on page load
+(function checkGcalReturn(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('gcal')==='connected'){
+    // Clean URL
+    history.replaceState(null,'',window.location.pathname+window.location.hash);
+    // Open calendar picker after a brief delay (let page render)
+    setTimeout(()=>{openCalConnect();loadGcalCalendars();},500);
+  }
+})();
 
 // ══ ICS IMPORT ══
 let icsEvents=[];
