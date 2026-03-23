@@ -9,6 +9,7 @@ create table if not exists public.students (
   credits     integer not null default 0,
   sessions    integer not null default 0,
   owing       numeric not null default 0,
+  phone       text    not null default '',
   created_at  timestamptz not null default now()
 );
 
@@ -56,6 +57,39 @@ create table if not exists public.invoices (
 alter table public.invoices enable row level security;
 
 create policy "coaches_own_invoices" on public.invoices
+  for all using (auth.uid() = coach_id)
+  with check (auth.uid() = coach_id);
+
+-- ── Terms ───────────────────────────────────────────────────────────────────
+create table if not exists public.terms (
+  id          uuid    primary key default gen_random_uuid(),
+  coach_id    uuid    not null references auth.users(id) on delete cascade,
+  name        text    not null,
+  start       text    not null,              -- YYYY-MM-DD
+  "end"       text    not null,              -- YYYY-MM-DD
+  weeks       integer not null default 0,
+  created_at  timestamptz not null default now()
+);
+
+alter table public.terms enable row level security;
+
+create policy "coaches_own_terms" on public.terms
+  for all using (auth.uid() = coach_id)
+  with check (auth.uid() = coach_id);
+
+-- ── Holidays ────────────────────────────────────────────────────────────────
+create table if not exists public.holidays (
+  id          uuid    primary key default gen_random_uuid(),
+  coach_id    uuid    not null references auth.users(id) on delete cascade,
+  name        text    not null,
+  start       text    not null,              -- YYYY-MM-DD
+  "end"       text    not null,              -- YYYY-MM-DD
+  created_at  timestamptz not null default now()
+);
+
+alter table public.holidays enable row level security;
+
+create policy "coaches_own_holidays" on public.holidays
   for all using (auth.uid() = coach_id)
   with check (auth.uid() = coach_id);
 

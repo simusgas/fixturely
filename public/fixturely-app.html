@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Fixturely</title>
+<meta name="description" content="Tennis coaching made simple">
+<meta name="theme-color" content="#E8724A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fixturely">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1265,14 +1272,47 @@
 
 <script>
 // ══ DATA ══
-const STUDENTS=[];
-const TERMS=[];
-const HOLIDAYS=[];
-const INVOICES=[];
+let STUDENTS=[];
+let TERMS=[];
+let HOLIDAYS=[];
+let INVOICES=[];
 
 const today=new Date(); today.setHours(0,0,0,0);
 let SESSIONS=[];
 let nextId=1;
+
+// ══ SUPABASE SYNC ══
+async function loadAllData(){
+  try {
+    const r=await fetch('/api/data');
+    if(!r.ok) return;
+    const d=await r.json();
+    STUDENTS=d.students||[];
+    SESSIONS=d.sessions||[];
+    TERMS=d.terms||[];
+    HOLIDAYS=d.holidays||[];
+    INVOICES=d.invoices||[];
+    if(SESSIONS.length) nextId=Math.max(...SESSIONS.map(s=>typeof s.id==='number'?s.id:0))+1;
+    renderSchedule(); renderToday(); renderStudents();
+  } catch(e){ console.error('Failed to load data',e); }
+}
+async function dbInsert(table,record){
+  try {
+    const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'insert',table,record})});
+    const d=await r.json();
+    return d.record||null;
+  } catch(e){ console.error('dbInsert failed',e); return null; }
+}
+async function dbUpdate(table,id,record){
+  try {
+    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',table,id,record})});
+  } catch(e){ console.error('dbUpdate failed',e); }
+}
+async function dbDelete(table,id){
+  try {
+    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',table,id})});
+  } catch(e){ console.error('dbDelete failed',e); }
+}
 
 // ══ HELPERS ══
 function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
@@ -1505,6 +1545,7 @@ function setPayStatus(id, status){
   s.payStatus = s.payStatus===status ? 'unpaid' : status;
   renderToday();
   if(s.payStatus==='paid') toast('🎉 All caught up!');
+  if(s.id) dbUpdate('sessions',s.id,{payStatus:s.payStatus});
 }
 
 function toggleInvPanel(id){
@@ -2012,15 +2053,18 @@ function setAddStuPill(btn,val){
   btn.classList.add('active');
   addStuLevel=val;
 }
-function submitAddStudent(){
+async function submitAddStudent(){
   const name=document.getElementById('astu-name').value.trim();
   if(!name){document.getElementById('astu-name').classList.add('err');setTimeout(()=>document.getElementById('astu-name').classList.remove('err'),1500);return;}
   const phone=document.getElementById('astu-phone').value.trim();
   const credits=parseInt(document.getElementById('astu-credits').value)||0;
-  STUDENTS.push({name,phone,level:addStuLevel,credits,sessions:0,owing:0});
+  const stu={name,phone,level:addStuLevel,credits,sessions:0,owing:0};
+  STUDENTS.push(stu);
   closeAddStuModal();
   renderStudents();
   toast(`✓ ${name} added to roster`);
+  const saved=await dbInsert('students',{name,phone:phone||'',level:addStuLevel,credits,sessions:0,owing:0});
+  if(saved) { const idx=STUDENTS.indexOf(stu); if(idx>=0) STUDENTS[idx]=Object.assign(stu,{id:saved.id}); }
 }
 
 function checkOverlap(){
@@ -2094,20 +2138,23 @@ function setPill(btn,group,val){
     checkOverlap();
   } else selRecur=val;
 }
-function bookLesson(){
+async function bookLesson(){
   const name=document.getElementById('stuIn').value.trim();
   if(!name){document.getElementById('stuIn').classList.add('err');setTimeout(()=>document.getElementById('stuIn').classList.remove('err'),1500);return;}
   const time=document.getElementById('startTime').value;
   const court=document.getElementById('courtIn').value.trim()||'Court 1';
   let durLabel=selDur;
   if(selDur==='custom'){const cv=document.getElementById('customDurIn').value.trim();durLabel=cv||'60m';}
-  SESSIONS.push({id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  const sess={id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'};
+  SESSIONS.push(sess);
   closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
+  const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; }
 }
 
 function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id===id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
 function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;}
-function confirmCancel(){const s=SESSIONS.find(s=>s.id===cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!==cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);}
+function confirmCancel(){const s=SESSIONS.find(s=>s.id===cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!==cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);}
 
 function openTermModal(){
   const td=ds(today);
@@ -2844,6 +2891,10 @@ renderSchedule();
 renderCourtsDayStrip();
 const initTab=location.hash.replace('#','');
 switchTab(VALID_TABS.includes(initTab)?initTab:'today',null,true);
+loadAllData();
+
+// ══ PWA ══
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 </script>
 </body>
 </html>

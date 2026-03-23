@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8724A"/>
+      <stop offset="100%" stop-color="#F09070"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Tennis ball -->
+  <circle cx="256" cy="240" r="120" fill="#C8E632" stroke="#A8C020" stroke-width="4"/>
+  <!-- Ball seam curve left -->
+  <path d="M175 160 Q220 240 175 320" fill="none" stroke="#A8C020" stroke-width="6" stroke-linecap="round"/>
+  <!-- Ball seam curve right -->
+  <path d="M337 160 Q292 240 337 320" fill="none" stroke="#A8C020" stroke-width="6" stroke-linecap="round"/>
+  <!-- Text -->
+  <text x="256" y="420" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="64" fill="#FFFFFF" letter-spacing="-1">fixturely</text>
+</svg>
