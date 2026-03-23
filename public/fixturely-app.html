@@ -1285,14 +1285,18 @@ let nextId=1;
 async function loadAllData(){
   try {
     const r=await fetch('/api/data');
-    if(!r.ok) return;
+    if(!r.ok){
+      const err=await r.text().catch(()=>'');
+      console.error('loadAllData failed:',r.status,err);
+      return;
+    }
     const d=await r.json();
+    console.log('loadAllData loaded:',{students:d.students?.length,sessions:d.sessions?.length});
     STUDENTS=d.students||[];
     SESSIONS=d.sessions||[];
     TERMS=d.terms||[];
     HOLIDAYS=d.holidays||[];
     INVOICES=d.invoices||[];
-    if(SESSIONS.length) nextId=Math.max(...SESSIONS.map(s=>typeof s.id==='number'?s.id:0))+1;
     renderSchedule(); renderToday(); renderStudents();
   } catch(e){ console.error('Failed to load data',e); }
 }
@@ -1300,6 +1304,8 @@ async function dbInsert(table,record){
   try {
     const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'insert',table,record})});
     const d=await r.json();
+    if(!d.success) console.error('dbInsert',table,'error:',d.error);
+    else console.log('dbInsert',table,'ok:',d.record?.id);
     return d.record||null;
   } catch(e){ console.error('dbInsert failed',e); return null; }
 }

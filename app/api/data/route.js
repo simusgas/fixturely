@@ -9,31 +9,33 @@ export async function GET() {
     return Response.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const [students, sessions, terms, holidays, invoices] = await Promise.all([
-    supabase.from('students').select('*').order('created_at'),
-    supabase.from('sessions').select('*').order('created_at'),
-    supabase.from('terms').select('*').order('created_at'),
-    supabase.from('holidays').select('*').order('created_at'),
-    supabase.from('invoices').select('*').order('created_at'),
-  ])
-
-  // Check for errors
-  for (const [name, result] of [['students', students], ['sessions', sessions], ['terms', terms], ['holidays', holidays], ['invoices', invoices]]) {
-    if (result.error) {
-      console.error(`[Data API] Error loading ${name}:`, result.error)
-      return Response.json({ error: `Failed to load ${name}` }, { status: 500 })
+  // Load each table individually — if a table doesn't exist yet, return []
+  async function safeSelect(table) {
+    const { data, error } = await supabase.from(table).select('*').order('created_at')
+    if (error) {
+      console.error(`[Data API] Error loading ${table}:`, error.message)
+      return []
     }
+    return data || []
   }
 
+  const [students, sessions, terms, holidays, invoices] = await Promise.all([
+    safeSelect('students'),
+    safeSelect('sessions'),
+    safeSelect('terms'),
+    safeSelect('holidays'),
+    safeSelect('invoices'),
+  ])
+
   return Response.json({
-    students: students.data,
-    sessions: sessions.data.map(s => ({
+    students,
+    sessions: sessions.map(s => ({
       ...s,
       payStatus: s.pay_status,
     })),
-    terms: terms.data,
-    holidays: holidays.data,
-    invoices: invoices.data,
+    terms,
+    holidays,
+    invoices,
   })
 }
 
@@ -67,7 +69,29 @@ export async function POST(request) {
       row.pay_status = row.payStatus
       delete row.payStatus
     }
-    const { data, error } = await supabase.from(table).insert(row).select().single()
+    // Remove id field if present — let Supabase generate it
+    delete row.id
+    let { data, error } = await supabase.from(table).insert(row).select().single()
+    // If insert fails due to unknown column (e.g. phone), retry without it
+    if (error && error.message && error.message.includes('column')) {
+      console.warn(`[Data API] Insert ${table} retrying without unknown columns:`, error.message)
+      // Strip to known columns per table
+      const known = {
+        students: ['coach_id', 'name', 'level', 'credits', 'sessions', 'owing', 'phone'],
+        sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes'],
+        terms: ['coach_id', 'name', 'start', 'end', 'weeks'],
+        holidays: ['coach_id', 'name', 'start', 'end'],
+        invoices: ['coach_id', 'invoice_number', 'student', 'amount', 'status', 'date', 'items'],
+      }
+      const cols = known[table]
+      if (cols) {
+        const cleaned = {}
+        for (const k of cols) { if (k in row) cleaned[k] = row[k] }
+        const retry = await supabase.from(table).insert(cleaned).select().single()
+        data = retry.data
+        error = retry.error
+      }
+    }
     if (error) {
       console.error(`[Data API] Insert ${table} error:`, error)
       return Response.json({ error: error.message }, { status: 500 })
