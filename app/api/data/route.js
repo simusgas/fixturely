@@ -72,12 +72,12 @@ export async function POST(request) {
     // Remove id field if present — let Supabase generate it
     delete row.id
     let { data, error } = await supabase.from(table).insert(row).select().single()
-    // If insert fails due to unknown column (e.g. phone), retry without it
-    if (error && error.message && error.message.includes('column')) {
-      console.warn(`[Data API] Insert ${table} retrying without unknown columns:`, error.message)
+    // If insert fails, retry with only core columns (strips optional fields like phone)
+    if (error) {
+      console.warn(`[Data API] Insert ${table} retrying with core columns only:`, error.message)
       // Strip to known columns per table
       const known = {
-        students: ['coach_id', 'name', 'level', 'credits', 'sessions', 'owing', 'phone'],
+        students: ['coach_id', 'name', 'level', 'credits', 'sessions', 'owing'],
         sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes'],
         terms: ['coach_id', 'name', 'start', 'end', 'weeks'],
         holidays: ['coach_id', 'name', 'start', 'end'],
