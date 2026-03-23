@@ -1,9 +1,12 @@
 {
+  "id": "/fixturely-app.html",
   "name": "Fixturely",
   "short_name": "Fixturely",
   "description": "Tennis coaching made simple",
   "start_url": "/fixturely-app.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#FAF8F5",
   "theme_color": "#E8724A",
   "icons": [
