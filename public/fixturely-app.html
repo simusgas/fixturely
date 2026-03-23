@@ -2225,18 +2225,17 @@ async function loadCourts() {
       <div class="cg-courts">`;
 
     resources.forEach(r => {
-      const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []);
-      const busy = sessions.filter(s => s.Category !== 0);
+      const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []).filter(s => s.Category !== 0);
+      const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
 
-      // Grid lines (background)
+      // Grid lines
       const lines = slots.map((m,i) =>
         `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#f0ede6'}"></div>`
       ).join('');
 
-      // Free-slot hover cells (only for slots not covered by a booked session or our own booking)
-      const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
+      // Free-slot hover cells (not covered by any ClubSpark session or our pending booking)
       const freeCells = slots.map((m,i) => {
-        const isBusy = busy.some(s => s.StartTime < m+30 && s.EndTime > m);
+        const isBusy = sessions.some(s => s.StartTime < m+30 && s.EndTime > m);
         if (isBusy) return '';
         const isMine = myBooked.some(b => b.start_mins < m+30 && b.end_mins > m);
         if (isMine) return '';
@@ -2247,45 +2246,52 @@ async function loadCourts() {
         return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>${selBadge}</div>`;
       }).join('');
 
-      // Session blocks (on top, pointer-events:none so hover passes through to free cells)
+      // Merged session blocks: ClubSpark is source of truth, Supabase identifies ours
       const blocks = sessions.map(s => {
-        if (s.Category === 0) return '';
-        const color = sessColor(s);
         const top = Math.max(0, (s.StartTime - GRID_S) / 30 * SLOT_H);
         const h = Math.max((s.EndTime - s.StartTime) / 30 * SLOT_H - 2, 14);
+        // Check if this ClubSpark session matches one of our Supabase bookings
+        const mine = myBooked.find(b => b.start_mins < s.EndTime && b.end_mins > s.StartTime);
+        if (mine) {
+          const isPending = mine.status === 'pending';
+          const pendingClass = isPending ? ' cg-pending' : '';
+          const nameLabel = isPending ? 'Booking...' : 'Your Booking';
+          const timeStr = `${slotFmt(s.StartTime)} – ${slotFmt(s.EndTime)}`;
+          return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 28 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
+        }
+        const color = sessColor(s);
         const label = (s.Name && !s.Name.includes('-')) ? s.Name : (s.Category === 8000 ? 'Closed' : '');
         const tc = sessTextCol(color);
         return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div></div>`;
       }).join('');
 
-      // Coach's own bookings — styled as solid blocks matching the grid's visual language
-      // Show confirmed bookings immediately from our DB. For bookings older than
-      // 10 minutes, cross-check with ClubSpark to detect external cancellations.
-      const myBlocks = myBookings.filter(b => b.court_name === r.Name).map(b => {
-        let show = false;
-        let isPending = false;
-        if (b.status === 'pending') {
-          show = true;
-          isPending = true;
-        } else if (b.status === 'confirmed') {
-          const ageMs = Date.now() - new Date(b.created_at).getTime();
-          if (ageMs < 10 * 60 * 1000) {
-            show = true;
-          } else {
-            show = busy.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins);
-          }
-        }
-        if (!show) return '';
+      // Pending bookings not yet reflected in ClubSpark (bot still processing)
+      const pendingNotOnCS = myBooked.filter(b =>
+        b.status === 'pending' &&
+        !sessions.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins)
+      );
+      const pendingBlocks = pendingNotOnCS.map(b => {
         const top = Math.max(0, (b.start_mins - GRID_S) / 30 * SLOT_H);
         const h = Math.max((b.end_mins - b.start_mins) / 30 * SLOT_H - 2, 14);
-        const pendingClass = isPending ? ' cg-pending' : '';
-        const timeStr = `${slotFmt(b.start_mins)} – ${slotFmt(b.end_mins)}`;
-        const nameLabel = isPending ? 'Booking...' : 'Your Booking';
-        return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 28 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
+        return `<div class="cg-mine cg-pending" style="top:${top}px;height:${h}px"><div class="cg-mine-name">Booking...</div></div>`;
       }).join('');
 
-      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${myBlocks}</div>`;
+      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${pendingBlocks}</div>`;
     });
+
+    // Detect and cancel stale bookings (confirmed in Supabase but gone from ClubSpark)
+    const staleIds = myBookings.filter(b => {
+      if (b.status !== 'confirmed') return false;
+      const ageMs = Date.now() - new Date(b.created_at).getTime();
+      if (ageMs < 10 * 60 * 1000) return false;
+      const courtRes = resources.find(r => r.Name === b.court_name);
+      if (!courtRes) return false;
+      const csSessions = (courtRes.Days && courtRes.Days[0] ? courtRes.Days[0].Sessions : []).filter(s => s.Category !== 0);
+      return !csSessions.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins);
+    }).map(b => b.id);
+    if (staleIds.length > 0) {
+      fetch('/api/courts/bookings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cancelIds: staleIds }) }).catch(() => {});
+    }
 
     html += `</div></div></div>`;
     body.innerHTML = html;
