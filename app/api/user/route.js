@@ -30,18 +30,39 @@ export async function PATCH(request) {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const fullName = body.fullName?.trim()
-  if (!fullName) {
-    return Response.json({ error: 'Full name is required' }, { status: 400 })
+  const { fullName, email, password } = body
+
+  // Build the update object
+  const update = {}
+  if (fullName !== undefined) {
+    const trimmed = fullName.trim()
+    if (!trimmed) return Response.json({ error: 'Name cannot be empty' }, { status: 400 })
+    update.data = { full_name: trimmed }
+  }
+  if (email !== undefined) {
+    const trimmed = email.trim()
+    if (!trimmed) return Response.json({ error: 'Email cannot be empty' }, { status: 400 })
+    update.email = trimmed
+  }
+  if (password !== undefined) {
+    if (password.length < 6) return Response.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
+    update.password = password
   }
 
-  const { error } = await supabase.auth.updateUser({
-    data: { full_name: fullName },
-  })
+  if (Object.keys(update).length === 0) {
+    return Response.json({ error: 'Nothing to update' }, { status: 400 })
+  }
+
+  const { error } = await supabase.auth.updateUser(update)
 
   if (error) {
-    return Response.json({ error: 'Failed to update name' }, { status: 500 })
+    return Response.json({ error: error.message || 'Failed to update profile' }, { status: 500 })
   }
 
-  return Response.json({ success: true, fullName })
+  return Response.json({
+    success: true,
+    fullName: update.data?.full_name || user.user_metadata?.full_name || '',
+    email: update.email || user.email,
+    emailChanged: !!update.email,
+  })
 }

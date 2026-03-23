@@ -50,8 +50,10 @@
   .ntab[data-t="schedule"]::after{background:var(--s-a);}
   .ntab[data-t="students"]::after{background:var(--u-a);}
   .ntab[data-t="courts"]::after  {background:var(--c-a);}
+  .ntab[data-t="profile"]::after {background:var(--t-a);}
   .ntab.active::after{transform:scaleX(1);}
   .ntab[data-t="courts"].active .nl,.ntab[data-t="courts"].active .ni svg{color:var(--c-dk);}
+  .ntab[data-t="profile"].active .nl{color:var(--t-dk);}
 
   /* ── SHARED HEADER BITS ── */
   .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
@@ -493,8 +495,12 @@
   .cg-time{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:6px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:3px;}
   .cg-courts{display:flex;flex:1;}
   .cg-court{position:relative;flex:1;border-right:1px solid var(--border);}
-  .cg-sess{position:absolute;left:2px;right:2px;border-radius:4px;overflow:hidden;padding:2px 4px;pointer-events:none;}
+  .cg-sess{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:3px 6px;pointer-events:none;}
   .cg-sess-name{font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-mine{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;pointer-events:none;z-index:5;background:var(--c-pl);border-left:3px solid var(--c-a);display:flex;flex-direction:column;justify-content:center;padding:3px 6px;}
+  .cg-mine-name{font-size:9px;font-weight:900;color:var(--c-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-mine-time{font-size:8px;font-weight:700;color:var(--c-a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-mine.cg-pending{background:repeating-linear-gradient(135deg,var(--c-pl),var(--c-pl) 6px,rgba(74,124,89,0.08) 6px,rgba(74,124,89,0.08) 12px);border-left-style:dashed;}
   .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
   .cg-slot-free:hover{background:rgba(0,0,0,0.045);}
   .cg-slot-free.cg-selected{background:rgba(74,124,89,0.12);border:1.5px solid var(--c-a);border-radius:3px;z-index:3;}
@@ -555,6 +561,7 @@
     .sb-item[data-t="courts"].active   { background:var(--c-pl); color:var(--c-dk); }
     .sb-item[data-t="share"] { color:var(--s-dk); }
     .sb-item[data-t="share"]:hover { background:var(--s-pl); }
+    .sb-profile[data-t="profile"].active { background:var(--t-pl); }
 
     /* ── Main column (right of sidebar) ── */
     .main-col { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; min-width:0; }
@@ -704,6 +711,30 @@
   .sh-split{display:flex;flex-direction:column;gap:16px;}
   .sh-split-left,.sh-split-right{width:100%;}
 
+  /* ── Profile ── */
+  .sb-profile{display:flex;align-items:center;gap:10px;padding:14px 16px;margin:0 10px 6px;border-radius:12px;cursor:pointer;transition:background 0.15s;}
+  .sb-profile:hover{background:var(--off);}
+  .sb-profile.active{background:var(--t-pl);}
+  .pf-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--t-a),var(--s-a));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--white);flex-shrink:0;letter-spacing:-0.5px;}
+  .pf-avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--t-a),var(--s-a));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:var(--white);flex-shrink:0;letter-spacing:-0.5px;}
+  .sb-profile-name{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sb-profile-email{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pf-card{background:var(--white);border-radius:16px;padding:20px;margin-bottom:14px;border:1px solid var(--border);}
+  .pf-card-title{font-size:12px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+  .pf-field{margin-bottom:14px;}
+  .pf-field:last-child{margin-bottom:0;}
+  .pf-label{font-size:12px;font-weight:700;color:var(--soft);margin-bottom:5px;}
+  .pf-input{width:100%;padding:10px 14px;background:var(--off);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.15s;}
+  .pf-input:focus{border-color:var(--t-a);}
+  .pf-save-btn{padding:9px 20px;background:var(--t-a);color:var(--white);border:none;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .pf-save-btn:hover{background:var(--t-dk);}
+  .pf-save-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .pf-logout-btn{width:100%;padding:12px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:14px;font-weight:800;color:var(--err);cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s,border-color 0.15s;}
+  .pf-logout-btn:hover{background:var(--err-lt);border-color:var(--err);}
+  .pf-msg{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;margin-top:8px;}
+  .pf-msg.ok{background:var(--ok-lt);color:var(--ok);}
+  .pf-msg.err{background:var(--err-lt);color:var(--err);}
+
   /* ── Tooltips ── */
   .tb-has-tip{position:relative;}
   .tb-tip{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap;z-index:50;margin-top:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;}
@@ -717,6 +748,10 @@
   <!-- Sidebar: desktop nav (hidden on mobile) -->
   <aside class="sidebar">
     <div class="sb-logo"><span>🎾</span><strong>Fixturely</strong></div>
+    <div class="sb-profile" id="sbProfile" onclick="switchTab('profile',this)" data-t="profile">
+      <div class="pf-avatar" id="sbAvatar">?</div>
+      <div style="overflow:hidden"><div class="sb-profile-name" id="sbName">Coach</div><div class="sb-profile-email" id="sbEmail"></div></div>
+    </div>
     <nav class="sb-nav">
       <button class="sb-item active" data-t="today"    onclick="switchTab('today',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span>Today</span></button>
       <button class="sb-item"        data-t="schedule" onclick="switchTab('schedule',this)"><span class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></span><span>Schedule</span></button>
@@ -835,12 +870,65 @@
     <div class="sh-body" id="shBody"></div>
   </div>
 
+  <!-- ══ PROFILE ══ -->
+  <div class="screen" id="screen-profile">
+    <div class="t-hdr" style="background:linear-gradient(155deg,var(--t-a) 0%,var(--s-a) 100%);">
+      <div class="t-hdr-top">
+        <div><div class="t-title">Profile</div><div class="t-sub">Account settings</div></div>
+      </div>
+    </div>
+    <div class="t-body" style="padding:20px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+        <div class="pf-avatar" id="pfAvatar" style="width:50px;height:50px;font-size:19px">?</div>
+        <div>
+          <div id="pfDisplayName" style="font-size:18px;font-weight:900;color:var(--text)">Coach</div>
+          <div id="pfDisplayEmail" style="font-size:13px;font-weight:600;color:var(--soft)"></div>
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <div class="pf-card-title">Personal Info</div>
+        <div class="pf-field">
+          <div class="pf-label">Full Name</div>
+          <input class="pf-input" id="pfNameInput" type="text" placeholder="Your name">
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Email</div>
+          <input class="pf-input" id="pfEmailInput" type="email" placeholder="you@example.com">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <button class="pf-save-btn" id="pfSaveInfoBtn" onclick="saveProfileInfo()">Save Changes</button>
+          <div id="pfInfoMsg"></div>
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <div class="pf-card-title">Change Password</div>
+        <div class="pf-field">
+          <div class="pf-label">New Password</div>
+          <input class="pf-input" id="pfPassInput" type="password" placeholder="Min. 6 characters" minlength="6">
+        </div>
+        <div class="pf-field">
+          <div class="pf-label">Confirm Password</div>
+          <input class="pf-input" id="pfPassConfirm" type="password" placeholder="Repeat new password">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <button class="pf-save-btn" id="pfSavePassBtn" onclick="saveProfilePassword()">Update Password</button>
+          <div id="pfPassMsg"></div>
+        </div>
+      </div>
+
+      <button class="pf-logout-btn" onclick="logOut()">Log Out</button>
+    </div>
+  </div>
+
   <!-- ══ BOTTOM NAV ══ -->
   <nav class="bnav">
     <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Today</span></button>
     <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Schedule</span></button>
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="nl">Students</span></button>
     <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nl">Courts</span></button>
+    <button class="ntab"        data-t="profile"  onclick="switchTab('profile',this)"> <span class="ni"><div class="pf-avatar-sm" id="bnAvatar">?</div></span><span class="nl">Profile</span></button>
   </nav>
   </div><!-- /main-col -->
 </div>
@@ -1207,23 +1295,31 @@ function getHol(d){const s=ds(d);return HOLIDAYS.find(h=>s>=h.start&&s<=h.end)||
 function wksLeft(e){return Math.max(0,Math.ceil((new Date(e)-today)/(7*24*3600*1000)));}
 
 // ══ TABS ══
-function switchTab(tab,btn){
+const VALID_TABS=['today','schedule','students','courts','share','profile'];
+function switchTab(tab,btn,skipHash){
+  if(!VALID_TABS.includes(tab)) tab='today';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('[data-t]').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+tab).classList.add('active');
   document.querySelectorAll(`[data-t="${tab}"]`).forEach(t=>t.classList.add('active'));
   updateTopbar(tab);
+  if(!skipHash && location.hash!=='#'+tab) history.replaceState(null,'','#'+tab);
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
   if(tab==='courts')   loadCourts();
   if(tab==='share')    renderSharePage();
+  if(tab==='profile')  renderProfile();
 }
+window.addEventListener('hashchange',()=>{
+  const tab=location.hash.replace('#','');
+  if(VALID_TABS.includes(tab)) switchTab(tab,null,true);
+});
 
 function updateTopbar(tab){
   const titleEl=document.getElementById('topnavTitle');
   const actsEl=document.getElementById('topnavActs');
   if(!titleEl||!actsEl) return;
-  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule'};
+  const titles={today:'Today',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule',profile:'Profile'};
   titleEl.textContent=titles[tab]||tab;
   if(tab==='today'){
     actsEl.innerHTML=``;
@@ -2137,10 +2233,13 @@ async function loadCourts() {
         `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#f0ede6'}"></div>`
       ).join('');
 
-      // Free-slot hover cells (only for slots not covered by a booked session)
+      // Free-slot hover cells (only for slots not covered by a booked session or our own booking)
+      const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
       const freeCells = slots.map((m,i) => {
         const isBusy = busy.some(s => s.StartTime < m+30 && s.EndTime > m);
         if (isBusy) return '';
+        const isMine = myBooked.some(b => b.start_mins < m+30 && b.end_mins > m);
+        if (isMine) return '';
         const selKey=`${r.Name}|${m}|${courtsDate}`;
         const isSel=mbSlots.some(s=>s.key===selKey);
         const selClass=isSel?' cg-selected':'';
@@ -2159,29 +2258,30 @@ async function loadCourts() {
         return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div></div>`;
       }).join('');
 
-      // Coach's own bookings overlay (green highlight)
-      // Only show "Booked" if the booking is confirmed AND ClubSpark still shows
-      // it as a booked session (handles cancellations made directly on ClubSpark).
-      // "Booking..." (pending) always shows since the bot may still be processing.
+      // Coach's own bookings — styled as solid blocks matching the grid's visual language
+      // Show confirmed bookings immediately from our DB. For bookings older than
+      // 10 minutes, cross-check with ClubSpark to detect external cancellations.
       const myBlocks = myBookings.filter(b => b.court_name === r.Name).map(b => {
-        let statusLabel = '';
         let show = false;
+        let isPending = false;
         if (b.status === 'pending') {
-          statusLabel = 'Booking...';
           show = true;
+          isPending = true;
         } else if (b.status === 'confirmed') {
-          // Cross-check: is this time slot actually booked on ClubSpark?
-          const stillBooked = busy.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins);
-          if (stillBooked) {
-            statusLabel = 'Booked';
+          const ageMs = Date.now() - new Date(b.created_at).getTime();
+          if (ageMs < 10 * 60 * 1000) {
             show = true;
+          } else {
+            show = busy.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins);
           }
-          // If not on ClubSpark anymore, don't show (was cancelled externally)
         }
         if (!show) return '';
         const top = Math.max(0, (b.start_mins - GRID_S) / 30 * SLOT_H);
         const h = Math.max((b.end_mins - b.start_mins) / 30 * SLOT_H - 2, 14);
-        return `<div style="position:absolute;top:${top}px;height:${h}px;left:2px;right:2px;border-radius:4px;background:rgba(61,139,94,0.15);border:2px solid var(--ok);pointer-events:none;z-index:5;display:flex;align-items:center;justify-content:center"><span style="font-size:9px;font-weight:900;color:var(--ok);background:var(--ok-lt);padding:2px 8px;border-radius:100px">${statusLabel}</span></div>`;
+        const pendingClass = isPending ? ' cg-pending' : '';
+        const timeStr = `${slotFmt(b.start_mins)} – ${slotFmt(b.end_mins)}`;
+        const nameLabel = isPending ? 'Booking...' : 'Your Booking';
+        return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 28 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
       }).join('');
 
       html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${myBlocks}</div>`;
@@ -2200,11 +2300,26 @@ let coachFullName='';
 let mbSlots=[]; // multi-book queue: [{key,court,resourceId,startMins,date,duration}]
 function courtFmt12(mins){const h=Math.floor(mins/60)%24,m=mins%60;return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 
+let coachEmail='';
+function getInitials(name){
+  if(!name) return '?';
+  return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+function updateProfileWidgets(){
+  const ini=getInitials(coachFullName);
+  const displayName=coachFullName||'Coach';
+  // Sidebar
+  const sbAv=document.getElementById('sbAvatar'); if(sbAv) sbAv.textContent=ini;
+  const sbNm=document.getElementById('sbName'); if(sbNm) sbNm.textContent=displayName;
+  const sbEm=document.getElementById('sbEmail'); if(sbEm) sbEm.textContent=coachEmail;
+  // Bottom nav
+  const bnAv=document.getElementById('bnAvatar'); if(bnAv) bnAv.textContent=ini;
+}
 // Fetch user info (including full name) on load
 (async function loadUserInfo(){
   try {
     const r=await fetch('/api/user');
-    if(r.ok){ const d=await r.json(); coachFullName=d.fullName||''; }
+    if(r.ok){ const d=await r.json(); coachFullName=d.fullName||''; coachEmail=d.email||''; updateProfileWidgets(); }
   } catch{}
 })();
 
@@ -2467,6 +2582,78 @@ async function submitCourtBooking(){
   }
 }
 
+// ══ PROFILE ══
+function renderProfile(){
+  const ini=getInitials(coachFullName);
+  document.getElementById('pfAvatar').textContent=ini;
+  document.getElementById('pfDisplayName').textContent=coachFullName||'Coach';
+  document.getElementById('pfDisplayEmail').textContent=coachEmail;
+  document.getElementById('pfNameInput').value=coachFullName;
+  document.getElementById('pfEmailInput').value=coachEmail;
+  document.getElementById('pfPassInput').value='';
+  document.getElementById('pfPassConfirm').value='';
+  document.getElementById('pfInfoMsg').innerHTML='';
+  document.getElementById('pfPassMsg').innerHTML='';
+}
+async function saveProfileInfo(){
+  const btn=document.getElementById('pfSaveInfoBtn');
+  const msgEl=document.getElementById('pfInfoMsg');
+  const name=document.getElementById('pfNameInput').value.trim();
+  const email=document.getElementById('pfEmailInput').value.trim();
+  if(!name){msgEl.innerHTML='<div class="pf-msg err">Name is required</div>';return;}
+  if(!email){msgEl.innerHTML='<div class="pf-msg err">Email is required</div>';return;}
+  btn.disabled=true; msgEl.innerHTML='';
+  try {
+    const body={};
+    if(name!==coachFullName) body.fullName=name;
+    if(email!==coachEmail) body.email=email;
+    if(Object.keys(body).length===0){msgEl.innerHTML='<div class="pf-msg ok">No changes</div>';btn.disabled=false;return;}
+    const r=await fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.success){
+      coachFullName=d.fullName||coachFullName;
+      if(!d.emailChanged) coachEmail=d.email||coachEmail;
+      updateProfileWidgets();
+      renderProfile();
+      const extra=d.emailChanged?' Check your new email to confirm the change.':'';
+      msgEl.innerHTML=`<div class="pf-msg ok">Saved!${extra}</div>`;
+    } else {
+      msgEl.innerHTML=`<div class="pf-msg err">${d.error||'Failed to save'}</div>`;
+    }
+  } catch(e){
+    msgEl.innerHTML='<div class="pf-msg err">Network error</div>';
+  }
+  btn.disabled=false;
+}
+async function saveProfilePassword(){
+  const btn=document.getElementById('pfSavePassBtn');
+  const msgEl=document.getElementById('pfPassMsg');
+  const pass=document.getElementById('pfPassInput').value;
+  const confirm=document.getElementById('pfPassConfirm').value;
+  if(pass.length<6){msgEl.innerHTML='<div class="pf-msg err">Min. 6 characters</div>';return;}
+  if(pass!==confirm){msgEl.innerHTML='<div class="pf-msg err">Passwords don\'t match</div>';return;}
+  btn.disabled=true; msgEl.innerHTML='';
+  try {
+    const r=await fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})});
+    const d=await r.json();
+    if(d.success){
+      msgEl.innerHTML='<div class="pf-msg ok">Password updated!</div>';
+      document.getElementById('pfPassInput').value='';
+      document.getElementById('pfPassConfirm').value='';
+    } else {
+      msgEl.innerHTML=`<div class="pf-msg err">${d.error||'Failed to update'}</div>`;
+    }
+  } catch(e){
+    msgEl.innerHTML='<div class="pf-msg err">Network error</div>';
+  }
+  btn.disabled=false;
+}
+function logOut(){
+  // Clear cookies and redirect to login
+  document.cookie.split(';').forEach(c=>{document.cookie=c.trim().split('=')[0]+'=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';});
+  window.location.href='/login';
+}
+
 // ══ MULTI-BOOK ══
 function updateMultiBar(){
   const bar=document.getElementById('mbBar');
@@ -2578,15 +2765,10 @@ async function executeMultiBook(){
 function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 // ══ INIT ══
-console.log('[Fixturely debug] localStorage state:', {
-  fixturely_onboard_done: localStorage.getItem('fixturely_onboard_done'),
-  fixturely_sched_nudge_dismissed: localStorage.getItem('fixturely_sched_nudge_dismissed'),
-  fixturely_shared: localStorage.getItem('fixturely_shared')
-});
-renderToday();
 renderSchedule();
 renderCourtsDateLbl();
-updateTopbar('today');
+const initTab=location.hash.replace('#','');
+switchTab(VALID_TABS.includes(initTab)?initTab:'today',null,true);
 </script>
 </body>
 </html>
