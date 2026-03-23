@@ -495,12 +495,18 @@
   .cg-court{position:relative;flex:1;border-right:1px solid var(--border);}
   .cg-sess{position:absolute;left:2px;right:2px;border-radius:4px;overflow:hidden;padding:2px 4px;pointer-events:none;}
   .cg-sess-name{font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.18s;}
+  .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
   .cg-slot-free:hover{background:rgba(0,0,0,0.045);}
+  .cg-slot-free.cg-selected{background:rgba(74,124,89,0.12);border:1.5px solid var(--c-a);border-radius:3px;z-index:3;}
+  .cg-slot-free.cg-selected .cg-slot-time{opacity:1;color:var(--c-dk);}
+  .cg-sel-badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--c-a);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1;}
   .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:9px;font-weight:700;color:var(--soft);position:absolute;top:4px;left:5px;pointer-events:none;}
   .cg-slot-free:hover .cg-slot-time{opacity:1;}
-  .cg-req-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:4px 10px;border-radius:100px;border:none;background:var(--c-a);color:#fff;font-size:10px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
-  .cg-slot-free:hover .cg-req-btn{opacity:1;pointer-events:auto;}
+  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:4px 8px;border-radius:100px;border:none;font-size:9px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;}
+  .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
+  .cg-sel-btn{background:var(--white);color:var(--c-dk);border:1.5px solid var(--c-a);}
+  .cg-slot-free:hover .cg-req-btn,.cg-slot-free:hover .cg-sel-btn{opacity:1;pointer-events:auto;}
+  .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
 
@@ -1040,35 +1046,124 @@
 </div>
 
 <!-- COURT BOOKING MODAL -->
+<style>
+@keyframes cb-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes cb-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes cb-fade-in{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+.cb-loading-wrap{display:flex;flex-direction:column;align-items:center;padding:30px 0 16px;animation:cb-fade-in 0.6s ease}
+.cb-ball-ring{position:relative;width:88px;height:88px;margin-bottom:28px}
+.cb-ball-ring .ring{position:absolute;inset:0;border-radius:50%;border:2.5px solid var(--c-pl);border-top-color:var(--c-a);animation:cb-spin 1.8s cubic-bezier(0.4,0,0.2,1) infinite}
+.cb-ball-ring .ring:nth-child(2){inset:10px;border-top-color:var(--c-dk);animation-duration:2.6s;animation-direction:reverse}
+.cb-ball-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;animation:cb-bounce 2s ease-in-out infinite}
+.cb-status-msg{font-size:16px;font-weight:800;color:var(--c-dk);text-align:center;min-height:24px;transition:opacity 0.5s ease}
+.cb-progress-track{width:100%;height:4px;background:var(--c-pl);border-radius:100px;margin-top:24px;overflow:hidden}
+.cb-progress-bar{height:100%;background:linear-gradient(90deg,var(--c-a),var(--c-dk));border-radius:100px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.cb-custom-dur{margin-top:8px;display:flex;align-items:center;gap:8px;animation:cb-fade-in 0.25s ease}
+.cb-custom-dur input{width:70px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;background:var(--white);color:var(--text);outline:none}
+.cb-custom-dur input:focus{border-color:var(--c-a)}
+.cb-custom-dur span{font-size:12px;font-weight:700;color:var(--soft)}
+</style>
 <div class="overlay" id="courtBookOvl" onclick="if(event.target===this)closeCourtBookModal()">
   <div class="modal">
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeCourtBookModal()">✕</button>
-    <div class="modal-title" style="color:var(--c-dk)">Book Court</div>
-    <div id="cbCourtLabel" style="background:var(--c-pl);border-radius:14px;padding:12px 15px;margin-bottom:18px;font-size:15px;font-weight:800;color:var(--c-dk)"></div>
-    <div class="field">
-      <label class="field-label">Date</label>
-      <div class="field-input" id="cbDate" style="background:var(--off);color:var(--soft)"></div>
+    <button class="modal-close" id="cbCloseBtn" onclick="closeCourtBookModal()">✕</button>
+    <!-- FORM VIEW -->
+    <div id="cbFormView">
+      <div class="modal-title" style="color:var(--c-dk)">Book Court</div>
+      <div id="cbCourtLabel" style="background:var(--c-pl);border-radius:14px;padding:12px 15px;margin-bottom:18px;font-size:15px;font-weight:800;color:var(--c-dk)"></div>
+      <div class="field">
+        <label class="field-label">Date</label>
+        <div class="field-input" id="cbDate" style="background:var(--off);color:var(--soft)"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Start Time</label>
+        <div class="field-input" id="cbStartTime" style="background:var(--off);color:var(--soft)"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Duration</label>
+        <div class="pill-group" id="cbDurPills">
+          <button class="pill" onclick="setCbDur(this,30)">30 min</button>
+          <button class="pill" onclick="setCbDur(this,45)">45 min</button>
+          <button class="pill active" onclick="setCbDur(this,60)">1 hour</button>
+          <button class="pill" id="cbCustomPill" onclick="toggleCbCustom()" style="font-size:11px;padding:8px 12px">Custom</button>
+        </div>
+        <div id="cbCustomDur" style="display:none" class="cb-custom-dur">
+          <input type="number" id="cbCustomInput" min="15" max="240" step="15" value="90" onchange="setCbCustomDur()" oninput="setCbCustomDur()">
+          <span>minutes (15-min increments)</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">End Time</label>
+        <div class="field-input" id="cbEndTime" style="background:var(--off);color:var(--soft)"></div>
+      </div>
+      <div id="cbError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
+      <button class="submit-btn" id="cbSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="submitCourtBooking()">Book Court ✓</button>
     </div>
-    <div class="field">
-      <label class="field-label">Start Time</label>
-      <div class="field-input" id="cbStartTime" style="background:var(--off);color:var(--soft)"></div>
-    </div>
-    <div class="field">
-      <label class="field-label">Duration</label>
-      <div class="pill-group" id="cbDurPills">
-        <button class="pill" onclick="setCbDur(this,30)">30 min</button>
-        <button class="pill active" onclick="setCbDur(this,60)">1 hour</button>
-        <button class="pill" onclick="setCbDur(this,90)">1.5 hrs</button>
-        <button class="pill" onclick="setCbDur(this,120)">2 hours</button>
+    <!-- LOADING VIEW -->
+    <div id="cbLoadingView" style="display:none">
+      <div class="modal-title" style="color:var(--c-dk)" id="cbLoadTitle">Booking Court</div>
+      <div id="cbLoadCourtLabel" style="background:var(--c-pl);border-radius:14px;padding:10px 15px;margin-bottom:18px;font-size:14px;font-weight:800;color:var(--c-dk);text-align:center"></div>
+      <div class="cb-loading-wrap">
+        <div class="cb-ball-ring">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="cb-ball-emoji">🎾</div>
+        </div>
+        <div class="cb-status-msg" id="cbStatusMsg">Getting things ready...</div>
+        <div class="cb-progress-track"><div class="cb-progress-bar" id="cbProgressBar" style="width:0"></div></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- NAME PROMPT MODAL -->
+<div class="overlay" id="namePromptOvl" onclick="if(event.target===this)document.getElementById('namePromptOvl').classList.remove('open')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="document.getElementById('namePromptOvl').classList.remove('open')">✕</button>
+    <div class="modal-title" style="color:var(--c-dk)">What's your name?</div>
+    <div style="font-size:13px;color:var(--soft);font-weight:600;margin-bottom:18px">We need your name to make court bookings on your behalf.</div>
     <div class="field">
-      <label class="field-label">End Time</label>
-      <div class="field-input" id="cbEndTime" style="background:var(--off);color:var(--soft)"></div>
+      <label class="field-label">Full Name</label>
+      <input class="field-input" id="npNameInput" type="text" placeholder="e.g. Alex Johnson" style="background:var(--white)">
     </div>
-    <div id="cbError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
-    <button class="submit-btn" id="cbSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="submitCourtBooking()">Book Court ✓</button>
+    <div id="npError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
+    <button class="submit-btn" id="npSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="saveCoachName()">Save Name ✓</button>
+  </div>
+</div>
+
+<!-- MULTI-BOOK FLOATING BAR -->
+<div id="mbBar" style="display:none;position:fixed;bottom:calc(var(--nav-h,70px) + 12px);left:50%;transform:translateX(-50%);z-index:900;background:var(--c-dk);color:#fff;border-radius:100px;padding:10px 14px 10px 18px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,0.25);display:none;align-items:center;gap:12px;animation:cb-fade-in 0.3s ease">
+  <span id="mbCount">0 selected</span>
+  <button onclick="openMultiBookConfirm()" style="background:var(--white);color:var(--c-dk);border:none;border-radius:100px;padding:8px 18px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">Book All</button>
+  <button onclick="clearMultiSelect()" style="background:transparent;color:rgba(255,255,255,0.6);border:none;font-size:18px;cursor:pointer;padding:0 2px;line-height:1" title="Clear selections">✕</button>
+</div>
+
+<!-- MULTI-BOOK CONFIRMATION MODAL -->
+<div class="overlay" id="mbConfirmOvl" onclick="if(event.target===this)document.getElementById('mbConfirmOvl').classList.remove('open')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="document.getElementById('mbConfirmOvl').classList.remove('open')">✕</button>
+    <!-- SUMMARY VIEW -->
+    <div id="mbSummaryView">
+      <div class="modal-title" style="color:var(--c-dk)">Confirm Bookings</div>
+      <div id="mbList" style="margin-bottom:18px"></div>
+      <button class="submit-btn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="executeMultiBook()">Confirm & Book All</button>
+    </div>
+    <!-- PROGRESS VIEW -->
+    <div id="mbProgressView" style="display:none">
+      <div class="modal-title" style="color:var(--c-dk)" id="mbProgressTitle">Booking courts...</div>
+      <div class="cb-loading-wrap">
+        <div class="cb-ball-ring">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="cb-ball-emoji">🎾</div>
+        </div>
+        <div class="cb-status-msg" id="mbProgressMsg">Getting things ready...</div>
+        <div class="cb-progress-track"><div class="cb-progress-bar" id="mbProgressBar" style="width:0"></div></div>
+      </div>
+      <div id="mbResultList" style="margin-top:16px"></div>
+    </div>
   </div>
 </div>
 
@@ -2046,7 +2141,11 @@ async function loadCourts() {
       const freeCells = slots.map((m,i) => {
         const isBusy = busy.some(s => s.StartTime < m+30 && s.EndTime > m);
         if (isBusy) return '';
-        return `<div class="cg-slot-free" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}','${r.Id||''}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.Id||''}',${m},'${courtsDate}')">Book</button></div>`;
+        const selKey=`${r.Name}|${m}|${courtsDate}`;
+        const isSel=mbSlots.some(s=>s.key===selKey);
+        const selClass=isSel?' cg-selected':'';
+        const selBadge=isSel?`<div class="cg-sel-badge">✓</div>`:'';
+        return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>${selBadge}</div>`;
       }).join('');
 
       // Session blocks (on top, pointer-events:none so hover passes through to free cells)
@@ -2061,10 +2160,27 @@ async function loadCourts() {
       }).join('');
 
       // Coach's own bookings overlay (green highlight)
+      // Only show "Booked" if the booking is confirmed AND ClubSpark still shows
+      // it as a booked session (handles cancellations made directly on ClubSpark).
+      // "Booking..." (pending) always shows since the bot may still be processing.
       const myBlocks = myBookings.filter(b => b.court_name === r.Name).map(b => {
+        let statusLabel = '';
+        let show = false;
+        if (b.status === 'pending') {
+          statusLabel = 'Booking...';
+          show = true;
+        } else if (b.status === 'confirmed') {
+          // Cross-check: is this time slot actually booked on ClubSpark?
+          const stillBooked = busy.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins);
+          if (stillBooked) {
+            statusLabel = 'Booked';
+            show = true;
+          }
+          // If not on ClubSpark anymore, don't show (was cancelled externally)
+        }
+        if (!show) return '';
         const top = Math.max(0, (b.start_mins - GRID_S) / 30 * SLOT_H);
         const h = Math.max((b.end_mins - b.start_mins) / 30 * SLOT_H - 2, 14);
-        const statusLabel = b.status === 'confirmed' ? 'Booked' : b.status === 'pending' ? 'Booking...' : '';
         return `<div style="position:absolute;top:${top}px;height:${h}px;left:2px;right:2px;border-radius:4px;background:rgba(61,139,94,0.15);border:2px solid var(--ok);pointer-events:none;z-index:5;display:flex;align-items:center;justify-content:center"><span style="font-size:9px;font-weight:900;color:var(--ok);background:var(--ok-lt);padding:2px 8px;border-radius:100px">${statusLabel}</span></div>`;
       }).join('');
 
@@ -2079,26 +2195,123 @@ async function loadCourts() {
 }
 // ══ COURT BOOKING ══
 let cbCourt='',cbResourceId='',cbStartMins=0,cbDate='',cbDuration=60;
+let cbMode='book'; // 'book' or 'select'
+let coachFullName='';
+let mbSlots=[]; // multi-book queue: [{key,court,resourceId,startMins,date,duration}]
 function courtFmt12(mins){const h=Math.floor(mins/60)%24,m=mins%60;return `${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 
-function requestCourtSlot(court, resourceId, startMins, date) {
-  cbCourt=court; cbResourceId=resourceId; cbStartMins=startMins; cbDate=date; cbDuration=60;
+// Fetch user info (including full name) on load
+(async function loadUserInfo(){
+  try {
+    const r=await fetch('/api/user');
+    if(r.ok){ const d=await r.json(); coachFullName=d.fullName||''; }
+  } catch{}
+})();
+
+function openCourtModal(court, resourceId, startMins, date, mode) {
+  if(!coachFullName){
+    cbCourt=court; cbResourceId=resourceId; cbStartMins=startMins; cbDate=date; cbDuration=60; cbMode=mode;
+    document.getElementById('npNameInput').value='';
+    document.getElementById('npError').style.display='none';
+    document.getElementById('npSubmitBtn').disabled=false;
+    document.getElementById('npSubmitBtn').textContent='Save Name ✓';
+    document.getElementById('namePromptOvl').classList.add('open');
+    return;
+  }
+  cbCourt=court; cbResourceId=resourceId; cbStartMins=startMins; cbDate=date; cbDuration=60; cbMode=mode;
   document.getElementById('cbCourtLabel').textContent=`🎾 ${court}`;
   const d=new Date(date+'T00:00:00');
   document.getElementById('cbDate').textContent=`${DF[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]} ${d.getFullYear()}`;
   document.getElementById('cbStartTime').textContent=courtFmt12(startMins);
+  cbCustomOpen=false;
+  document.getElementById('cbCustomDur').style.display='none';
+  document.getElementById('cbCustomPill').classList.remove('active');
   document.querySelectorAll('#cbDurPills .pill').forEach(p=>p.classList.toggle('active',p.textContent.trim()==='1 hour'));
   updateCbEndTime();
   document.getElementById('cbError').style.display='none';
   document.getElementById('cbSubmitBtn').disabled=false;
-  document.getElementById('cbSubmitBtn').textContent='Book Court ✓';
+  const btn=document.getElementById('cbSubmitBtn');
+  if(mode==='select'){
+    btn.textContent='Add to Queue ✓';
+    document.querySelector('#cbFormView .modal-title').textContent='Select Slot';
+  } else {
+    btn.textContent='Book Court ✓';
+    document.querySelector('#cbFormView .modal-title').textContent='Book Court';
+  }
   document.getElementById('courtBookOvl').classList.add('open');
 }
+function requestCourtSlot(court, resourceId, startMins, date) {
+  openCourtModal(court, resourceId, startMins, date, 'book');
+}
+function selectCourtSlot(court, resourceId, startMins, date) {
+  const key=`${court}|${startMins}|${date}`;
+  // If already selected, deselect it
+  const idx=mbSlots.findIndex(s=>s.key===key);
+  if(idx>=0){
+    mbSlots.splice(idx,1);
+    updateMultiBar();
+    loadCourts(); // re-render to remove highlight
+    return;
+  }
+  openCourtModal(court, resourceId, startMins, date, 'select');
+}
 
+async function saveCoachName(){
+  const btn=document.getElementById('npSubmitBtn');
+  const errEl=document.getElementById('npError');
+  const name=document.getElementById('npNameInput').value.trim();
+  if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Saving...'; errEl.style.display='none';
+  try {
+    const r=await fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fullName:name})});
+    const d=await r.json();
+    if(d.success){
+      coachFullName=name;
+      document.getElementById('namePromptOvl').classList.remove('open');
+      // Now open the booking modal with the stashed intent
+      openCourtModal(cbCourt,cbResourceId,cbStartMins,cbDate,cbMode);
+    } else {
+      errEl.textContent=d.error||'Failed to save name.'; errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Save Name ✓';
+    }
+  } catch(e){
+    errEl.textContent='Network error — try again.'; errEl.style.display='block';
+    btn.disabled=false; btn.textContent='Save Name ✓';
+  }
+}
+
+let cbCustomOpen=false;
 function setCbDur(btn,mins){
+  // Close custom if a preset is picked
+  cbCustomOpen=false;
+  document.getElementById('cbCustomDur').style.display='none';
+  document.getElementById('cbCustomPill').classList.remove('active');
   btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   cbDuration=mins;
+  updateCbEndTime();
+}
+function toggleCbCustom(){
+  cbCustomOpen=!cbCustomOpen;
+  const wrap=document.getElementById('cbCustomDur');
+  const pill=document.getElementById('cbCustomPill');
+  if(cbCustomOpen){
+    wrap.style.display='flex';
+    pill.classList.add('active');
+    // Deactivate preset pills
+    document.querySelectorAll('#cbDurPills .pill:not(#cbCustomPill)').forEach(p=>p.classList.remove('active'));
+    setCbCustomDur();
+  } else {
+    wrap.style.display='none';
+    pill.classList.remove('active');
+  }
+}
+function setCbCustomDur(){
+  let v=parseInt(document.getElementById('cbCustomInput').value);
+  if(isNaN(v)||v<15) v=15;
+  if(v>240) v=240;
+  v=Math.round(v/15)*15;
+  cbDuration=v;
   updateCbEndTime();
 }
 
@@ -2108,14 +2321,106 @@ function updateCbEndTime(){
 
 function closeCourtBookModal(){
   document.getElementById('courtBookOvl').classList.remove('open');
+  // Reset to form view
+  setTimeout(()=>{
+    document.getElementById('cbFormView').style.display='';
+    document.getElementById('cbLoadingView').style.display='none';
+    document.getElementById('cbCloseBtn').style.display='';
+    if(cbLoadingInterval) clearInterval(cbLoadingInterval);
+  },300);
+}
+
+// ── Loading animation ──
+let cbLoadingInterval=null;
+const CB_STEPS=[
+  {msg:'Getting things ready...', pct:8, t:0},
+  {msg:'Connecting to ClubSpark...', pct:25, t:2500},
+  {msg:'Reserving your court...', pct:50, t:5500},
+  {msg:'Almost there...', pct:75, t:9000},
+  {msg:'Confirming your booking...', pct:90, t:12000},
+];
+
+function startCbLoading(){
+  document.getElementById('cbFormView').style.display='none';
+  document.getElementById('cbLoadingView').style.display='';
+  document.getElementById('cbCloseBtn').style.display='none';
+  document.getElementById('cbLoadCourtLabel').textContent=`🎾 ${cbCourt} · ${courtFmt12(cbStartMins)} - ${courtFmt12(cbStartMins+cbDuration)}`;
+
+  const msgEl=document.getElementById('cbStatusMsg');
+  const barEl=document.getElementById('cbProgressBar');
+
+  barEl.style.transition='none';
+  barEl.style.width='0';
+  // Force reflow so the reset takes effect before the transition kicks in
+  barEl.offsetWidth;
+  barEl.style.transition='width 1.2s cubic-bezier(0.4,0,0.2,1)';
+  msgEl.textContent=CB_STEPS[0].msg;
+  msgEl.style.opacity='1';
+
+  const start=Date.now();
+  let lastStep=0;
+  cbLoadingInterval=setInterval(()=>{
+    const elapsed=Date.now()-start;
+    let stepIdx=0;
+    for(let i=CB_STEPS.length-1;i>=0;i--){if(elapsed>=CB_STEPS[i].t){stepIdx=i;break;}}
+    if(stepIdx!==lastStep){
+      lastStep=stepIdx;
+      msgEl.style.opacity='0';
+      setTimeout(()=>{
+        msgEl.textContent=CB_STEPS[stepIdx].msg;
+        msgEl.style.opacity='1';
+      },300);
+    }
+    // Smooth progress
+    const cur=CB_STEPS[stepIdx];
+    const next=CB_STEPS[stepIdx+1];
+    let pct=cur.pct;
+    if(next){
+      const p=(elapsed-cur.t)/(next.t-cur.t);
+      pct=cur.pct+(next.pct-cur.pct)*Math.min(p,1);
+    }
+    barEl.style.width=Math.min(pct,93)+'%';
+  },300);
+}
+
+function finishCbLoading(success){
+  if(cbLoadingInterval) clearInterval(cbLoadingInterval);
+  const barEl=document.getElementById('cbProgressBar');
+  const msgEl=document.getElementById('cbStatusMsg');
+  barEl.style.width='100%';
+  if(success){
+    msgEl.style.opacity='0';
+    setTimeout(()=>{msgEl.textContent='Court booked!';msgEl.style.opacity='1';},300);
+  }
 }
 
 async function submitCourtBooking(){
-  const btn=document.getElementById('cbSubmitBtn');
-  const errEl=document.getElementById('cbError');
-  btn.disabled=true;
-  btn.textContent='Booking...';
-  errEl.style.display='none';
+  // Validate custom duration
+  if(cbCustomOpen){
+    let v=parseInt(document.getElementById('cbCustomInput').value);
+    if(isNaN(v)||v<15||v>240){
+      const errEl=document.getElementById('cbError');
+      errEl.textContent='Duration must be between 15 and 240 minutes.';
+      errEl.style.display='block';
+      return;
+    }
+    cbDuration=Math.round(v/15)*15;
+  }
+
+  // If in select mode, add to queue instead of booking
+  if(cbMode==='select'){
+    const key=`${cbCourt}|${cbStartMins}|${cbDate}`;
+    if(!mbSlots.some(s=>s.key===key)){
+      mbSlots.push({key, court:cbCourt, resourceId:cbResourceId, startMins:cbStartMins, date:cbDate, duration:cbDuration});
+    }
+    closeCourtBookModal();
+    updateMultiBar();
+    loadCourts(); // re-render to show highlight
+    return;
+  }
+
+  document.getElementById('cbError').style.display='none';
+  startCbLoading();
 
   try {
     const res=await fetch('/api/courts/book',{
@@ -2131,21 +2436,142 @@ async function submitCourtBooking(){
     });
     const data=await res.json();
     if(data.success){
-      closeCourtBookModal();
-      toast(`✅ ${cbCourt} booked — ${courtFmt12(cbStartMins)} to ${courtFmt12(cbStartMins+cbDuration)}`);
-      loadCourts(); // refresh grid
+      finishCbLoading(true);
+      setTimeout(()=>{
+        closeCourtBookModal();
+        toast(`✅ ${cbCourt} booked — ${courtFmt12(cbStartMins)} to ${courtFmt12(cbStartMins+cbDuration)}`);
+        loadCourts();
+      },1200);
     } else {
+      if(cbLoadingInterval) clearInterval(cbLoadingInterval);
+      // Switch back to form view with error
+      document.getElementById('cbFormView').style.display='';
+      document.getElementById('cbLoadingView').style.display='none';
+      document.getElementById('cbCloseBtn').style.display='';
+      const errEl=document.getElementById('cbError');
       errEl.textContent=data.error||'Booking failed. Please try again.';
       errEl.style.display='block';
-      btn.disabled=false;
-      btn.textContent='Book Court ✓';
+      document.getElementById('cbSubmitBtn').disabled=false;
+      document.getElementById('cbSubmitBtn').textContent='Book Court ✓';
     }
   } catch(e) {
+    if(cbLoadingInterval) clearInterval(cbLoadingInterval);
+    document.getElementById('cbFormView').style.display='';
+    document.getElementById('cbLoadingView').style.display='none';
+    document.getElementById('cbCloseBtn').style.display='';
+    const errEl=document.getElementById('cbError');
     errEl.textContent='Network error — check your connection and try again.';
     errEl.style.display='block';
-    btn.disabled=false;
-    btn.textContent='Book Court ✓';
+    document.getElementById('cbSubmitBtn').disabled=false;
+    document.getElementById('cbSubmitBtn').textContent='Book Court ✓';
   }
+}
+
+// ══ MULTI-BOOK ══
+function updateMultiBar(){
+  const bar=document.getElementById('mbBar');
+  if(mbSlots.length===0){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  document.getElementById('mbCount').textContent=`${mbSlots.length} court${mbSlots.length>1?'s':''} selected`;
+}
+function clearMultiSelect(){
+  mbSlots=[];
+  updateMultiBar();
+  loadCourts();
+}
+function removeFromQueue(idx){
+  mbSlots.splice(idx,1);
+  if(mbSlots.length===0){
+    document.getElementById('mbConfirmOvl').classList.remove('open');
+    updateMultiBar();
+    loadCourts();
+  } else {
+    renderMbSummary();
+    updateMultiBar();
+  }
+}
+function renderMbSummary(){
+  const list=document.getElementById('mbList');
+  list.innerHTML=mbSlots.map((s,i)=>{
+    const d=new Date(s.date+'T00:00:00');
+    const dateStr=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--c-pl);border-radius:12px;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;color:var(--c-dk)">${s.court}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--soft)">${dateStr} · ${courtFmt12(s.startMins)} - ${courtFmt12(s.startMins+s.duration)} (${s.duration}min)</div>
+      </div>
+      <button onclick="removeFromQueue(${i})" style="background:none;border:none;color:var(--soft);font-size:16px;cursor:pointer;padding:2px 6px">✕</button>
+    </div>`;
+  }).join('');
+}
+function openMultiBookConfirm(){
+  if(mbSlots.length===0) return;
+  renderMbSummary();
+  document.getElementById('mbSummaryView').style.display='';
+  document.getElementById('mbProgressView').style.display='none';
+  document.getElementById('mbConfirmOvl').classList.add('open');
+}
+async function executeMultiBook(){
+  const total=mbSlots.length;
+  document.getElementById('mbSummaryView').style.display='none';
+  document.getElementById('mbProgressView').style.display='';
+
+  const msgEl=document.getElementById('mbProgressMsg');
+  const barEl=document.getElementById('mbProgressBar');
+  const resultList=document.getElementById('mbResultList');
+  barEl.style.transition='none';
+  barEl.style.width='0';
+  barEl.offsetWidth;
+  barEl.style.transition='width 1.2s cubic-bezier(0.4,0,0.2,1)';
+  resultList.innerHTML='';
+  document.getElementById('mbProgressTitle').textContent=`Booking ${total} court${total>1?'s':''}...`;
+
+  const results=[];
+  for(let i=0;i<total;i++){
+    const s=mbSlots[i];
+    msgEl.style.opacity='0';
+    setTimeout(()=>{
+      msgEl.textContent=`Booking ${i+1} of ${total} — ${s.court} at ${courtFmt12(s.startMins)}`;
+      msgEl.style.opacity='1';
+    },200);
+    barEl.style.width=((i/total)*100)+'%';
+
+    let ok=false, err='';
+    try {
+      const res=await fetch('/api/courts/book',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({courtName:s.court,resourceId:s.resourceId||undefined,date:s.date,startMins:s.startMins,durationMins:s.duration})
+      });
+      const data=await res.json();
+      ok=data.success;
+      err=data.error||'';
+    } catch(e){ err='Network error'; }
+
+    results.push({...s,ok,err});
+    const icon=ok?'✅':'❌';
+    resultList.innerHTML+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;font-weight:700;color:${ok?'var(--c-dk)':'var(--err)'}">${icon} ${s.court} · ${courtFmt12(s.startMins)}${ok?'':' — '+err}</div>`;
+  }
+
+  barEl.style.width='100%';
+  const successes=results.filter(r=>r.ok).length;
+  msgEl.style.opacity='0';
+  setTimeout(()=>{
+    msgEl.textContent=successes===total?'All courts booked!':
+      `${successes} of ${total} booked`;
+    msgEl.style.opacity='1';
+  },200);
+
+  // Clear the queue
+  mbSlots=[];
+  updateMultiBar();
+
+  // Auto-close after a moment and refresh
+  setTimeout(()=>{
+    document.getElementById('mbConfirmOvl').classList.remove('open');
+    if(successes>0) toast(`✅ ${successes} court${successes>1?'s':''} booked`);
+    loadCourts();
+  },successes===total?2000:4000);
 }
 
 // ══ TOAST ══

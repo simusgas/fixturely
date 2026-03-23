@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -29,7 +30,11 @@ export default function LoginPage() {
         router.refresh()
       }
     } else {
-      const { error } = await supabase.auth.signUp({ email, password })
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName.trim() } },
+      })
       if (error) {
         setError(error.message)
       } else {
@@ -70,6 +75,33 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {mode === 'signup' && (
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '800', color: '#7A6840', marginBottom: '7px' }}>
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                placeholder="e.g. Alex Johnson"
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 15px',
+                  background: '#FAF8F5',
+                  border: '1.5px solid #EEE8DC',
+                  borderRadius: '14px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  color: '#1C1407',
+                  fontFamily: "'Nunito', sans-serif",
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+          )}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: '800', color: '#7A6840', marginBottom: '7px' }}>
               Email

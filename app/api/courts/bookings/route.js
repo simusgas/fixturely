@@ -27,5 +27,15 @@ export async function GET(request) {
     return Response.json({ error: 'Failed to fetch bookings' }, { status: 500 })
   }
 
-  return Response.json({ bookings })
+  // Filter out stale pending bookings (older than 2 minutes — the bot should
+  // have finished by then, so these are stuck/failed)
+  const now = Date.now()
+  const filtered = bookings.filter(b => {
+    if (b.status === 'confirmed') return true
+    // Pending: only show if created within last 2 minutes
+    const age = now - new Date(b.created_at).getTime()
+    return age < 2 * 60 * 1000
+  })
+
+  return Response.json({ bookings: filtered })
 }

@@ -4,7 +4,8 @@ import { bookCourt } from '@/lib/clubspark/book'
 export const maxDuration = 60 // Vercel Pro: allow up to 60s for Playwright
 
 const VALID_COURTS = ['Court 13', 'Court 14', 'Court 15', 'Court 16', 'Court 17', 'Court 18']
-const VALID_DURATIONS = [30, 60, 90, 120]
+const MIN_DURATION = 15
+const MAX_DURATION = 240
 
 export async function POST(request) {
   // 1. Authenticate the coach
@@ -33,8 +34,8 @@ export async function POST(request) {
     return Response.json({ success: false, error: `Invalid court: ${courtName}` }, { status: 400 })
   }
 
-  if (!VALID_DURATIONS.includes(durationMins)) {
-    return Response.json({ success: false, error: `Invalid duration: ${durationMins}. Must be 30, 60, 90, or 120.` }, { status: 400 })
+  if (!Number.isInteger(durationMins) || durationMins < MIN_DURATION || durationMins > MAX_DURATION || durationMins % 15 !== 0) {
+    return Response.json({ success: false, error: `Invalid duration: ${durationMins}. Must be 15-240 minutes in 15-minute increments.` }, { status: 400 })
   }
 
   const startMinsNum = Number(startMins)
@@ -74,7 +75,8 @@ export async function POST(request) {
   }
 
   // 4. Attempt the ClubSpark booking via Playwright
-  console.log(`[Book API] Starting ClubSpark booking for ${courtName} on ${date} at ${startMinsNum}min (booking ID: ${booking.id})`)
+  const coachName = user.user_metadata?.full_name || user.user_metadata?.name || user.email
+  console.log(`[Book API] Starting ClubSpark booking for ${courtName} on ${date} at ${startMinsNum}min for ${coachName} (booking ID: ${booking.id})`)
 
   const result = await bookCourt({
     courtName,
@@ -82,6 +84,7 @@ export async function POST(request) {
     date,
     startMins: startMinsNum,
     durationMins,
+    coachName,
   })
 
   // 5. Update the booking record with the result
