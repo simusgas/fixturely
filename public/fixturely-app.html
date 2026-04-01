@@ -795,6 +795,19 @@
   .pf-save-btn:disabled{opacity:0.5;cursor:not-allowed;}
   .pf-logout-btn{width:100%;padding:12px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:14px;font-weight:800;color:var(--err);cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s,border-color 0.15s;}
   .pf-logout-btn:hover{background:var(--err-lt);border-color:var(--err);}
+  .pf-section{margin-bottom:20px;}
+  .pf-section-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:10px;}
+  .notif-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-info{flex:1;margin-right:12px;}
+  .notif-name{font-size:14px;font-weight:800;color:var(--text);}
+  .notif-desc{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px;}
+  .notif-toggle{position:relative;width:44px;height:26px;flex-shrink:0;}
+  .notif-toggle input{opacity:0;width:0;height:0;}
+  .notif-toggle .slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:26px;transition:background 0.2s;}
+  .notif-toggle .slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:var(--white);border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+  .notif-toggle input:checked+.slider{background:var(--t-a);}
+  .notif-toggle input:checked+.slider::before{transform:translateX(18px);}
   .pf-msg{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;margin-top:8px;}
   .pf-msg.ok{background:var(--ok-lt);color:var(--ok);}
   .pf-msg.err{background:var(--err-lt);color:var(--err);}
@@ -980,6 +993,11 @@
           <button class="pf-save-btn" id="pfSavePassBtn" onclick="saveProfilePassword()">Update Password</button>
           <div id="pfPassMsg"></div>
         </div>
+      </div>
+
+      <div class="pf-section">
+        <div class="pf-section-title">Notifications</div>
+        <div id="pfNotifs"></div>
       </div>
 
       <div class="pf-section">
@@ -2923,6 +2941,63 @@ async function submitCourtBooking(){
 }
 
 // ══ PROFILE ══
+// ══ NOTIFICATIONS ══
+const NOTIF_TYPES=[
+  {id:'tmrw_lessons',name:"Tomorrow's lessons",desc:'Evening reminder at 8pm about all lessons the next day'},
+  {id:'lesson_soon',name:'Lesson starting soon',desc:'30 minutes before each lesson'},
+  {id:'weekly_summary',name:'Weekly summary',desc:'Sunday evening overview of lessons, students, and earnings'},
+  {id:'new_booking',name:'New student booking',desc:'When a student books through your shared schedule'},
+  {id:'lesson_cancelled',name:'Lesson cancelled',desc:'When a student cancels a lesson'},
+  {id:'court_confirmed',name:'Court booking confirmed',desc:'Confirmation when a ClubSpark booking goes through'},
+  {id:'court_failed',name:'Court booking failed',desc:'Alert if a ClubSpark booking failed'},
+  {id:'unpaid_lessons',name:'Unpaid lessons',desc:'Weekly reminder about lessons that haven\'t been paid for'},
+];
+function loadNotifPrefs(){
+  try{const raw=localStorage.getItem('fixturely_notif_prefs');return raw?JSON.parse(raw):{};}catch(e){return {};}
+}
+function saveNotifPrefs(prefs){
+  try{localStorage.setItem('fixturely_notif_prefs',JSON.stringify(prefs));}catch(e){}
+}
+async function requestNotifPermission(){
+  if(!('Notification' in window)) return 'denied';
+  if(Notification.permission==='granted') return 'granted';
+  if(Notification.permission==='denied') return 'denied';
+  return await Notification.requestPermission();
+}
+async function toggleNotif(id,checked){
+  const prefs=loadNotifPrefs();
+  if(checked){
+    // Request push permission on first enable
+    const anyEnabled=Object.values(prefs).some(v=>v);
+    if(!anyEnabled){
+      const perm=await requestNotifPermission();
+      if(perm==='denied'){
+        toast('Notifications blocked — enable in browser settings');
+        const cb=document.getElementById('notif-'+id);
+        if(cb) cb.checked=false;
+        return;
+      }
+    }
+  }
+  prefs[id]=checked;
+  saveNotifPrefs(prefs);
+}
+function renderNotifSection(){
+  const el=document.getElementById('pfNotifs');
+  if(!el) return;
+  const prefs=loadNotifPrefs();
+  const hasPush='Notification' in window;
+  let html='';
+  if(!hasPush){
+    html+='<div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px">Push notifications are not supported in this browser</div>';
+  }
+  NOTIF_TYPES.forEach(n=>{
+    const on=!!prefs[n.id];
+    html+=`<div class="notif-item"><div class="notif-info"><div class="notif-name">${n.name}</div><div class="notif-desc">${n.desc}</div></div><label class="notif-toggle"><input type="checkbox" id="notif-${n.id}" ${on?'checked':''} onchange="toggleNotif('${n.id}',this.checked)"${!hasPush?' disabled':''}><span class="slider"></span></label></div>`;
+  });
+  el.innerHTML=html;
+}
+
 function renderProfile(){
   const ini=getInitials(coachFullName);
   document.getElementById('pfAvatar').textContent=ini;
@@ -2943,6 +3018,8 @@ function renderProfile(){
       ccEl.innerHTML=`<button onclick="openCalConnect()" style="width:100%;padding:14px;border-radius:14px;border:1.5px dashed var(--border);background:var(--off);color:var(--soft);font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--s-a)'" onmouseout="this.style.borderColor='var(--border)'">📅 Connect Google Calendar</button>`;
     }
   }
+  // Notifications section
+  renderNotifSection();
 }
 async function saveProfileInfo(){
   const btn=document.getElementById('pfSaveInfoBtn');

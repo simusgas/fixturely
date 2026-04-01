@@ -22,6 +22,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
+  // Only handle same-origin requests
+  if (url.origin !== self.location.origin) return;
+
   // Network-first for navigation and API calls
   if (e.request.mode === 'navigate' || url.pathname.startsWith('/api/')) {
     e.respondWith(
@@ -33,7 +36,7 @@ self.addEventListener('fetch', e => {
           }
           return r;
         })
-        .catch(() => caches.match(e.request))
+        .catch(() => caches.match(e.request).then(r => r || new Response('Offline', { status: 503 })))
     );
     return;
   }
@@ -41,5 +44,6 @@ self.addEventListener('fetch', e => {
   // Cache-first for static assets
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
+      .catch(() => new Response('', { status: 404 }))
   );
 });
