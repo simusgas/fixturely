@@ -646,43 +646,39 @@
     .hk-col-scroll{max-height:none;overflow:visible;}
     .hk-col-hd{position:static;}
 
-    /* ── iOS Calendar-style mobile schedule ── */
-    .mc-strip{position:sticky;top:0;z-index:10;background:var(--white);border-bottom:1px solid var(--border);}
-    .mc-week-nav{display:flex;align-items:center;padding:6px 10px;gap:8px;}
-    .mc-week-lbl{flex:1;font-size:15px;font-weight:900;color:var(--text);}
-    .mc-nav-arr{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--soft);cursor:pointer;}
-    .mc-nav-arr:active{background:var(--off);}
-    .mc-week-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);min-height:32px;}
-    .mc-week-btn:active{background:var(--off);}
-    .mc-days{display:grid;grid-template-columns:repeat(7,1fr);padding:2px 6px 8px;}
-    .mc-day{text-align:center;cursor:pointer;padding:4px 0;}
-    .mc-day-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;}
-    .mc-day-num{font-size:14px;font-weight:800;color:var(--text);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:3px auto 0;transition:all 0.15s;}
-    .mc-day.is-today .mc-day-num{background:var(--p);color:#fff;}
-    .mc-day.is-sel:not(.is-today) .mc-day-num{background:var(--p-lt);color:var(--p);font-weight:900;}
-    .mc-day-dot{width:5px;height:5px;border-radius:50%;background:var(--p);margin:3px auto 0;}
+    /* ── iOS Calendar mobile schedule ── */
+    .mc-strip{position:sticky;top:0;z-index:10;background:var(--white);border-bottom:0.5px solid #E8E8E8;}
+    .mc-week-nav{display:flex;align-items:center;padding:4px 12px;gap:6px;}
+    .mc-week-lbl{flex:1;font-size:14px;font-weight:600;color:var(--text);}
+    .mc-nav-arr{width:28px;height:28px;border:none;background:none;font-size:16px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .mc-nav-arr:active{color:var(--p);}
+    .mc-week-btn{padding:3px 10px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--p);}
+    .mc-week-btn:active{opacity:0.6;}
+    .mc-hdr-actions{display:flex;gap:8px;padding:0 12px 6px;}
+    .mc-hdr-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none;background:none;color:var(--p);}
+    .mc-hdr-btn:active{opacity:0.6;}
+    .mc-days{display:grid;grid-template-columns:repeat(7,1fr);padding:0 4px 6px;}
+    .mc-day{text-align:center;cursor:pointer;padding:2px 0;}
+    .mc-day-name{font-size:9px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:0.2px;}
+    .mc-day-num{font-size:13px;font-weight:600;color:var(--text);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;transition:all 0.12s;}
+    .mc-day.is-today .mc-day-num{background:var(--p);color:#fff;font-weight:700;}
+    .mc-day.is-sel:not(.is-today) .mc-day-num{color:var(--p);font-weight:700;}
+    .mc-day-dot{width:3px;height:3px;border-radius:50%;background:var(--p);margin:2px auto 0;}
     .mc-day-dot.empty{background:transparent;}
     /* Timeline */
-    .mc-timeline{position:relative;padding-left:52px;min-height:200px;}
-    .mc-hour-row{position:relative;height:60px;border-top:1px solid var(--border);}
-    .mc-hour-lbl{position:absolute;left:-52px;top:-7px;width:46px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);padding-right:6px;}
-    .mc-half{position:absolute;left:0;right:0;top:30px;border-top:1px dashed rgba(226,232,240,0.6);}
-    .mc-event{position:absolute;left:2px;right:2px;border-radius:8px;padding:6px 10px;z-index:2;cursor:pointer;overflow:hidden;background:var(--p-lt);border-left:3px solid var(--p);}
-    .mc-event:active{opacity:0.8;}
-    .mc-event-name{font-size:14px;font-weight:900;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .mc-event-meta{font-size:11px;font-weight:600;color:var(--soft);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .mc-event.paid{background:var(--ok-lt);border-left-color:var(--ok);}
-    .mc-event.paid .mc-event-name{color:#064E3B;}
-    .mc-now{position:absolute;left:0;right:0;height:2px;background:var(--err);z-index:3;pointer-events:none;}
-    .mc-now::before{content:'';position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--err);}
-    .mc-free{position:absolute;left:2px;right:2px;top:2px;bottom:2px;display:flex;gap:4px;align-items:stretch;}
-    .mc-free .m-btn{flex:1;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;min-height:0;padding:0;border:none;}
-    .m-btn-book{background:var(--p);color:#fff;}
-    .m-btn-book:active{background:var(--p-dk);}
-    .m-btn-block{background:var(--white);color:var(--soft);border:1.5px solid var(--border) !important;}
-    .m-btn-block:active{background:var(--off);}
-    .mc-blocked{position:absolute;left:2px;right:2px;top:2px;bottom:2px;border-radius:6px;background:var(--off);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;}
-    .mc-blocked:active{background:var(--border);}
+    .mc-timeline{position:relative;padding-left:48px;min-height:200px;}
+    .mc-hour-row{cursor:pointer;}
+    .mc-hour-lbl{position:absolute;left:-48px;top:-6px;width:42px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
+    .mc-event{position:absolute;left:1px;right:6px;border-radius:4px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#D6DEFF;border-left:3px solid var(--p);}
+    .mc-event:active{opacity:0.7;}
+    .mc-event-name{font-size:12px;font-weight:600;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
+    .mc-event-meta{font-size:10px;font-weight:400;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mc-event.paid{background:#D1FAE5;border-left-color:var(--ok);}
+    .mc-event.paid .mc-event-name{color:#065F46;}
+    .mc-now{position:absolute;left:0;right:0;height:1px;background:#FF3B30;z-index:3;pointer-events:none;}
+    .mc-now::before{content:'';position:absolute;left:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:#FF3B30;}
+    .mc-blocked{position:absolute;left:1px;right:6px;border-radius:3px;background:#F8F8F8;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:500;color:#C0C0C0;cursor:pointer;}
+    .mc-blocked:active{background:#F0F0F0;}
   }
 
   @media (min-width:1024px) {
@@ -2462,10 +2458,13 @@ function renderMobileScheduleHTML(){
       <div class="mc-day-dot${hasLessons?'':' empty'}"></div>
     </div>`;
   });
-  html+=`</div></div>`;
+  html+=`</div>`;
+  // Small action buttons
+  html+=`<div class="mc-hdr-actions"><button class="mc-hdr-btn" onclick="openBookModal()">+ Book</button><button class="mc-hdr-btn" onclick="blockRecurring()">Block</button></div>`;
+  html+=`</div>`;
 
   // ── Daily timeline ──
-  const ROW_H=60; // px per hour
+  const ROW_H=50;
   const totalHours=CAL_E-CAL_S;
   const totalH=totalHours*ROW_H;
   const now=new Date();
@@ -2474,51 +2473,43 @@ function renderMobileScheduleHTML(){
 
   html+=`<div class="mc-timeline" style="height:${totalH}px" id="mcTimeline">`;
 
-  // Hour rows + labels + half-hour lines
+  // Hour rows with time labels — tap empty space to book
   for(let h=CAL_S;h<CAL_E;h++){
     const top=(h-CAL_S)*ROW_H;
     const lbl=fmtHour(h);
-    html+=`<div class="mc-hour-row" style="top:${top}px;height:${ROW_H}px;position:absolute;left:0;right:0;border-top:1px solid var(--border)">
+    html+=`<div class="mc-hour-row" style="top:${top}px;height:${ROW_H}px;position:absolute;left:0;right:0;border-top:0.5px solid #F0F0F0" onclick="bookAtTime('${dstr}',${h},0)">
       <div class="mc-hour-lbl">${lbl}</div>
-      <div class="mc-half"></div>
     </div>`;
   }
-  // Bottom border
-  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:1px solid var(--border)"></div>`;
+  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:0.5px solid #F0F0F0"></div>`;
 
-  // Session blocks (absolute positioned by time)
+  // Session blocks — slim bars
   daySess.forEach(s=>{
     const startM=t2m(s.time);
     const durM=dm(s.dur);
     const top=((startM-CAL_S*60)/60)*ROW_H;
-    const height=Math.max((durM/60)*ROW_H-2,24);
+    const height=Math.max((durM/60)*ROW_H-2,20);
     if(top+height<=0||top>=totalH) return;
     const isPaid=s.payStatus==='paid';
-    const showMeta=height>32;
-    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')">
+    const showMeta=height>28;
+    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openSessDetail('${s.id}')">
       <div class="mc-event-name">${s.student}</div>
-      ${showMeta?`<div class="mc-event-meta">${fmt(s.time)} – ${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}
+      ${showMeta?`<div class="mc-event-meta">${fmt(s.time)}${s.court?' · '+s.court:''}</div>`:''}
     </div>`;
   });
 
-  // Free slots with Book/Block buttons + blocked slots
+  // Blocked slots — subtle bars (no free-slot buttons)
   for(let h=CAL_S;h<CAL_E;h++){
     for(let half=0;half<2;half++){
       const m=h*60+half*30;
       const timeStr=`${h.toString().padStart(2,'0')}:${(half*30).toString().padStart(2,'0')}`;
-      const slotTop=((m-CAL_S*60)/60)*ROW_H;
-      const slotH=ROW_H/2;
-      // Check if any session overlaps this 30-min slot
       const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
       if(busy) continue;
       const blocked=isSlotBlocked(dstr,timeStr);
       if(blocked){
-        html+=`<div class="mc-blocked" style="top:${slotTop+2}px;height:${slotH-4}px" onclick="unblockSlot('${dstr}','${timeStr}')">Blocked</div>`;
-      } else {
-        html+=`<div class="mc-free" style="position:absolute;left:2px;right:2px;top:${slotTop+1}px;height:${slotH-2}px">
-          <button class="m-btn m-btn-book" onclick="bookAtTime('${dstr}',${h},${half*30})">Book</button>
-          <button class="m-btn m-btn-block" onclick="blockSlot('${dstr}',${h},${half*30})">Block</button>
-        </div>`;
+        const slotTop=((m-CAL_S*60)/60)*ROW_H;
+        const slotH=ROW_H/2;
+        html+=`<div class="mc-blocked" style="top:${slotTop+1}px;height:${slotH-2}px" onclick="event.stopPropagation();unblockSlot('${dstr}','${timeStr}')">Blocked</div>`;
       }
     }
   }
