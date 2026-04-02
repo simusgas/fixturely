@@ -6,46 +6,45 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Fixturely</title>
 <meta name="description" content="Tennis coaching made simple">
-<meta name="theme-color" content="#E8724A">
+<meta name="theme-color" content="#4F46E5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fixturely">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --white:     #FFFFFF;
-    --off:       #FAF8F5;
+    --off:       #F8FAFC;
     --card:      #FFFFFF;
-    --text:      #1C1407;
-    --soft:      #7A6840;
-    --muted:     #BBA87A;
-    --border:    #EEE8DC;
+    --text:      #0F172A;
+    --soft:      #475569;
+    --muted:     #94A3B8;
+    --border:    #E2E8F0;
     --nav-h:     calc(56px + env(safe-area-inset-bottom));
-    /* Schedule — amber */
-    --s-a:#F5A623; --s-b:#FDC75A; --s-c:#FDE68A; --s-pl:#FEF0C7; --s-dk:#D4880F;
-    /* Today — warm coral */
-    --t-a:#E8724A; --t-b:#F09070; --t-c:#F8C0A8; --t-pl:#FEF0EB; --t-dk:#C05530;
-    /* Students — sage */
-    --u-a:#6B8F71; --u-b:#8FB896; --u-c:#B8D9BC; --u-pl:#E8F5EA; --u-dk:#4D6B52;
-    /* Status */
-    --ok:#3D8B5E; --ok-lt:#E6F5EE;
-    --warn:#C47A1E; --warn-lt:#FEF3DC;
-    --err:#B85450; --err-lt:#FDECEA;
-    /* Courts — forest green */
-    --c-a:#4A7C59; --c-b:#6B9E7A; --c-c:#96C4A4; --c-pl:#E4F2E8; --c-dk:#2E5C3A;
+    /* Primary — indigo */
+    --p:#4F46E5; --p-lt:#EEF2FF; --p-dk:#3730A3;
+    /* All sections — unified indigo */
+    --s-a:#4F46E5; --s-b:#6366F1; --s-c:#A5B4FC; --s-pl:#EEF2FF; --s-dk:#3730A3;
+    --t-a:#4F46E5; --t-b:#6366F1; --t-c:#A5B4FC; --t-pl:#EEF2FF; --t-dk:#3730A3;
+    --u-a:#4F46E5; --u-b:#6366F1; --u-c:#A5B4FC; --u-pl:#EEF2FF; --u-dk:#3730A3;
+    --c-a:#4F46E5; --c-b:#6366F1; --c-c:#A5B4FC; --c-pl:#EEF2FF; --c-dk:#3730A3;
+    /* Status — semantic colors kept distinct */
+    --ok:#059669; --ok-lt:#ECFDF5;
+    --warn:#D97706; --warn-lt:#FEF3C7;
+    --err:#DC2626; --err-lt:#FEF2F2;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{height:100%;}
-  body{min-height:100%;background:var(--white);font-family:'Nunito',sans-serif;color:var(--text);overflow-x:hidden;}
+  body{min-height:100%;background:var(--off);font-family:'Inter',sans-serif;color:var(--text);overflow-x:hidden;}
   .phone{max-width:420px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--off);position:relative;display:flex;flex-direction:column;}
   .screen{flex:1;overflow-x:hidden;padding-bottom:var(--nav-h);display:none;}
   .screen.active{display:block;}
 
   /* ── NAV ── */
   .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -2px 12px rgba(0,0,0,0.06);z-index:90;border-radius:0;padding-bottom:env(safe-area-inset-bottom);}
-  .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;font-family:'Nunito',sans-serif;transition:all 0.2s;padding:4px 2px;position:relative;}
+  .ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.2s;padding:4px 2px;position:relative;}
   .ntab .ni{font-size:20px;transition:transform 0.2s;display:flex;align-items:center;justify-content:center;}
   .ntab .ni svg{width:22px;height:22px;color:var(--muted);}
   .ntab.active .ni svg{color:inherit;}
@@ -61,11 +60,13 @@
   .ntab[data-t="courts"]::after  {background:var(--c-a);}
   .ntab[data-t="profile"]::after {background:var(--t-a);}
   .ntab.active::after{transform:scaleX(1);}
+  .nav-badge{position:absolute;top:2px;right:calc(50% - 18px);min-width:16px;height:16px;border-radius:16px;background:var(--err);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 4px;display:none;}
+  .nav-badge.show{display:flex;}
   .ntab[data-t="courts"].active .nl,.ntab[data-t="courts"].active .ni svg{color:var(--c-dk);}
   .ntab[data-t="profile"].active .nl{color:var(--t-dk);}
 
   /* ── SHARED HEADER BITS ── */
-  .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
+  .hdr-btn{background:rgba(255,255,255,0.8);border:none;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.15s;}
   .hdr-btn:hover{transform:scale(1.03);background:var(--white);}
   .hdr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   .hst{background:rgba(255,255,255,0.22);border-radius:14px;padding:11px;text-align:center;}
@@ -102,7 +103,7 @@
   .hk-stat{background:var(--card);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
   .hk-stat-n{font-size:20px;font-weight:900;color:var(--text);}
   .hk-stat-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:2px;}
-  .hk-action{width:100%;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);transition:background 0.15s;}
+  .hk-action{width:100%;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);transition:background 0.15s;}
   .hk-action:hover{background:var(--off);}
   .hk-empty{text-align:center;padding:20px 10px;color:var(--muted);font-size:13px;font-weight:600;}
   .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
@@ -126,7 +127,7 @@
   .td-next-countdown{font-size:12px;font-weight:800;margin-top:8px;background:var(--t-pl);color:var(--t-dk);display:inline-block;padding:4px 12px;border-radius:100px;}
   .td-section-lbl{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1.5px;text-transform:uppercase;margin:16px 0 10px;}
   .td-quick-actions{display:flex;gap:8px;margin-bottom:16px;}
-  .td-qa-btn{flex:1;padding:12px 8px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);text-align:center;transition:all 0.15s;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+  .td-qa-btn{flex:1;padding:12px 8px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);text-align:center;transition:all 0.15s;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
   .td-qa-btn:hover{background:var(--t-pl);border-color:var(--t-a);color:var(--t-dk);}
   .td-lesson-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid var(--t-a);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform 0.15s;}
   .td-lesson-card:hover{transform:translateY(-2px);}
@@ -143,7 +144,7 @@
   .td-bl-desc{font-size:12px;color:var(--soft);font-weight:600;margin-bottom:10px;}
   .td-bl-url-row{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:10px;padding:8px 10px;border:1px solid var(--border);}
   .td-bl-url{flex:1;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .td-bl-copy,.td-bl-share{border:none;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all 0.15s;}
+  .td-bl-copy,.td-bl-share{border:none;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.15s;}
   .td-bl-copy{background:var(--s-a);color:var(--white);}
   .td-bl-copy:hover{background:var(--s-dk);}
   .td-bl-share{background:var(--white);color:var(--s-dk);border:1.5px solid var(--s-a);}
@@ -163,7 +164,7 @@
   .td-onboard-step-title{font-size:14px;font-weight:800;color:var(--text);}
   .td-onboard-step-sub{font-size:12px;color:var(--muted);font-weight:600;}
   .td-onboard-done{background:var(--ok-lt);border-color:var(--ok);}
-  .td-onboard-dismiss-btn{background:var(--ok);color:var(--white);border:none;padding:10px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .td-onboard-dismiss-btn{background:var(--ok);color:var(--white);border:none;padding:10px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s;}
   .td-onboard-dismiss-btn:hover{background:#2E7049;}
 
   /* Today lesson card (legacy) */
@@ -177,7 +178,7 @@
 
   /* Paid / Not Paid toggle buttons — side by side */
   .tl-toggle{display:flex;gap:0;border-radius:100px;overflow:hidden;border:1.5px solid var(--border);width:fit-content;}
-  .tl-tog-btn{padding:8px 18px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Nunito',sans-serif;background:var(--off);color:var(--muted);transition:all 0.2s;white-space:nowrap;}
+  .tl-tog-btn{padding:8px 18px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:var(--off);color:var(--muted);transition:all 0.2s;white-space:nowrap;}
   .tl-tog-btn:first-child{border-right:1px solid var(--border);}
   .tl-tog-btn.sel-paid{background:var(--ok);color:var(--white);}
   .tl-tog-btn.sel-notpaid{background:var(--warn-lt);color:var(--warn);}
@@ -191,7 +192,7 @@
   /* Not paid — action buttons that appear below */
   .tl-notpaid-actions{margin-top:10px;display:flex;gap:8px;animation:fadeUp 0.2s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  .tl-act-btn{flex:1;padding:10px;border-radius:100px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;text-align:center;}
+  .tl-act-btn{flex:1;padding:10px;border-radius:100px;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;text-align:center;}
   .btn-send-inv{background:var(--t-pl);color:var(--t-dk);}
   .btn-send-inv:hover{background:#F8D0B8;}
   .btn-remind{background:var(--s-pl);color:var(--s-dk);}
@@ -205,7 +206,7 @@
   .inv-row:last-of-type{border:none;}
   .inv-lbl{color:var(--soft);font-weight:600;}
   .inv-val{font-weight:800;}
-  .inv-send-btn{width:100%;padding:11px;border-radius:100px;margin-top:10px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .inv-send-btn{width:100%;padding:11px;border-radius:100px;margin-top:10px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.15s;}
   .inv-send-btn:hover{transform:translateY(-1px);}
 
   .t-empty{text-align:center;padding:40px 20px;}
@@ -222,7 +223,7 @@
   .inv-row:last-of-type{border:none;}
   .inv-lbl{color:var(--soft);font-weight:600;}
   .inv-val{font-weight:800;}
-  .inv-send-btn{width:100%;padding:12px;border-radius:100px;margin-top:12px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .inv-send-btn{width:100%;padding:12px;border-radius:100px;margin-top:12px;background:linear-gradient(135deg,var(--t-a),var(--t-dk));color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:transform 0.15s;}
   .inv-send-btn:hover{transform:translateY(-1px);}
 
   /* ══════════════════════
@@ -257,7 +258,7 @@
 
   /* ── Schedule calendar views (day + week) ── */
   .sv-toggle{display:flex;background:rgba(255,255,255,0.22);border-radius:100px;padding:3px;width:110px;flex-shrink:0;}
-  .sv-tog-btn{flex:1;padding:6px 0;border-radius:100px;border:none;background:none;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:rgba(28,20,7,0.5);transition:all 0.2s;}
+  .sv-tog-btn{flex:1;padding:6px 0;border-radius:100px;border:none;background:none;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:rgba(28,20,7,0.5);transition:all 0.2s;}
   .sv-tog-btn.active{background:var(--white);color:var(--s-dk);box-shadow:0 2px 6px rgba(0,0,0,0.12);}
   /* Day view */
   .sv-day-wrap{padding:0 0 10px;}
@@ -287,7 +288,7 @@
   .sv-empty-icon{font-size:48px;}
   .sv-empty-t{font-size:17px;font-weight:900;color:var(--soft);}
   .sv-empty-s{font-size:13px;font-weight:600;color:var(--muted);text-align:center;}
-  .sv-empty-btn{background:var(--s-a);color:var(--white);border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;box-shadow:0 4px 14px rgba(245,166,35,0.3);transition:background 0.15s;}
+  .sv-empty-btn{background:var(--s-a);color:var(--white);border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;box-shadow:0 4px 14px rgba(79,70,229,0.25);transition:background 0.15s;}
   .sv-empty-btn:hover{background:var(--s-dk);}
   /* Schedule sharing nudge */
   .sched-nudge{display:flex;align-items:center;justify-content:space-between;background:var(--s-pl);border:1px solid var(--s-b);border-radius:10px;padding:10px 14px;margin:0 16px 12px;gap:10px;}
@@ -306,27 +307,35 @@
   .sg-day-hd.sg-sel:not(.sg-today) .sg-day-num{background:var(--s-dk);color:#fff;}
   .sg-body{display:flex;width:100%;}
   .sg-times{width:56px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
-  .sg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
+  .sg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #F1F5F9;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
   .sg-cols{display:flex;flex:1;}
   .sg-col{position:relative;flex:1;border-right:1px solid var(--border);}
-  .sg-col.sg-col-today{background:rgba(245,166,35,0.04);}
-  .sg-sess{position:absolute;left:2px;right:2px;border-radius:10px;overflow:hidden;padding:6px 9px;background:#F5C542;display:flex;flex-direction:column;justify-content:flex-start;z-index:2;cursor:pointer;transition:opacity 0.15s;box-shadow:0 1px 5px rgba(180,120,10,0.18);}
-  .sg-sess.sg-paid{background:#5CB85C;color:#fff;}
-  .sg-sess.sg-paid .sg-sess-name{color:#fff;}
-  .sg-sess.sg-paid .sg-sess-time{color:rgba(255,255,255,0.8);}
-  .sg-sess.sg-paid .sg-sess-court{color:rgba(255,255,255,0.65);}
-  .sg-sess-name{font-size:17px;font-weight:900;color:#5A3E00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-  .sg-sess-time{font-size:14px;font-weight:800;color:#7A5500;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-  .sg-sess-court{font-size:13px;font-weight:700;color:#7A5500;opacity:0.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sg-col.sg-col-today{background:rgba(79,70,229,0.03);}
+  .sg-sess{position:absolute;left:2px;right:2px;border-radius:10px;overflow:hidden;padding:6px 9px;background:var(--s-pl);border-left:3px solid var(--s-a);display:flex;flex-direction:column;justify-content:flex-start;z-index:2;cursor:pointer;transition:opacity 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+  .sg-sess.sg-paid{background:var(--ok-lt);border-left-color:var(--ok);}
+  .sg-sess.sg-paid .sg-sess-name{color:var(--c-dk);}
+  .sg-sess.sg-paid .sg-sess-time{color:var(--soft);opacity:0.8;}
+  .sg-sess.sg-paid .sg-sess-court{color:var(--soft);opacity:0.65;}
+  .sg-sess-name{font-size:17px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .sg-sess-time{font-size:14px;font-weight:800;color:var(--soft);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .sg-sess-court{font-size:13px;font-weight:700;color:var(--soft);opacity:0.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
   .sg-sess:hover{opacity:0.85;}
-  .sg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
-  .sg-slot-free:hover{background:rgba(0,0,0,0.045);}
-  .sg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
+  .sg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:background 0.18s;}
+  .sg-slot-free:hover{background:rgba(0,0,0,0.035);}
+  .sg-slot-time{opacity:0;transition:opacity 0.18s;font-size:10px;font-weight:700;color:var(--soft);pointer-events:none;}
   .sg-slot-free:hover .sg-slot-time{opacity:1;}
-  .sg-book-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;box-shadow:0 2px 6px rgba(212,136,15,0.35);min-height:36px;min-width:44px;}
-  .sg-slot-free:hover .sg-book-btn{opacity:1;pointer-events:auto;}
+  .sg-slot-btns{display:flex;gap:5px;opacity:0;pointer-events:none;transition:opacity 0.18s;}
+  .sg-slot-free:hover .sg-slot-btns{opacity:1;pointer-events:auto;}
+  .sg-book-btn,.sg-block-btn{padding:4px 12px;border-radius:8px;font-size:10px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;min-width:44px;text-align:center;}
+  .sg-book-btn{border:none;background:var(--p);color:#fff;}
+  .sg-book-btn:hover{background:var(--p-dk);}
+  .sg-block-btn{border:1.5px solid var(--border);background:var(--white);color:var(--soft);}
+  .sg-block-btn:hover{background:var(--off);border-color:var(--muted);}
   .sg-hr-line{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
   .sg-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.7);}
+  .sg-block{position:absolute;left:2px;right:2px;border-radius:6px;background:var(--off);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;z-index:1;transition:background 0.15s;}
+  .sg-block:hover{background:var(--border);}
+  .sg-block-lbl{font-size:10px;font-weight:700;color:var(--muted);}
   .sg-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
   .sg-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
   /* Working hours control */
@@ -334,8 +343,8 @@
   .wh-ctrl:hover{background:var(--off);}
   .wh-edit{display:none;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 0;}
   .wh-edit.open{display:flex;}
-  .wh-edit select{padding:6px 8px;border-radius:10px;border:1.5px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;background:var(--white);color:var(--text);}
-  .wh-edit button{padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;}
+  .wh-edit select{padding:6px 8px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;background:var(--white);color:var(--text);}
+  .wh-edit button{padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;}
 
   /* ══════════════════════
      STUDENTS
@@ -347,7 +356,7 @@
   .u-hdr-btn{color:var(--u-dk);}
   .srch-wrap{padding:16px 16px 0;}
   .srch-bar{display:flex;align-items:center;gap:10px;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:11px 15px;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
-  .srch-bar input{flex:1;border:none;outline:none;font-size:14px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;background:none;}
+  .srch-bar input{flex:1;border:none;outline:none;font-size:14px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;background:none;}
   .srch-bar input::placeholder{color:var(--muted);font-weight:500;}
   .stu-list{padding:12px 16px 8px;}
   .stu-card{background:var(--card);border-radius:16px;padding:13px 15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;display:flex;align-items:center;gap:13px;transition:transform 0.2s;border-left:4px solid var(--u-b);}
@@ -363,7 +372,16 @@
   .stu-detail{position:absolute;inset:0;background:var(--off);z-index:60;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.77,0,0.18,1);overflow-y:auto;padding-bottom:80px;}
   .stu-detail.open{transform:translateX(0);}
   .det-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:52px 20px 24px;border-radius:0 0 28px 28px;}
-  .det-back{background:rgba(255,255,255,0.25);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+  .det-back{background:rgba(255,255,255,0.25);color:var(--white);border:none;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+  .det-edit-btn{position:absolute;top:52px;right:20px;background:rgba(255,255,255,0.2);border:none;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;color:var(--white);cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s;}
+  .det-edit-btn:hover{background:rgba(255,255,255,0.35);}
+  .estu-lesson{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .estu-lesson:last-child{border-bottom:none;}
+  .estu-lesson-info{flex:1;}
+  .estu-lesson-name{font-size:13px;font-weight:700;color:var(--text);}
+  .estu-lesson-meta{font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+  .estu-lesson-del{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:4px;transition:color 0.15s;}
+  .estu-lesson-del:hover{color:var(--err);}
   .det-av{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--white);margin-bottom:12px;}
   .det-name{font-size:22px;font-weight:900;color:var(--white);}
   .det-sub{font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:3px;}
@@ -377,7 +395,7 @@
   .ul-t{font-size:13px;font-weight:800;color:var(--u-dk);white-space:nowrap;}
   .ul-d{font-size:12px;font-weight:700;}
   .ul-c{font-size:11px;color:var(--muted);font-weight:600;}
-  .u-inv-btn{width:100%;padding:14px;border-radius:100px;margin-top:14px;background:linear-gradient(135deg,var(--u-a),var(--u-dk));color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 13px rgba(77,107,82,0.3);transition:transform 0.15s;}
+  .u-inv-btn{width:100%;padding:14px;border-radius:100px;margin-top:14px;background:linear-gradient(135deg,var(--u-a),var(--u-dk));color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 13px rgba(79,70,229,0.25);transition:transform 0.15s;}
   .u-inv-btn:hover{transform:translateY(-1px);}
 
   /* Loading spinner — used by Courts tab */
@@ -396,11 +414,11 @@
   /* Preview banner (coach only) */
   .sc-preview-bar{background:var(--text);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:10;gap:10px;}
   .sc-preview-bar span{opacity:0.85;}
-  .sc-preview-exit{background:rgba(255,255,255,0.15);border:none;color:var(--white);padding:6px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;transition:background 0.15s;}
+  .sc-preview-exit{background:rgba(255,255,255,0.15);border:none;color:var(--white);padding:6px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:background 0.15s;}
   .sc-preview-exit:hover{background:rgba(255,255,255,0.25);}
   /* Header */
   .sc-hdr{background:linear-gradient(155deg,var(--s-a) 0%,var(--s-b) 55%,var(--s-c) 100%);padding:28px 20px 24px;text-align:center;position:relative;}
-  .sc-back{position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.2);border:none;color:var(--white);padding:7px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .sc-back{position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.2);border:none;color:var(--white);padding:7px 13px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
   .sc-hdr-icon{font-size:28px;margin-bottom:6px;}
   .sc-coach-name{font-size:22px;font-weight:900;color:var(--white);letter-spacing:-0.3px;}
   .sc-sport{font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);margin-top:3px;}
@@ -426,8 +444,8 @@
   .sc-slot-time{font-size:16px;font-weight:900;color:var(--text);}
   .sc-slot-meta{font-size:12px;font-weight:700;color:var(--soft);margin-top:3px;}
   .sc-slot-type{font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;}
-  .sc-req-btn{background:var(--s-a);color:var(--white);border:none;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.2s;white-space:nowrap;box-shadow:0 2px 8px rgba(245,166,35,0.3);flex-shrink:0;}
-  .sc-req-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,0.45);}
+  .sc-req-btn{background:var(--s-a);color:var(--white);border:none;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;box-shadow:0 2px 8px rgba(79,70,229,0.25);flex-shrink:0;}
+  .sc-req-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(79,70,229,0.35);}
   /* Empty state */
   .sc-empty{text-align:center;padding:48px 20px 60px;color:var(--muted);}
   .sc-empty-icon{font-size:42px;margin-bottom:12px;}
@@ -445,7 +463,7 @@
   .sc-confirm-icon{font-size:52px;margin-bottom:12px;}
   .sc-confirm-t{font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;}
   .sc-confirm-s{font-size:14px;font-weight:600;color:var(--soft);line-height:1.6;margin-bottom:24px;}
-  .sc-confirm-done{width:100%;padding:14px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .sc-confirm-done{width:100%;padding:14px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
 
   /* ══════════════════════
      MODALS / OVERLAYS
@@ -455,12 +473,12 @@
   .modal{background:var(--white);border-radius:28px 28px 0 0;padding:24px 20px 40px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;transform:translateY(40px);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);}
   .overlay.open .modal{transform:translateY(0);}
   .modal-handle{width:40px;height:4px;background:#E5E7EB;border-radius:100px;margin:0 auto 20px;}
-  .modal-title{font-size:21px;font-weight:900;color:var(--s-dk);margin-bottom:20px;}
+  .modal-title{font-size:21px;font-weight:900;color:var(--text);margin-bottom:20px;}
   .modal-close{position:absolute;top:20px;right:20px;background:#F3F4F6;border:none;width:31px;height:31px;border-radius:50%;font-size:14px;cursor:pointer;color:var(--soft);display:flex;align-items:center;justify-content:center;}
   .field{margin-bottom:17px;position:relative;}
   .field-label{font-size:13px;font-weight:800;color:var(--soft);margin-bottom:7px;display:block;}
-  .field-input{width:100%;padding:12px 15px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
-  .field-input:focus{border-color:var(--s-a);box-shadow:0 0 0 3px rgba(245,166,35,0.13);background:var(--white);}
+  .field-input{width:100%;padding:12px 15px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
+  .field-input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(79,70,229,0.12);background:var(--white);}
   .field-input::placeholder{color:var(--muted);font-weight:500;}
   .field-input.err{border-color:#C07070;}
   .ac-wrap{position:relative;}
@@ -474,14 +492,14 @@
   .hl{color:var(--s-dk);font-weight:900;}
   .no-res{padding:13px 15px;font-size:13px;color:var(--muted);font-weight:600;text-align:center;}
   .pill-group{display:flex;gap:8px;flex-wrap:wrap;}
-  .pill{padding:8px 15px;border-radius:100px;border:1.5px solid var(--border);font-size:13px;font-weight:700;cursor:pointer;background:var(--off);color:var(--soft);font-family:'Nunito',sans-serif;transition:all 0.2s;}
-  .pill.active{background:var(--s-a);color:var(--white);border-color:var(--s-a);box-shadow:0 3px 9px rgba(212,136,15,0.28);}
-  .pill:hover:not(.active){border-color:var(--s-a);color:var(--s-dk);}
+  .pill{padding:8px 15px;border-radius:100px;border:1.5px solid var(--border);font-size:13px;font-weight:700;cursor:pointer;background:var(--off);color:var(--soft);font-family:'Inter',sans-serif;transition:all 0.2s;}
+  .pill.active{background:var(--p);color:var(--white);border-color:var(--p);box-shadow:0 3px 9px rgba(79,70,229,0.25);}
+  .pill:hover:not(.active){border-color:var(--p);color:var(--p-dk);}
   .ow{background:#FEF5E0;border:1.5px solid #E8C070;border-radius:14px;padding:13px 15px;margin-bottom:16px;gap:10px;font-size:13px;font-weight:600;color:#8A5E00;display:none;line-height:1.5;}
   .ow.show{display:flex;align-items:flex-start;}
   .ow-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
   .ow strong{font-weight:900;}
-  .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--s-a),var(--s-dk));color:var(--white);border:none;border-radius:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 14px rgba(212,136,15,0.3);transition:transform 0.15s;margin-top:6px;}
+  .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--p),var(--p-dk));color:var(--white);border:none;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 14px rgba(79,70,229,0.25);transition:transform 0.15s;margin-top:6px;}
   .submit-btn:hover{transform:translateY(-1px);}
   /* Compact booking modal */
   #bookOvl .modal{padding:18px 18px 28px;}
@@ -512,8 +530,8 @@
   .dialog-title{font-size:17px;font-weight:900;margin-bottom:7px;}
   .dialog-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:22px;line-height:1.5;}
   .dialog-btns{display:flex;gap:10px;}
-  .dbtn-no{flex:1;padding:12px;border-radius:100px;background:var(--off);border:1.5px solid var(--border);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
-  .dbtn-yes{flex:1;padding:12px;border-radius:100px;background:#C07878;color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+  .dbtn-no{flex:1;padding:12px;border-radius:100px;background:var(--off);border:1.5px solid var(--border);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
+  .dbtn-yes{flex:1;padding:12px;border-radius:100px;background:#C07878;color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
   .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(28,20,7,0.9);color:var(--white);padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;z-index:500;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
   .toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -546,7 +564,7 @@
   .cg-court-hd{flex:1;text-align:center;font-size:13px;font-weight:900;color:var(--text);padding:14px 4px;border-left:1px solid var(--border);}
   .cg-body{display:flex;width:100%;}
   .cg-times{width:56px;flex-shrink:0;position:sticky;left:0;z-index:10;background:var(--off);}
-  .cg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #f0ede6;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
+  .cg-time{font-size:13px;font-weight:800;color:var(--soft);text-align:right;padding-right:8px;border-bottom:1px solid #F1F5F9;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;}
   .cg-courts{display:flex;flex:1;}
   .cg-court{position:relative;flex:1;border-right:1px solid var(--border);}
   .cg-sess{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:5px 8px;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-start;}
@@ -555,16 +573,16 @@
   .cg-mine{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;pointer-events:none;z-index:5;background:var(--c-pl);border-left:3px solid var(--c-a);display:flex;flex-direction:column;justify-content:flex-start;padding:5px 8px;}
   .cg-mine-name{font-size:13px;font-weight:900;color:var(--c-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cg-mine-time{font-size:11px;font-weight:700;color:var(--c-a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
-  .cg-mine.cg-pending{background:repeating-linear-gradient(135deg,var(--c-pl),var(--c-pl) 6px,rgba(74,124,89,0.08) 6px,rgba(74,124,89,0.08) 12px);border-left-style:dashed;}
+  .cg-mine.cg-pending{background:repeating-linear-gradient(135deg,var(--c-pl),var(--c-pl) 6px,rgba(79,70,229,0.06) 6px,rgba(79,70,229,0.06) 12px);border-left-style:dashed;}
   .cg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background 0.18s;}
   .cg-slot-free:hover{background:rgba(0,0,0,0.045);}
-  .cg-slot-free.cg-selected{background:rgba(74,124,89,0.12);border:1.5px solid var(--c-a);border-radius:3px;z-index:3;}
+  .cg-slot-free.cg-selected{background:rgba(79,70,229,0.1);border:1.5px solid var(--c-a);border-radius:3px;z-index:3;}
   .cg-slot-free.cg-selected .cg-slot-time{opacity:1;color:var(--c-dk);}
   .cg-sel-badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--c-a);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1;}
   .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
   .cg-slot-free:hover .cg-slot-time{opacity:1;}
-  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;min-height:36px;min-width:44px;}
-  .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(74,124,89,0.35);}
+  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;min-height:36px;min-width:44px;}
+  .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(79,70,229,0.25);}
   .cg-sel-btn{background:var(--white);color:var(--c-dk);border:1.5px solid var(--c-a);}
   .cg-slot-free:hover .cg-req-btn,.cg-slot-free:hover .cg-sel-btn{opacity:1;pointer-events:auto;}
   .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
@@ -575,7 +593,7 @@
   body:has(.overlay.open), body:has(.dialog-ovl.open){overflow:hidden !important;}
 
   /* ── Mobile profile avatar (top-right) ── */
-  .mob-pf-btn{position:fixed;top:12px;right:12px;z-index:85;width:36px;height:36px;border-radius:50%;background:var(--white);border:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--soft);font-family:'Nunito',sans-serif;transition:transform 0.15s;}
+  .mob-pf-btn{position:fixed;top:12px;right:12px;z-index:85;width:36px;height:36px;border-radius:50%;background:var(--white);border:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--soft);font-family:'Inter',sans-serif;transition:transform 0.15s;}
   .mob-pf-btn:hover{transform:scale(1.08);}
 
   /* ── Desktop-only elements: hidden on mobile ── */
@@ -611,7 +629,7 @@
     .sb-item {
       display:flex; align-items:center; gap:10px;
       padding:10px 14px; border:none; background:none; border-radius:10px;
-      cursor:pointer; font-family:'Nunito',sans-serif; font-size:14px;
+      cursor:pointer; font-family:'Inter',sans-serif; font-size:14px;
       font-weight:700; color:var(--soft); transition:background 0.15s,color 0.15s;
       text-align:left; width:100%;
     }
@@ -644,12 +662,12 @@
       display:flex; align-items:center; gap:5px;
       padding:7px 14px; border-radius:100px; border:1.5px solid var(--border);
       background:var(--white); font-size:13px; font-weight:800;
-      cursor:pointer; font-family:'Nunito',sans-serif; color:var(--soft);
+      cursor:pointer; font-family:'Inter',sans-serif; color:var(--soft);
       transition:background 0.15s, border-color 0.15s; white-space:nowrap;
     }
     .tb-btn:hover { background:var(--off); border-color:var(--muted); }
-    .tb-btn-primary { background:var(--s-a); color:var(--white); border-color:var(--s-a); }
-    .tb-btn-primary:hover { background:var(--s-dk); border-color:var(--s-dk); }
+    .tb-btn-primary { background:var(--p); color:var(--white); border-color:var(--p); }
+    .tb-btn-primary:hover { background:var(--p-dk); border-color:var(--p-dk); }
     /* Toggle in topbar */
     .topnav-acts .sv-toggle { background:var(--off); border:1.5px solid var(--border); margin:0; }
     .topnav-acts .sv-tog-btn { color:var(--soft); padding:5px 14px; }
@@ -735,7 +753,7 @@
   .sh-preview-dots{display:flex;gap:5px;}
   .sh-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
   .sh-preview-url{flex:1;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .sh-preview-label{font-size:12px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;text-align:center;}
+  .sh-preview-label{font-size:14px;font-weight:900;color:var(--p-dk);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;background:var(--p-lt);padding:10px 16px;border-radius:10px;border:1.5px solid rgba(79,70,229,0.15);}
   .sh-preview-content{max-height:500px;overflow-y:auto;}
   .sh-preview-empty{text-align:center;padding:40px 20px;color:var(--muted);}
   .sh-preview-empty-icon{font-size:36px;margin-bottom:10px;}
@@ -748,7 +766,7 @@
   .sh-link-sub{font-size:12px;color:var(--soft);font-weight:600;margin-bottom:12px;}
   .sh-link-url-row{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);margin-bottom:10px;}
   .sh-link-url{flex:1;font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .sh-link-copy{background:var(--s-a);color:var(--white);border:none;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .sh-link-copy{background:var(--s-a);color:var(--white);border:none;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s;}
   .sh-link-copy:hover{background:var(--s-dk);}
 
   /* Share with students list */
@@ -760,7 +778,7 @@
   .sh-stu-check.checked{background:var(--s-a);border-color:var(--s-a);color:var(--white);}
   .sh-stu-name{font-size:14px;font-weight:700;color:var(--text);}
   .sh-stu-level{font-size:11px;color:var(--muted);font-weight:600;}
-  .sh-send-btn{width:100%;padding:12px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:10px;box-shadow:0 4px 14px rgba(245,166,35,0.3);transition:all 0.15s;}
+  .sh-send-btn{width:100%;padding:12px;border-radius:100px;background:var(--s-a);color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-top:10px;box-shadow:0 4px 14px rgba(79,70,229,0.25);transition:all 0.15s;}
   .sh-send-btn:hover{background:var(--s-dk);}
   .sh-send-btn:disabled{opacity:0.5;cursor:default;}
 
@@ -768,7 +786,7 @@
   .sh-manual-card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
   .sh-manual-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:12px;}
   .sh-manual-btns{display:flex;flex-direction:column;gap:8px;}
-  .sh-manual-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text);transition:all 0.15s;}
+  .sh-manual-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text);transition:all 0.15s;}
   .sh-manual-btn:hover{background:var(--off);border-color:var(--s-b);}
   .sh-manual-icon{font-size:18px;width:28px;text-align:center;}
   /* Mobile: share page stacked */
@@ -788,12 +806,12 @@
   .pf-field{margin-bottom:14px;}
   .pf-field:last-child{margin-bottom:0;}
   .pf-label{font-size:12px;font-weight:700;color:var(--soft);margin-bottom:5px;}
-  .pf-input{width:100%;padding:10px 14px;background:var(--off);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;color:var(--text);font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.15s;}
+  .pf-input{width:100%;padding:10px 14px;background:var(--off);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s;}
   .pf-input:focus{border-color:var(--t-a);}
-  .pf-save-btn{padding:9px 20px;background:var(--t-a);color:var(--white);border:none;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s;}
+  .pf-save-btn{padding:9px 20px;background:var(--t-a);color:var(--white);border:none;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s;}
   .pf-save-btn:hover{background:var(--t-dk);}
   .pf-save-btn:disabled{opacity:0.5;cursor:not-allowed;}
-  .pf-logout-btn{width:100%;padding:12px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:14px;font-weight:800;color:var(--err);cursor:pointer;font-family:'Nunito',sans-serif;transition:background 0.15s,border-color 0.15s;}
+  .pf-logout-btn{width:100%;padding:12px;background:var(--off);border:1.5px solid var(--border);border-radius:14px;font-size:14px;font-weight:800;color:var(--err);cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.15s,border-color 0.15s;}
   .pf-logout-btn:hover{background:var(--err-lt);border-color:var(--err);}
   .pf-section{margin-bottom:20px;}
   .pf-section-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:10px;}
@@ -806,7 +824,7 @@
   .notif-toggle input{opacity:0;width:0;height:0;}
   .notif-toggle .slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:26px;transition:background 0.2s;}
   .notif-toggle .slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:var(--white);border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
-  .notif-toggle input:checked+.slider{background:var(--t-a);}
+  .notif-toggle input:checked+.slider{background:var(--p);}
   .notif-toggle input:checked+.slider::before{transform:translateX(18px);}
   .pf-msg{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;margin-top:8px;}
   .pf-msg.ok{background:var(--ok-lt);color:var(--ok);}
@@ -894,8 +912,9 @@
       </div>
       <div id="dsk-stu-right">
         <div class="stu-detail" id="stuDetail">
-          <div class="det-hdr">
+          <div class="det-hdr" style="position:relative">
             <button class="det-back" onclick="closeStuDetail()">← Back</button>
+            <button class="det-edit-btn" onclick="openEditStudentModal(document.getElementById('detName').textContent)">Edit</button>
             <div class="det-av" id="detAv"></div>
             <div class="det-name" id="detName"></div>
             <div class="det-sub" id="detSub"></div>
@@ -996,6 +1015,12 @@
       </div>
 
       <div class="pf-section">
+        <div class="pf-section-title">Days Off</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px">Toggle days you don't work — these show as unavailable to students</div>
+        <div id="pfDaysOff"></div>
+      </div>
+
+      <div class="pf-section">
         <div class="pf-section-title">Notifications</div>
         <div id="pfNotifs"></div>
       </div>
@@ -1012,7 +1037,7 @@
   <!-- ══ BOTTOM NAV ══ -->
   <button class="mob-pf-btn" id="mobPfBtn" onclick="switchTab('profile',this)">?</button>
   <nav class="bnav">
-    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="nl">Home</span></button>
+    <button class="ntab active" data-t="today"    onclick="switchTab('today',this)">    <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><div class="nav-badge" id="homeBadge"></div></span><span class="nl">Home</span></button>
     <button class="ntab"        data-t="schedule" onclick="switchTab('schedule',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="nl">Schedule</span></button>
     <button class="ntab"        data-t="students" onclick="switchTab('students',this)"> <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="nl">Students</span></button>
     <button class="ntab"        data-t="courts"   onclick="switchTab('courts',this)">  <span class="ni"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nl">Courts</span></button>
@@ -1031,8 +1056,8 @@
   <div class="sc-hdr">
     <button class="sc-back" id="scBackBtn" onclick="hideStudentView()">← Back</button>
     <div class="sc-hdr-icon">🎾</div>
-    <div class="sc-coach-name">Coach Alex</div>
-    <div class="sc-sport">Tennis Coach · Sydney</div>
+    <div class="sc-coach-name" id="scCoachName">Coach</div>
+    <div class="sc-sport" id="scCoachSport">Tennis Coach</div>
   </div>
   <!-- Body -->
   <div class="sc-body">
@@ -1068,7 +1093,7 @@
       <div class="sc-confirm" id="scConfirm">
         <div class="sc-confirm-icon">✅</div>
         <div class="sc-confirm-t">Request sent!</div>
-        <div class="sc-confirm-s">Coach Alex will get back to you shortly to confirm your booking.</div>
+        <div class="sc-confirm-s" id="scConfirmMsg">Your coach will get back to you shortly to confirm your booking.</div>
         <button class="sc-confirm-done" onclick="closeScReq()">Done</button>
       </div>
     </div>
@@ -1093,7 +1118,7 @@
     <div class="field"><label class="field-label">Start Time</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input type="time" class="field-input" id="startTime" value="09:00" onclick="this.select()" oninput="checkOverlap();updateAmPmBtn()" style="flex:1" />
-        <button type="button" id="ampmBtn" onclick="toggleAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
+        <button type="button" id="ampmBtn" onclick="toggleAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
       </div>
     </div>
     <div class="field"><label class="field-label">Duration</label>
@@ -1168,7 +1193,29 @@
       <label class="field-label">Starting Credits</label>
       <input type="number" class="field-input" id="astu-credits" placeholder="0" min="0" value="0" />
     </div>
-    <button class="submit-btn" style="background:linear-gradient(135deg,var(--u-a),var(--u-dk));box-shadow:0 4px 14px rgba(77,107,82,0.3)" onclick="submitAddStudent()">Add Student ✓</button>
+    <button class="submit-btn" style="background:linear-gradient(135deg,var(--u-a),var(--u-dk));box-shadow:0 4px 14px rgba(79,70,229,0.25)" onclick="submitAddStudent()">Add Student ✓</button>
+  </div>
+</div>
+
+<!-- EDIT STUDENT MODAL -->
+<div class="overlay" id="editStuOvl" onclick="if(event.target===this)closeEditStudentModal()">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeEditStudentModal()">✕</button>
+    <div class="modal-title">Edit Student</div>
+    <div class="field">
+      <label class="field-label">Name</label>
+      <input type="text" class="field-input" id="estu-name" placeholder="Student name" />
+    </div>
+    <div class="field">
+      <label class="field-label">Rate per Lesson ($)</label>
+      <input type="number" class="field-input" id="estu-rate" placeholder="e.g. 80" min="0" />
+    </div>
+    <div id="estuLessons" style="display:none"></div>
+    <button class="submit-btn" onclick="saveEditStudent()">Save Changes ✓</button>
+    <div style="text-align:center;margin-top:16px">
+      <button id="estuDeleteBtn" onclick="confirmDeleteFromEdit()" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;padding:6px 12px;transition:color 0.15s" onmouseover="this.style.color='var(--err)'" onmouseout="this.style.color='var(--muted)'">Remove this student…</button>
+    </div>
   </div>
 </div>
 
@@ -1183,7 +1230,7 @@
       <label class="field-label">Start Time</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input type="time" class="field-input" id="editLsnTime" style="flex:1" oninput="updateEditAmPm()" />
-        <button type="button" id="editAmpmBtn" onclick="toggleEditAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
+        <button type="button" id="editAmpmBtn" onclick="toggleEditAmPm()" style="padding:11px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--off);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);white-space:nowrap;flex-shrink:0">AM</button>
       </div>
     </div>
     <div class="field">
@@ -1208,7 +1255,49 @@
       </div>
     </div>
     <button class="submit-btn" onclick="saveEditLesson()">Save Changes ✓</button>
-    <button onclick="cancelFromEdit()" style="width:100%;padding:13px;border-radius:16px;margin-top:10px;background:var(--err-lt);color:var(--err);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">Cancel this lesson</button>
+    <button onclick="cancelFromEdit()" style="width:100%;padding:13px;border-radius:16px;margin-top:10px;background:var(--err-lt);color:var(--err);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Cancel this lesson</button>
+  </div>
+</div>
+
+<!-- SHARE REQUEST MODAL -->
+<div class="overlay" id="shReqOvl" onclick="if(event.target===this)closeShReq()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeShReq()">✕</button>
+    <div id="shReqForm">
+      <div class="modal-title">Request a Lesson</div>
+      <div id="shReqSummary" style="background:var(--p-lt);border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:14px;font-weight:800;color:var(--p-dk)"></div>
+      <div class="field">
+        <label class="field-label">Your Name</label>
+        <input type="text" class="field-input" id="shReqName" placeholder="e.g. Sarah Johnson" />
+      </div>
+      <div class="field">
+        <label class="field-label">Duration</label>
+        <div class="pill-group" id="shReqDurPills">
+          <button class="pill" onclick="setShReqDur(this,'30m')">30 min</button>
+          <button class="pill" onclick="setShReqDur(this,'45m')">45 min</button>
+          <button class="pill active" onclick="setShReqDur(this,'1h')">1 hour</button>
+          <button class="pill" onclick="setShReqDur(this,'custom')">Custom</button>
+        </div>
+        <div id="shReqCustomDur" style="display:none;margin-top:8px">
+          <input type="text" class="field-input" id="shReqCustomIn" placeholder="e.g. 75 min" oninput="updateShReqSummary()" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Frequency</label>
+        <div class="pill-group" id="shReqFreqPills">
+          <button class="pill active" onclick="shReqFreq='One-time';this.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">One-time</button>
+          <button class="pill" onclick="shReqFreq='Weekly';this.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Weekly</button>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="submitShReq()">Send Request ✓</button>
+    </div>
+    <div id="shReqConfirm" style="display:none;text-align:center;padding:20px 10px">
+      <div style="font-size:52px;margin-bottom:12px">✅</div>
+      <div style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px">Request sent!</div>
+      <div style="font-size:14px;font-weight:600;color:var(--soft);line-height:1.6;margin-bottom:24px">Your coach will confirm your lesson shortly.</div>
+      <button class="submit-btn" onclick="closeShReq()">Done</button>
+    </div>
   </div>
 </div>
 
@@ -1220,7 +1309,7 @@
 .cc-item-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
 .cc-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--s-a);flex-shrink:0;margin-top:2px;}
 .cc-provider{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
-.cc-provider-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--text);transition:all 0.15s;}
+.cc-provider-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;color:var(--text);transition:all 0.15s;}
 .cc-provider-btn:hover{background:var(--off);border-color:var(--s-a);}
 .cc-provider-btn.disabled{opacity:0.5;cursor:default;pointer-events:none;}
 .cc-provider-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;}
@@ -1322,7 +1411,7 @@
 .cb-progress-track{width:100%;height:4px;background:var(--c-pl);border-radius:100px;margin-top:24px;overflow:hidden}
 .cb-progress-bar{height:100%;background:linear-gradient(90deg,var(--c-a),var(--c-dk));border-radius:100px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
 .cb-custom-dur{margin-top:8px;display:flex;align-items:center;gap:8px;animation:cb-fade-in 0.25s ease}
-.cb-custom-dur input{width:70px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;background:var(--white);color:var(--text);outline:none}
+.cb-custom-dur input{width:70px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:700;text-align:center;font-family:'Inter',sans-serif;background:var(--white);color:var(--text);outline:none}
 .cb-custom-dur input:focus{border-color:var(--c-a)}
 .cb-custom-dur span{font-size:12px;font-weight:700;color:var(--soft)}
 </style>
@@ -1396,9 +1485,9 @@
 </div>
 
 <!-- MULTI-BOOK FLOATING BAR -->
-<div id="mbBar" style="display:none;position:fixed;bottom:calc(var(--nav-h,70px) + 12px);left:50%;transform:translateX(-50%);z-index:900;background:var(--c-dk);color:#fff;border-radius:100px;padding:10px 14px 10px 18px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,0.25);display:none;align-items:center;gap:12px;animation:cb-fade-in 0.3s ease">
+<div id="mbBar" style="display:none;position:fixed;bottom:calc(var(--nav-h,70px) + 12px);left:50%;transform:translateX(-50%);z-index:900;background:var(--c-dk);color:#fff;border-radius:100px;padding:10px 14px 10px 18px;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,0.25);display:none;align-items:center;gap:12px;animation:cb-fade-in 0.3s ease">
   <span id="mbCount">0 selected</span>
-  <button onclick="openMultiBookConfirm()" style="background:var(--white);color:var(--c-dk);border:none;border-radius:100px;padding:8px 18px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">Book All</button>
+  <button onclick="openMultiBookConfirm()" style="background:var(--white);color:var(--c-dk);border:none;border-radius:100px;padding:8px 18px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Inter',sans-serif">Book All</button>
   <button onclick="clearMultiSelect()" style="background:transparent;color:rgba(255,255,255,0.6);border:none;font-size:18px;cursor:pointer;padding:0 2px;line-height:1" title="Clear selections">✕</button>
 </div>
 
@@ -1438,6 +1527,8 @@ let STUDENTS=[];
 let TERMS=[];
 let HOLIDAYS=[];
 let INVOICES=[];
+let BLOCKS=[]; // {date,time,dur,recur} — blocked time slots
+let DAYS_OFF=[]; // [0-6] — days of week off (0=Sun,1=Mon,...)
 
 const today=new Date(); today.setHours(0,0,0,0);
 let SESSIONS=[];
@@ -1460,12 +1551,13 @@ async function loadAllData(){
     HOLIDAYS=d.holidays||[];
     INVOICES=d.invoices||[];
     renderSchedule(); renderToday(); renderStudents();
+    loadPendingRequests();
     saveCache();
   } catch(e){ console.error('Failed to load data',e); }
 }
 function saveCache(){
   try { localStorage.setItem('fixturely_data',JSON.stringify({
-    students:STUDENTS,sessions:SESSIONS,terms:TERMS,holidays:HOLIDAYS,invoices:INVOICES,ts:Date.now()
+    students:STUDENTS,sessions:SESSIONS,terms:TERMS,holidays:HOLIDAYS,invoices:INVOICES,blocks:BLOCKS,daysOff:DAYS_OFF,ts:Date.now()
   })); } catch(e){}
 }
 function loadCachedData(){
@@ -1478,6 +1570,8 @@ function loadCachedData(){
     TERMS=d.terms||[];
     HOLIDAYS=d.holidays||[];
     INVOICES=d.invoices||[];
+    BLOCKS=d.blocks||[];
+    DAYS_OFF=d.daysOff||[];
     return true;
   } catch(e){ return false; }
 }
@@ -1657,6 +1751,9 @@ function renderToday(){
   const tmrwStr=ds(add(today,1));
   const tmrwSess=SESSIONS.filter(s=>s.date===tmrwStr).sort((a,b)=>a.time.localeCompare(b.time));
 
+  // ── Pending requests ──
+  html+=renderPendingRequestsHTML();
+
   // ═══ KANBAN BOARD ═══
   html+=`<div class="hk-board">`;
 
@@ -1756,7 +1853,90 @@ function sendRemind(id,name){
 // ══ STUDENT CALENDAR ══
 let scSelDate=new Date(today), scIsPreview=false, scReqSlot='';
 
+function isSlotBlocked(dstr,timeStr){
+  const d=new Date(dstr+'T00:00:00');
+  // Check days off
+  if(DAYS_OFF.includes(d.getDay())) return true;
+  const tM=t2m(timeStr);
+  // Check blocks (one-time and recurring)
+  return BLOCKS.some(b=>{
+    const bM=t2m(b.time),bE=bM+dm(b.dur);
+    if(b.recur==='daily'||(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5)){
+      return tM<bE&&tM+30>bM;
+    }
+    if(b.date===dstr) return tM<bE&&tM+30>bM;
+    return false;
+  });
+}
+function isDayOff(dstr){
+  const d=new Date(dstr+'T00:00:00');
+  return DAYS_OFF.includes(d.getDay());
+}
+function blockSlot(dstr,h,mn){
+  const time=`${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;
+  if(BLOCKS.some(b=>b.date===dstr&&b.time===time)) return;
+  BLOCKS.push({date:dstr,time,dur:'30m',recur:'once'});
+  saveCache();renderSchedule();syncAvailability();
+  toast('Slot blocked');
+}
+function unblockSlot(dstr,timeStr){
+  // Find matching block — check one-time first, then recurring
+  let idx=BLOCKS.findIndex(b=>b.date===dstr&&b.time===timeStr);
+  if(idx===-1){
+    // May be a recurring block — ask if they want to remove the recurring rule
+    const d=new Date(dstr+'T00:00:00');
+    idx=BLOCKS.findIndex(b=>{
+      const bM=t2m(b.time),tM=t2m(timeStr);
+      if(b.recur==='daily') return tM>=bM&&tM<bM+dm(b.dur);
+      if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM>=bM&&tM<bM+dm(b.dur);
+      return false;
+    });
+    if(idx>=0&&!confirm(`This is a recurring block (${BLOCKS[idx].time}, ${BLOCKS[idx].recur}). Remove the entire recurring block?`)) return;
+  }
+  if(idx>=0){
+    BLOCKS.splice(idx,1);
+    saveCache();renderSchedule();syncAvailability();
+    toast('Block removed');
+  }
+}
+function blockRecurring(){
+  const time=prompt('Block time (e.g. 12:00):','12:00');
+  if(!time) return;
+  const dur=prompt('Duration (e.g. 1h, 30m):','1h');
+  if(!dur) return;
+  const recur=prompt('Recurrence (weekdays or daily):','weekdays');
+  if(!recur) return;
+  BLOCKS.push({date:'',time,dur,recur});
+  saveCache();renderSchedule();syncAvailability();
+  toast(`Blocked ${time} ${recur}`);
+}
+function unblock(idx){
+  BLOCKS.splice(idx,1);
+  saveCache();renderSchedule();syncAvailability();
+  toast('Block removed');
+}
+function toggleDayOff(day){
+  const idx=DAYS_OFF.indexOf(day);
+  if(idx>=0) DAYS_OFF.splice(idx,1);
+  else DAYS_OFF.push(day);
+  saveCache();syncAvailability();
+  renderDaysOff();
+}
+function syncAvailability(){
+  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({blocks:BLOCKS,daysOff:DAYS_OFF})}).catch(()=>{});
+}
+function renderDaysOff(){
+  const el=document.getElementById('pfDaysOff');
+  if(!el) return;
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  el.innerHTML=dayNames.map((name,i)=>{
+    const off=DAYS_OFF.includes(i);
+    return `<div class="notif-item"><div class="notif-info"><div class="notif-name">${name}</div></div><label class="notif-toggle"><input type="checkbox" ${off?'checked':''} onchange="toggleDayOff(${i})"><span class="slider"></span></label></div>`;
+  }).join('');
+}
+
 function getAvailableSlots(dstr){
+  if(isDayOff(dstr)) return [];
   const booked=SESSIONS.filter(s=>s.date===dstr);
   const slots=[];
   const isToday=dstr===ds(today);
@@ -1764,20 +1944,25 @@ function getAvailableSlots(dstr){
   for(let h=7;h<=19;h++){
     const t=`${h.toString().padStart(2,'0')}:00`;
     const tM=t2m(t);
-    if(isToday&&tM<=nowM) continue; // skip past times for today
+    if(isToday&&tM<=nowM) continue;
     const taken=booked.some(s=>{const sS=t2m(s.time),sE=sS+dm(s.dur);return tM<sE&&tM+60>sS;});
-    if(!taken) slots.push(t);
+    if(taken) continue;
+    if(isSlotBlocked(dstr,t)) continue;
+    slots.push(t);
   }
   return slots;
 }
 
-const BOOKING_URL='https://fixturely.app/coach/yourname';
+function getCoachSlug(){return (coachFullName||'coach').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function getBookingUrl(){return window.location.origin+'/coach/'+getCoachSlug();}
+const BOOKING_URL_LEGACY='https://fixturely.app/coach/yourname';
 function shareCalendar(){
   switchTab('share',document.querySelector('[data-t=share]'));
 }
 function copyBookingLink(){
-  if(navigator.clipboard){navigator.clipboard.writeText(BOOKING_URL).then(()=>toast('📤 Booking link copied to clipboard!'));}
-  else{toast('📤 Share: fixturely.app/coach/yourname');}
+  const url=getBookingUrl();
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('📤 Booking link copied to clipboard!'));}
+  else{toast('📤 Share: '+url.replace('https://',''));}
 }
 function markShared(){
   localStorage.setItem('fixturely_shared','1');
@@ -1794,7 +1979,7 @@ function toggleShareStudent(name){
 function sendToSelected(){
   const names=[...shareSelectedStudents];
   if(!names.length) return;
-  const msg=`Hey! You can view my coaching schedule and book a lesson here: ${BOOKING_URL}`;
+  const msg=`Hey! You can view my coaching schedule and book a lesson here: ${getBookingUrl()}`;
   if(navigator.share){
     navigator.share({title:'Book a lesson with me',text:msg}).catch(()=>{});
   } else {
@@ -1806,43 +1991,62 @@ function sendToSelected(){
   renderSharePage();
 }
 function shareViaChannel(channel){
-  const msg=encodeURIComponent(`Hey! You can view my coaching schedule and book a lesson here: ${BOOKING_URL}`);
-  const url=BOOKING_URL;
+  const burl=getBookingUrl();
+  const msg=encodeURIComponent(`Hey! You can view my coaching schedule and book a lesson here: ${burl}`);
   if(channel==='text'){window.open(`sms:?body=${msg}`,'_blank');}
   else if(channel==='email'){window.open(`mailto:?subject=${encodeURIComponent('Book a tennis lesson')}&body=${msg}`,'_blank');}
   else if(channel==='whatsapp'){window.open(`https://wa.me/?text=${msg}`,'_blank');}
   markShared();
 }
+let sharePreviewDate=null;
+let shareWeekStart=null;
 function renderSharePage(){
   const body=document.getElementById('shBody');
+  if(!shareWeekStart) shareWeekStart=wkStart(today);
 
-  // Build the student-view preview
+  // Build week days for the current share week
+  const weekDays=[];
+  for(let i=0;i<7;i++){
+    const d=add(shareWeekStart,i);
+    const dstr=ds(d);
+    const isPast=d<today&&dstr!==ds(today);
+    const slots=isPast?[]:getAvailableSlots(dstr);
+    weekDays.push({d,dstr,slots,isPast});
+  }
+  // Auto-select first available day if none selected or not in current week
+  if(!sharePreviewDate||!weekDays.some(wd=>wd.dstr===sharePreviewDate)){
+    const first=weekDays.find(wd=>wd.slots.length>0);
+    sharePreviewDate=first?first.dstr:null;
+  }
+
+  // Week label
+  const weekEnd=add(shareWeekStart,6);
+  const weekLbl=shareWeekStart.getMonth()===weekEnd.getMonth()
+    ?`${MN[shareWeekStart.getMonth()]} ${shareWeekStart.getFullYear()}`
+    :`${MS[shareWeekStart.getMonth()]} – ${MS[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  // Don't allow navigating before current week
+  const canPrev=shareWeekStart>wkStart(today);
+  const canNext=add(shareWeekStart,7)<=add(today,28);
+
   let previewHTML='';
   const hasAnySessions=SESSIONS.length>0;
   if(hasAnySessions){
-    // Build a mini version of the student calendar view
-    const previewDays=[];
-    for(let i=0;i<7;i++){
-      const d=add(today,i);
-      const dstr=ds(d);
-      const slots=getAvailableSlots(dstr);
-      previewDays.push({d,dstr,slots,dayName:DS_[d.getDay()],num:d.getDate()});
-    }
-    const dayStrip=previewDays.map(pd=>{
-      const hasSlots=pd.slots.length>0;
-      return `<div style="display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:12px;min-width:44px;${hasSlots?'border:1.5px solid var(--s-b);background:var(--white)':'border:1.5px solid var(--border);opacity:0.4;background:var(--off)'}"><div style="font-size:9px;font-weight:800;color:${hasSlots?'var(--s-dk)':'var(--muted)'};text-transform:uppercase">${pd.dayName}</div><div style="font-size:15px;font-weight:900;color:var(--text)">${pd.num}</div></div>`;
+    const dayGrid=weekDays.map(wd=>{
+      const hasSlots=wd.slots.length>0;
+      const isSel=wd.dstr===sharePreviewDate;
+      const isToday=wd.dstr===ds(today);
+      return `<div onclick="${hasSlots?`selectShareDay('${wd.dstr}')`:''}" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;cursor:${hasSlots?'pointer':'default'};transition:all 0.15s;${isSel?'background:var(--p)':''};${wd.isPast?'opacity:0.3':''}"><div style="font-size:9px;font-weight:800;color:${isSel?'rgba(255,255,255,0.8)':'var(--muted)'};text-transform:uppercase;margin-bottom:4px">${DW[((wd.d.getDay()+6)%7)]}</div><div style="font-size:14px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${isSel?'#fff':isToday?'var(--p)':'var(--text)'};${isToday&&!isSel?'border:2px solid var(--p)':''}">${wd.d.getDate()}</div>${hasSlots?`<div style="width:4px;height:4px;border-radius:50%;background:${isSel?'rgba(255,255,255,0.7)':'var(--p)'};margin-top:3px"></div>`:''}</div>`;
     }).join('');
-    const firstAvail=previewDays.find(pd=>pd.slots.length>0);
-    let slotCards='';
-    if(firstAvail){
-      slotCards=firstAvail.slots.slice(0,3).map(t=>`<div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:900;color:var(--text)">${fmt(t)}</div><div style="font-size:11px;color:var(--soft);font-weight:600">1 hour · Tennis lesson</div></div><div style="background:var(--s-a);color:var(--white);padding:8px 14px;border-radius:100px;font-size:12px;font-weight:800">Book</div></div>`).join('');
-      if(firstAvail.slots.length>3) slotCards+=`<div style="text-align:center;font-size:12px;color:var(--muted);font-weight:600;padding:4px">+${firstAvail.slots.length-3} more slots</div>`;
-    }
+
     previewHTML=`<div style="padding:20px">
-      <div style="text-align:center;margin-bottom:16px"><div style="font-size:24px;margin-bottom:4px">🎾</div><div style="font-size:18px;font-weight:900;color:var(--text)">Coach Alex</div><div style="font-size:12px;color:var(--soft);font-weight:600">Tennis Coach · Sydney</div></div>
-      <div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Choose a day</div>
-      <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px">${dayStrip}</div>
-      ${firstAvail?`<div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Available times</div>${slotCards}`:''}
+      <div style="text-align:center;margin-bottom:16px"><div style="font-size:24px;margin-bottom:4px">🎾</div><div style="font-size:18px;font-weight:900;color:var(--text)">${coachFullName||'Coach'}</div><div style="font-size:12px;color:var(--soft);font-weight:600">Tennis Coach</div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <button onclick="changeShareWeek(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canPrev?'':'opacity:0.3;pointer-events:none'}">‹</button>
+        <div style="font-size:13px;font-weight:900;color:var(--text)">${weekLbl}</div>
+        <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
+      </div>
+      <div style="display:flex;gap:2px;margin-bottom:16px">${dayGrid}</div>
+      <div id="shPreviewSlots"></div>
     </div>`;
   } else {
     previewHTML=`<div class="sh-preview-empty"><div class="sh-preview-empty-icon">📅</div><div class="sh-preview-empty-t">Your schedule is empty</div><div class="sh-preview-empty-s">Add some lessons first and your students<br>will see your availability here</div></div>`;
@@ -1862,18 +2066,18 @@ function renderSharePage(){
   } else {
     studentsListHTML=`<div style="text-align:center;padding:20px 16px">
       <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:10px">No students yet</div>
-      <button onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)" style="background:var(--s-a);color:var(--white);border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">+ Add Student</button>
+      <button onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)" style="background:var(--s-a);color:var(--white);border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">+ Add Student</button>
     </div>`;
   }
   const selCount=shareSelectedStudents.size;
 
   body.innerHTML=`<div class="sh-split">
     <div class="sh-split-left">
-      <div class="sh-preview-label">This is how students see your schedule</div>
+      <div class="sh-preview-label">👁 Student view — this is exactly what students see</div>
       <div class="sh-preview-frame">
         <div class="sh-preview-bar">
           <div class="sh-preview-dots"><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div></div>
-          <div class="sh-preview-url">${BOOKING_URL.replace('https://','')}</div>
+          <div class="sh-preview-url">${getBookingUrl().replace('https://','')}</div>
         </div>
         <div class="sh-preview-content">${previewHTML}</div>
       </div>
@@ -1881,9 +2085,9 @@ function renderSharePage(){
     <div class="sh-split-right">
       <div class="sh-link-card">
         <div class="sh-link-title">Your Booking Link</div>
-        <div class="sh-link-sub">Students use this link to see your availability and book lessons</div>
+        <div class="sh-link-sub">Students use this link to see your availability and request lessons</div>
         <div class="sh-link-url-row">
-          <div class="sh-link-url">${BOOKING_URL.replace('https://','')}</div>
+          <div class="sh-link-url">${getBookingUrl().replace('https://','')}</div>
           <button class="sh-link-copy" onclick="copyBookingLink();markShared()">Copy Link</button>
         </div>
       </div>
@@ -1902,6 +2106,83 @@ function renderSharePage(){
       </div>
     </div>
   </div>`;
+  // Render slots for selected day after DOM is set
+  setTimeout(()=>renderSharePreviewSlots(),0);
+}
+
+function renderSharePreviewSlots(){
+  const el=document.getElementById('shPreviewSlots');
+  if(!el) return;
+  if(!sharePreviewDate){el.innerHTML='';return;}
+  const slots=getAvailableSlots(sharePreviewDate);
+  const d=new Date(sharePreviewDate+'T00:00:00');
+  const dateStr=`${DF[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]}`;
+  if(!slots.length){
+    el.innerHTML=`<div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;font-weight:600">No available times on this day</div>`;
+    return;
+  }
+  el.innerHTML=`<div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Available times</div>`+
+    slots.map(t=>`<div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:900;color:var(--text)">${fmt(t)}</div><div style="font-size:11px;color:var(--soft);font-weight:600">1 hour · ${dateStr}</div></div><button onclick="openSharePreviewReq('${t}','${dateStr}')" style="background:var(--p);color:#fff;border:none;padding:8px 16px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 2px 6px rgba(79,70,229,0.25)">Request</button></div>`).join('');
+}
+function selectShareDay(dstr){
+  sharePreviewDate=dstr;
+  renderSharePage();
+  setTimeout(()=>{const el=document.getElementById('shPreviewSlots');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+}
+function changeShareWeek(n){
+  const newWeek=add(shareWeekStart,n*7);
+  if(newWeek<wkStart(today)) return;
+  // Limit to ~1 month ahead
+  if(newWeek>add(today,28)) return;
+  shareWeekStart=newWeek;
+  sharePreviewDate=null;
+  renderSharePage();
+}
+let shReqTime='',shReqDateStr='',shReqFreq='One-time',shReqDur='1h';
+function openSharePreviewReq(time,dateStr){
+  shReqTime=time;
+  shReqDateStr=dateStr;
+  shReqFreq='One-time';
+  shReqDur='1h';
+  document.getElementById('shReqName').value='';
+  document.getElementById('shReqForm').style.display='';
+  document.getElementById('shReqConfirm').style.display='none';
+  document.getElementById('shReqCustomDur').style.display='none';
+  document.getElementById('shReqCustomIn').value='';
+  document.querySelectorAll('#shReqDurPills .pill').forEach((p,i)=>p.classList.toggle('active',i===2));
+  document.querySelectorAll('#shReqFreqPills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  updateShReqSummary();
+  document.getElementById('shReqOvl').classList.add('open');
+  setTimeout(()=>document.getElementById('shReqName').focus(),350);
+}
+function setShReqDur(btn,val){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  shReqDur=val;
+  document.getElementById('shReqCustomDur').style.display=val==='custom'?'block':'none';
+  updateShReqSummary();
+}
+function getShReqDurLabel(){
+  if(shReqDur==='30m') return '30 min';
+  if(shReqDur==='45m') return '45 min';
+  if(shReqDur==='1h') return '1 hour';
+  if(shReqDur==='custom'){
+    const v=document.getElementById('shReqCustomIn').value.trim();
+    return v||'Custom';
+  }
+  return shReqDur;
+}
+function updateShReqSummary(){
+  document.getElementById('shReqSummary').textContent=`${fmt(shReqTime)} · ${shReqDateStr} · ${getShReqDurLabel()}`;
+}
+function closeShReq(){document.getElementById('shReqOvl').classList.remove('open');}
+function submitShReq(){
+  const name=document.getElementById('shReqName').value.trim();
+  if(!name){document.getElementById('shReqName').classList.add('err');setTimeout(()=>document.getElementById('shReqName').classList.remove('err'),1500);return;}
+  document.getElementById('shReqForm').style.display='none';
+  document.getElementById('shReqConfirm').style.display='block';
+  // This is the coach testing the preview — just show confirmation, don't actually submit
+  toast('Preview: request would be sent to you');
 }
 
 function showStudentView(isPreview){
@@ -2028,7 +2309,7 @@ function updateCourtsHoursCtrl(){
   const lbl=document.getElementById('whCtrlC');
   if(lbl) lbl.textContent=`🕐 ${fmtHour(CAL_S)} – ${fmtHour(CAL_E)}`;
   const ed=document.getElementById('whEditC');
-  if(ed) ed.innerHTML=`${whSelectHTML('whStartC',CAL_S)} <span style="font-weight:800;color:var(--soft)">to</span> ${whSelectHTML('whEndC',CAL_E)} <button onclick="saveCourtsHours()" style="padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;background:var(--c-a);color:#fff">Apply</button>`;
+  if(ed) ed.innerHTML=`${whSelectHTML('whStartC',CAL_S)} <span style="font-weight:800;color:var(--soft)">to</span> ${whSelectHTML('whEndC',CAL_E)} <button onclick="saveCourtsHours()" style="padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;background:var(--c-a);color:#fff">Apply</button>`;
 }
 async function saveCourtsHours(){
   const s=parseInt(document.getElementById('whStartC').value);
@@ -2160,8 +2441,11 @@ function renderWeekViewHTML(weekStart){
       const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
       if(busy) return '';
       const h=Math.floor(m/60),mn=m%60;
+      const timeStr=`${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;
       const lbl=`${h%12||12}:${mn.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;
-      return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button></div>`;
+      const blocked=isSlotBlocked(dstr,timeStr);
+      if(blocked) return `<div class="sg-block" style="top:${i*SG_SH}px;height:${SG_SH}px;pointer-events:auto;cursor:pointer" onclick="unblockSlot('${dstr}','${timeStr}')"><div class="sg-block-lbl">Blocked</div></div>`;
+      return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><div class="sg-slot-btns"><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button><button class="sg-block-btn" onclick="event.stopPropagation();blockSlot('${dstr}',${h},${mn})">Block</button></div></div>`;
     }).join('');
 
     const blocksHTML=daySess.map(s=>{
@@ -2282,6 +2566,7 @@ function setAddStuPill(btn,val){
 async function submitAddStudent(){
   const name=document.getElementById('astu-name').value.trim();
   if(!name){document.getElementById('astu-name').classList.add('err');setTimeout(()=>document.getElementById('astu-name').classList.remove('err'),1500);return;}
+  if(STUDENTS.some(s=>s.name.toLowerCase()===name.toLowerCase())){toast('A student with that name already exists');return;}
   const phone=document.getElementById('astu-phone').value.trim();
   const credits=parseInt(document.getElementById('astu-credits').value)||0;
   const stu={name,phone,level:addStuLevel,credits,sessions:0,owing:0};
@@ -2426,7 +2711,7 @@ function openStuDetail(name){
   document.getElementById('detAv').textContent=ini(s.name);
   document.getElementById('detName').textContent=s.name;
   document.getElementById('detSub').textContent=`${s.level} · ${s.sessions} sessions total`;
-  document.getElementById('detBody').innerHTML=`<div class="det-stats"><div class="det-stat"><div class="det-stat-n">${s.credits}</div><div class="det-stat-l">Credits</div></div><div class="det-stat"><div class="det-stat-n">${s.sessions}</div><div class="det-stat-l">Sessions</div></div><div class="det-stat"><div class="det-stat-n" style="color:${s.owing>0?'#B05050':'var(--ok)'}">$${s.owing}</div><div class="det-stat-l">Owing</div></div></div><div class="sec-lbl">Upcoming Lessons</div>${up.length?up.map(se=>`<div class="up-l"><div class="ul-t">${fmt(se.time)}</div><div><div class="ul-d">${fmtD(se.date)}</div><div class="ul-c">${se.court} · ${se.dur}</div></div></div>`).join(''):`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No upcoming lessons</div>`}<button class="u-inv-btn" onclick="toast('Invoice sent to ${s.name}! 💸')">Send Invoice →</button>`;
+  document.getElementById('detBody').innerHTML=`<div class="det-stats"><div class="det-stat"><div class="det-stat-n">${s.credits}</div><div class="det-stat-l">Credits</div></div><div class="det-stat"><div class="det-stat-n">${s.sessions}</div><div class="det-stat-l">Sessions</div></div><div class="det-stat"><div class="det-stat-n" style="color:${s.owing>0?'var(--err)':'var(--ok)'}">$${s.owing}</div><div class="det-stat-l">Owing</div></div></div><div class="sec-lbl">Upcoming Lessons</div>${up.length?up.map(se=>`<div class="up-l"><div class="ul-t">${fmt(se.time)}</div><div><div class="ul-d">${fmtD(se.date)}</div><div class="ul-c">${se.court?' '+se.court+' ·':''} ${se.dur}</div></div></div>`).join(''):`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No upcoming lessons</div>`}`;
   document.getElementById('stuDetail').classList.add('open');
   const right=document.getElementById('dsk-stu-right');
   if(right) right.classList.add('has-detail');
@@ -2436,6 +2721,73 @@ function closeStuDetail(){
   document.getElementById('stuDetail').classList.remove('open');
   const right=document.getElementById('dsk-stu-right');
   if(right) right.classList.remove('has-detail');
+}
+let editStuOrigName=null;
+function openEditStudentModal(name){
+  const s=STUDENTS.find(s=>s.name===name);
+  if(!s) return;
+  editStuOrigName=name;
+  document.getElementById('estu-name').value=s.name;
+  document.getElementById('estu-rate').value=s.rate||'';
+  document.getElementById('editStuOvl').classList.add('open');
+}
+function closeEditStudentModal(){document.getElementById('editStuOvl').classList.remove('open');editStuOrigName=null;}
+function saveEditStudent(){
+  const s=STUDENTS.find(s=>s.name===editStuOrigName);
+  if(!s) return;
+  const newName=document.getElementById('estu-name').value.trim();
+  if(!newName){toast('Name cannot be empty');return;}
+  // Duplicate check (different student with same name)
+  if(newName!==editStuOrigName&&STUDENTS.some(st=>st.name.toLowerCase()===newName.toLowerCase())){
+    toast('A student with that name already exists');return;
+  }
+  const rate=parseInt(document.getElementById('estu-rate').value)||0;
+  const oldName=s.name;
+  s.name=newName;
+  s.rate=rate;
+  // Update linked sessions if name changed
+  if(newName!==oldName){
+    SESSIONS.forEach(se=>{if(se.student===oldName) se.student=newName;});
+    SESSIONS.filter(se=>se.student===newName).forEach(se=>{if(se.id) dbUpdate('sessions',se.id,{student:newName});});
+  }
+  if(s.id) dbUpdate('students',s.id,{name:newName});
+  saveCache();
+  closeEditStudentModal();
+  closeStuDetail();
+  renderStudents();renderToday();renderSchedule();
+  toast('✓ Student updated');
+}
+function removeStuLesson(sessId,stuName){
+  const se=SESSIONS.find(s=>s.id==sessId);
+  if(!se) return;
+  if(!confirm(`Remove ${fmt(se.time)} lesson on ${fmtD(se.date)}?`)) return;
+  SESSIONS.splice(SESSIONS.indexOf(se),1);
+  if(se.id) dbDelete('sessions',se.id);
+  saveCache();
+  // Re-render the lesson list in the modal
+  openEditStudentModal(stuName);
+  renderSchedule();renderToday();
+}
+function confirmDeleteFromEdit(){
+  const name=editStuOrigName;
+  const s=STUDENTS.find(s=>s.name===name);
+  if(!s) return;
+  const linked=SESSIONS.filter(se=>se.student===name);
+  const msg=linked.length>0
+    ?`Remove ${name} and their ${linked.length} lesson${linked.length!==1?'s':''}? This cannot be undone.`
+    :`Remove ${name}? This cannot be undone.`;
+  if(!confirm(msg)) return;
+  for(const se of linked){
+    SESSIONS.splice(SESSIONS.indexOf(se),1);
+    if(se.id) dbDelete('sessions',se.id);
+  }
+  STUDENTS.splice(STUDENTS.indexOf(s),1);
+  if(s.id) dbDelete('students',s.id);
+  saveCache();
+  closeEditStudentModal();
+  closeStuDetail();
+  renderStudents();renderToday();renderSchedule();
+  toast(`✓ ${name} removed`);
 }
 
 
@@ -2507,7 +2859,7 @@ function minsToTimeLbl(m) {
 function sessColor(s) { return s.Colour || ({1000:'#fcfabd',2000:'#e1e2ff',3000:'#fdd4ff',4000:'#cdfdff',8000:'#d1d1d1'}[s.Category] || '#e8e8e8'); }
 function sessTextCol(hex) {
   const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-  return (r*299+g*587+b*114)/1000 > 160 ? '#1C1407' : '#fff';
+  return (r*299+g*587+b*114)/1000 > 160 ? '#0F172A' : '#fff';
 }
 async function loadCourts() {
   const body = document.getElementById('cBody');
@@ -2555,7 +2907,7 @@ async function loadCourts() {
 
       // Grid lines
       const lines = slots.map((m,i) =>
-        `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#f0ede6'}"></div>`
+        `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#F1F5F9'}"></div>`
       ).join('');
 
       // Free-slot hover cells (not covered by any ClubSpark session or our pending booking)
@@ -2648,6 +3000,9 @@ function updateProfileWidgets(){
   const bnAv=document.getElementById('bnAvatar'); if(bnAv) bnAv.textContent=ini;
   // Mobile profile button
   const mobPf=document.getElementById('mobPfBtn'); if(mobPf) mobPf.textContent=ini;
+  // Student calendar / share page
+  const scName=document.getElementById('scCoachName'); if(scName) scName.textContent=displayName;
+  const scConf=document.getElementById('scConfirmMsg'); if(scConf) scConf.textContent=`${displayName} will get back to you shortly to confirm your booking.`;
 }
 // Fetch user info (including full name) on load
 (async function loadUserInfo(){
@@ -2658,6 +3013,8 @@ function updateProfileWidgets(){
       coachFullName=d.fullName||''; coachEmail=d.email||'';
       if(d.workStart!==undefined) CAL_S=d.workStart;
       if(d.workEnd!==undefined) CAL_E=d.workEnd;
+      if(d.blocks) BLOCKS=d.blocks;
+      if(d.daysOff) DAYS_OFF=d.daysOff;
       updateProfileWidgets();
       renderSchedule(); renderToday();
     }
@@ -3013,13 +3370,14 @@ function renderProfile(){
   const ccEl=document.getElementById('pfCalendars');
   if(ccEl){
     if(gcalConnected){
-      ccEl.innerHTML=`<div style="background:var(--card);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05)"><div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:18px">📅</div><div><div style="font-size:14px;font-weight:800;color:var(--text)">Google Calendar</div><div style="font-size:12px;font-weight:600;color:var(--soft)">Connected</div></div></div><button onclick="disconnectGcal()" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--err);background:var(--white);color:var(--err);font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">Disconnect</button></div></div>`;
+      ccEl.innerHTML=`<div style="background:var(--card);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05)"><div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:18px">📅</div><div><div style="font-size:14px;font-weight:800;color:var(--text)">Google Calendar</div><div style="font-size:12px;font-weight:600;color:var(--soft)">Connected</div></div></div><button onclick="disconnectGcal()" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--err);background:var(--white);color:var(--err);font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Disconnect</button></div></div>`;
     } else {
-      ccEl.innerHTML=`<button onclick="openCalConnect()" style="width:100%;padding:14px;border-radius:14px;border:1.5px dashed var(--border);background:var(--off);color:var(--soft);font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--s-a)'" onmouseout="this.style.borderColor='var(--border)'">📅 Connect Google Calendar</button>`;
+      ccEl.innerHTML=`<button onclick="openCalConnect()" style="width:100%;padding:14px;border-radius:14px;border:1.5px dashed var(--border);background:var(--off);color:var(--soft);font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--s-a)'" onmouseout="this.style.borderColor='var(--border)'">📅 Connect Google Calendar</button>`;
     }
   }
   // Notifications section
   renderNotifSection();
+  renderDaysOff();
 }
 async function saveProfileInfo(){
   const btn=document.getElementById('pfSaveInfoBtn');
@@ -3198,6 +3556,79 @@ async function executeMultiBook(){
     if(successes>0) toast(`✅ ${successes} court${successes>1?'s':''} booked`);
     loadCourts();
   },successes===total?2000:4000);
+}
+
+// ══ LESSON REQUESTS ══
+let pendingRequests=[];
+async function loadPendingRequests(){
+  try{
+    const r=await fetch('/api/requests');
+    if(!r.ok) return;
+    const d=await r.json();
+    pendingRequests=d.requests||[];
+    updateRequestBadge();
+  }catch(e){}
+}
+function updateRequestBadge(){
+  const badge=document.getElementById('homeBadge');
+  if(!badge) return;
+  if(pendingRequests.length>0){
+    badge.textContent=pendingRequests.length;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+async function acceptRequest(id){
+  try{
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept'})});
+    const d=await r.json();
+    if(d.success){
+      const req=pendingRequests.find(r=>r.id===id);
+      if(req){
+        // Add to local SESSIONS
+        SESSIONS.push({id:'req-'+id,student:req.student_name,level:'',time:req.requested_time,dur:'1h',court:'',recur:'One-time',date:req.requested_date,payStatus:'unpaid'});
+        saveCache();
+      }
+      pendingRequests=pendingRequests.filter(r=>r.id!==id);
+      updateRequestBadge();
+      renderToday();renderSchedule();
+      toast('✓ Lesson accepted — added to schedule');
+    }
+  }catch(e){toast('Failed to accept request');}
+}
+async function declineRequest(id){
+  if(!confirm('Decline this lesson request?')) return;
+  try{
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'decline'})});
+    const d=await r.json();
+    if(d.success){
+      pendingRequests=pendingRequests.filter(r=>r.id!==id);
+      updateRequestBadge();
+      renderToday();
+      toast('Request declined');
+    }
+  }catch(e){toast('Failed to decline request');}
+}
+function renderPendingRequestsHTML(){
+  if(pendingRequests.length===0) return '';
+  let html=`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.8px;color:var(--p);padding:0 2px 8px;display:flex;align-items:center;gap:6px">📩 Pending Requests <span style="background:var(--err);color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:100px">${pendingRequests.length}</span></div>`;
+  pendingRequests.forEach(req=>{
+    const d=new Date(req.requested_date+'T00:00:00');
+    const dateLabel=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
+    html+=`<div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-left:3px solid var(--p)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-size:15px;font-weight:900;color:var(--text)">${req.student_name}</div><div style="font-size:12px;font-weight:600;color:var(--soft);margin-top:2px">${dateLabel} · ${fmt(req.requested_time)}</div>${req.contact?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${req.contact}</div>`:''}</div>
+      </div>
+      ${req.message?`<div style="font-size:12px;color:var(--soft);font-style:italic;margin-bottom:8px">"${req.message}"</div>`:''}
+      <div style="display:flex;gap:8px">
+        <button onclick="acceptRequest('${req.id}')" style="flex:1;padding:8px;border-radius:10px;border:none;background:var(--p);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Accept</button>
+        <button onclick="declineRequest('${req.id}')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Decline</button>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
 }
 
 // ══ CONNECT CALENDAR ══

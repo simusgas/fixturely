@@ -14,6 +14,8 @@ export async function GET() {
     fullName: user.user_metadata?.full_name || '',
     workStart: user.user_metadata?.work_start ?? 6,
     workEnd: user.user_metadata?.work_end ?? 22,
+    blocks: user.user_metadata?.blocks || [],
+    daysOff: user.user_metadata?.days_off || [],
   })
 }
 
@@ -32,7 +34,7 @@ export async function PATCH(request) {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { fullName, email, password, workStart, workEnd } = body
+  const { fullName, email, password, workStart, workEnd, blocks, daysOff } = body
 
   // Build the update object
   const update = {}
@@ -48,6 +50,12 @@ export async function PATCH(request) {
       work_start: workStart !== undefined ? workStart : (existing.work_start ?? 6),
       work_end: workEnd !== undefined ? workEnd : (existing.work_end ?? 22),
     }
+  }
+  if (blocks !== undefined) {
+    update.data = { ...update.data, blocks }
+  }
+  if (daysOff !== undefined) {
+    update.data = { ...update.data, days_off: daysOff }
   }
   if (email !== undefined) {
     const trimmed = email.trim()
