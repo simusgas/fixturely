@@ -654,9 +654,11 @@
     .mc-nav-arr:active{color:var(--p);}
     .mc-week-btn{padding:3px 10px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--p);}
     .mc-week-btn:active{opacity:0.6;}
-    .mc-hdr-actions{display:flex;gap:8px;padding:0 12px 6px;}
-    .mc-hdr-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none;background:none;color:var(--p);}
-    .mc-hdr-btn:active{opacity:0.6;}
+    .mc-tl-header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 2px 50px;}
+    .mc-tl-book{font-size:12px;font-weight:600;color:var(--p);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;}
+    .mc-tl-book:active{opacity:0.5;}
+    .mc-tl-block{font-size:12px;font-weight:600;color:#999;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;}
+    .mc-tl-block:active{opacity:0.5;}
     .mc-days{display:grid;grid-template-columns:repeat(7,1fr);padding:0 4px 6px;}
     .mc-day{text-align:center;cursor:pointer;padding:2px 0;}
     .mc-day-name{font-size:9px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:0.2px;}
@@ -666,9 +668,8 @@
     .mc-day-dot{width:3px;height:3px;border-radius:50%;background:var(--p);margin:2px auto 0;}
     .mc-day-dot.empty{background:transparent;}
     /* Timeline */
-    .mc-timeline{position:relative;padding-left:48px;min-height:200px;}
-    .mc-hour-row{cursor:pointer;}
-    .mc-hour-lbl{position:absolute;left:-48px;top:-6px;width:42px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
+    .mc-timeline{position:relative;padding-left:50px;min-height:200px;}
+    .mc-hour-lbl{position:absolute;left:-50px;top:-7px;width:44px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
     .mc-event{position:absolute;left:1px;right:6px;border-radius:4px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#D6DEFF;border-left:3px solid var(--p);}
     .mc-event:active{opacity:0.7;}
     .mc-event-name{font-size:12px;font-weight:600;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
@@ -2458,13 +2459,13 @@ function renderMobileScheduleHTML(){
       <div class="mc-day-dot${hasLessons?'':' empty'}"></div>
     </div>`;
   });
-  html+=`</div>`;
-  // Small action buttons
-  html+=`<div class="mc-hdr-actions"><button class="mc-hdr-btn" onclick="openBookModal()">+ Book</button><button class="mc-hdr-btn" onclick="blockRecurring()">Block</button></div>`;
-  html+=`</div>`;
+  html+=`</div></div>`;
+
+  // ── Book/Block buttons ──
+  html+=`<div class="mc-tl-header"><button class="mc-tl-block" onclick="blockRecurring()">Block</button><button class="mc-tl-book" onclick="openBookModal()">+ Book</button></div>`;
 
   // ── Daily timeline ──
-  const ROW_H=50;
+  const ROW_H=60;
   const totalHours=CAL_E-CAL_S;
   const totalH=totalHours*ROW_H;
   const now=new Date();
@@ -2477,11 +2478,11 @@ function renderMobileScheduleHTML(){
   for(let h=CAL_S;h<CAL_E;h++){
     const top=(h-CAL_S)*ROW_H;
     const lbl=fmtHour(h);
-    html+=`<div class="mc-hour-row" style="top:${top}px;height:${ROW_H}px;position:absolute;left:0;right:0;border-top:0.5px solid #F0F0F0" onclick="bookAtTime('${dstr}',${h},0)">
+    html+=`<div style="position:absolute;left:0;right:0;top:${top}px;height:${ROW_H}px;border-top:1px solid #EBEBEB">
       <div class="mc-hour-lbl">${lbl}</div>
     </div>`;
   }
-  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:0.5px solid #F0F0F0"></div>`;
+  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:1px solid #EBEBEB"></div>`;
 
   // Session blocks — slim bars
   daySess.forEach(s=>{
@@ -2525,22 +2526,17 @@ function renderMobileScheduleHTML(){
 }
 
 function scrollToMobileNow(){
-  // Scroll to current time line or first lesson
-  const nowLine=document.getElementById('mcNowLine');
   const timeline=document.getElementById('mcTimeline');
   if(!timeline) return;
   const screen=timeline.closest('.screen');
   if(!screen) return;
+  const nowLine=document.getElementById('mcNowLine');
   if(nowLine){
-    const offset=nowLine.offsetTop-120;
-    screen.scrollTop=Math.max(0,offset);
+    // Scroll so now line is ~100px from top
+    screen.scrollTop=Math.max(0,nowLine.offsetTop+timeline.offsetTop-100);
   } else {
-    // Scroll to first lesson
-    const firstEvent=timeline.querySelector('.mc-event');
-    if(firstEvent){
-      const offset=firstEvent.offsetTop+timeline.offsetTop-120;
-      screen.scrollTop=Math.max(0,offset);
-    }
+    // Scroll to top of timeline (6am)
+    screen.scrollTop=Math.max(0,timeline.offsetTop);
   }
 }
 
