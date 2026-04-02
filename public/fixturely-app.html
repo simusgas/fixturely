@@ -646,39 +646,43 @@
     .hk-col-scroll{max-height:none;overflow:visible;}
     .hk-col-hd{position:static;}
 
-    /* ── Mobile schedule day view ── */
-    .m-day-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
-    .m-day-title{font-size:15px;font-weight:900;color:var(--text);text-align:center;}
-    .m-day-sub{font-size:11px;font-weight:600;color:var(--muted);text-align:center;}
-    .m-day-arr{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--soft);cursor:pointer;}
-    .m-day-arr:active{background:var(--off);}
-    .m-day-toggle{padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:11px;font-weight:800;color:var(--soft);cursor:pointer;font-family:'Inter',sans-serif;}
-    .m-day-toggle:active{background:var(--off);}
-    .m-slot{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);min-height:56px;}
-    .m-slot-time{width:60px;flex-shrink:0;font-size:13px;font-weight:800;color:var(--soft);}
-    .m-slot-content{flex:1;min-width:0;}
-    .m-slot-booked{background:var(--p-lt);border-radius:10px;padding:10px 12px;cursor:pointer;}
-    .m-slot-booked:active{opacity:0.8;}
-    .m-slot-booked .m-slot-name{font-size:15px;font-weight:900;color:var(--p-dk);}
-    .m-slot-booked .m-slot-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
-    .m-slot-blocked{background:var(--off);border-radius:10px;padding:10px 12px;border:1px dashed var(--border);cursor:pointer;}
-    .m-slot-blocked:active{opacity:0.8;}
-    .m-slot-blocked .m-slot-lbl{font-size:12px;font-weight:700;color:var(--muted);}
-    .m-slot-free{display:flex;gap:8px;}
-    .m-slot-free .m-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;}
-    .m-btn-book{background:var(--p);color:#fff;border:none;}
+    /* ── iOS Calendar-style mobile schedule ── */
+    .mc-strip{position:sticky;top:0;z-index:10;background:var(--white);border-bottom:1px solid var(--border);}
+    .mc-week-nav{display:flex;align-items:center;padding:6px 10px;gap:8px;}
+    .mc-week-lbl{flex:1;font-size:15px;font-weight:900;color:var(--text);}
+    .mc-nav-arr{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--soft);cursor:pointer;}
+    .mc-nav-arr:active{background:var(--off);}
+    .mc-week-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:var(--soft);min-height:32px;}
+    .mc-week-btn:active{background:var(--off);}
+    .mc-days{display:grid;grid-template-columns:repeat(7,1fr);padding:2px 6px 8px;}
+    .mc-day{text-align:center;cursor:pointer;padding:4px 0;}
+    .mc-day-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;}
+    .mc-day-num{font-size:14px;font-weight:800;color:var(--text);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:3px auto 0;transition:all 0.15s;}
+    .mc-day.is-today .mc-day-num{background:var(--p);color:#fff;}
+    .mc-day.is-sel:not(.is-today) .mc-day-num{background:var(--p-lt);color:var(--p);font-weight:900;}
+    .mc-day-dot{width:5px;height:5px;border-radius:50%;background:var(--p);margin:3px auto 0;}
+    .mc-day-dot.empty{background:transparent;}
+    /* Timeline */
+    .mc-timeline{position:relative;padding-left:52px;min-height:200px;}
+    .mc-hour-row{position:relative;height:60px;border-top:1px solid var(--border);}
+    .mc-hour-lbl{position:absolute;left:-52px;top:-7px;width:46px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);padding-right:6px;}
+    .mc-half{position:absolute;left:0;right:0;top:30px;border-top:1px dashed rgba(226,232,240,0.6);}
+    .mc-event{position:absolute;left:2px;right:2px;border-radius:8px;padding:6px 10px;z-index:2;cursor:pointer;overflow:hidden;background:var(--p-lt);border-left:3px solid var(--p);}
+    .mc-event:active{opacity:0.8;}
+    .mc-event-name{font-size:14px;font-weight:900;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mc-event-meta{font-size:11px;font-weight:600;color:var(--soft);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mc-event.paid{background:var(--ok-lt);border-left-color:var(--ok);}
+    .mc-event.paid .mc-event-name{color:#064E3B;}
+    .mc-now{position:absolute;left:0;right:0;height:2px;background:var(--err);z-index:3;pointer-events:none;}
+    .mc-now::before{content:'';position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--err);}
+    .mc-free{position:absolute;left:2px;right:2px;top:2px;bottom:2px;display:flex;gap:4px;align-items:stretch;}
+    .mc-free .m-btn{flex:1;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;min-height:0;padding:0;border:none;}
+    .m-btn-book{background:var(--p);color:#fff;}
     .m-btn-book:active{background:var(--p-dk);}
-    .m-btn-block{background:var(--white);color:var(--soft);border:1.5px solid var(--border);}
+    .m-btn-block{background:var(--white);color:var(--soft);border:1.5px solid var(--border) !important;}
     .m-btn-block:active{background:var(--off);}
-    /* Compact week mini-map */
-    .m-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:8px 12px;}
-    .m-week-day{text-align:center;cursor:pointer;padding:4px 0;}
-    .m-week-day-name{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;}
-    .m-week-day-num{font-size:12px;font-weight:900;color:var(--text);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto;}
-    .m-week-day.today .m-week-day-num{background:var(--p);color:#fff;}
-    .m-week-day.sel .m-week-day-num{border:2px solid var(--p);}
-    .m-week-slots{display:flex;gap:1px;margin-top:2px;justify-content:center;height:4px;}
-    .m-week-dot{width:4px;height:4px;border-radius:2px;}
+    .mc-blocked{position:absolute;left:2px;right:2px;top:2px;bottom:2px;border-radius:6px;background:var(--off);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;}
+    .mc-blocked:active{background:var(--border);}
   }
 
   @media (min-width:1024px) {
@@ -2427,119 +2431,126 @@ async function saveWorkingHours(){
   toast(`Hours: ${fmtHour(s)} – ${fmtHour(e)}`);
 }
 function isMobile(){return window.innerWidth<1024;}
-let mobileSchedView='day';
 
-function renderMobileDayViewHTML(){
-  const dstr=ds(sel);
-  const d=sel;
-  const dateLabel=`${DF[d.getDay()]}, ${d.getDate()} ${MN[d.getMonth()]}`;
+function renderMobileScheduleHTML(){
+  const days=[];
+  for(let i=0;i<7;i++) days.push(add(ws,i));
+  const todayStr=ds(today),selStr=ds(sel),dstr=ds(sel);
   const daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
 
-  // Nav header with day toggle
-  let html=`<div class="m-day-nav">
-    <button class="m-day-arr" onclick="prevDay()">‹</button>
-    <div style="flex:1;text-align:center" onclick="mobileSchedView='week';renderSchedule()">
-      <div class="m-day-title">${dateLabel}</div>
-      <div class="m-day-sub">${daySess.length} lesson${daySess.length!==1?'s':''} · Tap for week</div>
-    </div>
-    <button class="m-day-arr" onclick="nextDay()">›</button>
-  </div>`;
+  // Week label
+  const weekEnd=add(ws,6);
+  const weekLbl=ws.getMonth()===weekEnd.getMonth()?`${MN[ws.getMonth()]} ${ws.getFullYear()}`:`${MS[ws.getMonth()]}–${MS[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
 
-  // Time slots from CAL_S to CAL_E
+  // ── Week strip ──
+  let html=`<div class="mc-strip">
+    <div class="mc-week-nav">
+      <button class="mc-nav-arr" onclick="changeWeek(-1)">‹</button>
+      <div class="mc-week-lbl">${weekLbl}</div>
+      <button class="mc-week-btn" onclick="goToday()">Today</button>
+      <button class="mc-nav-arr" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="mc-days">`;
+  days.forEach(d=>{
+    const dd=ds(d);
+    const isT=dd===todayStr;
+    const isS=dd===selStr;
+    const hasLessons=SESSIONS.some(s=>s.date===dd);
+    html+=`<div class="mc-day${isT?' is-today':''}${isS?' is-sel':''}" onclick="sel=new Date('${dd}T00:00:00');ws=wkStart(sel);renderSchedule()">
+      <div class="mc-day-name">${DW[((d.getDay()+6)%7)]}</div>
+      <div class="mc-day-num">${d.getDate()}</div>
+      <div class="mc-day-dot${hasLessons?'':' empty'}"></div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+
+  // ── Daily timeline ──
+  const ROW_H=60; // px per hour
+  const totalHours=CAL_E-CAL_S;
+  const totalH=totalHours*ROW_H;
+  const now=new Date();
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const showNow=dstr===todayStr&&nowMins>=CAL_S*60&&nowMins<CAL_E*60;
+
+  html+=`<div class="mc-timeline" style="height:${totalH}px" id="mcTimeline">`;
+
+  // Hour rows + labels + half-hour lines
+  for(let h=CAL_S;h<CAL_E;h++){
+    const top=(h-CAL_S)*ROW_H;
+    const lbl=fmtHour(h);
+    html+=`<div class="mc-hour-row" style="top:${top}px;height:${ROW_H}px;position:absolute;left:0;right:0;border-top:1px solid var(--border)">
+      <div class="mc-hour-lbl">${lbl}</div>
+      <div class="mc-half"></div>
+    </div>`;
+  }
+  // Bottom border
+  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:1px solid var(--border)"></div>`;
+
+  // Session blocks (absolute positioned by time)
+  daySess.forEach(s=>{
+    const startM=t2m(s.time);
+    const durM=dm(s.dur);
+    const top=((startM-CAL_S*60)/60)*ROW_H;
+    const height=Math.max((durM/60)*ROW_H-2,24);
+    if(top+height<=0||top>=totalH) return;
+    const isPaid=s.payStatus==='paid';
+    const showMeta=height>32;
+    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')">
+      <div class="mc-event-name">${s.student}</div>
+      ${showMeta?`<div class="mc-event-meta">${fmt(s.time)} – ${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}
+    </div>`;
+  });
+
+  // Free slots with Book/Block buttons + blocked slots
   for(let h=CAL_S;h<CAL_E;h++){
     for(let half=0;half<2;half++){
       const m=h*60+half*30;
       const timeStr=`${h.toString().padStart(2,'0')}:${(half*30).toString().padStart(2,'0')}`;
-      const lbl=half===0?fmtHour(h):'';
-
-      // Check if a session starts at this time
-      const sess=daySess.find(s=>t2m(s.time)===m);
-      // Check if slot is within an ongoing session
-      const ongoing=!sess&&daySess.find(s=>{const sM=t2m(s.time),eM=sM+dm(s.dur);return m>sM&&m<eM;});
+      const slotTop=((m-CAL_S*60)/60)*ROW_H;
+      const slotH=ROW_H/2;
+      // Check if any session overlaps this 30-min slot
+      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
+      if(busy) continue;
       const blocked=isSlotBlocked(dstr,timeStr);
-
-      if(ongoing) continue; // skip slots inside a multi-slot session
-
-      html+=`<div class="m-slot">`;
-      html+=`<div class="m-slot-time">${lbl}</div>`;
-      html+=`<div class="m-slot-content">`;
-
-      if(sess){
-        const durSlots=Math.ceil(dm(sess.dur)/30);
-        html+=`<div class="m-slot-booked" onclick="openSessDetail('${sess.id}')">
-          <div class="m-slot-name">${sess.student}</div>
-          <div class="m-slot-meta">${fmt(sess.time)} – ${et(sess.time,sess.dur)}${sess.court?' · '+sess.court:''}</div>
-        </div>`;
-      } else if(blocked){
-        html+=`<div class="m-slot-blocked" onclick="unblockSlot('${dstr}','${timeStr}')"><div class="m-slot-lbl">Blocked</div></div>`;
+      if(blocked){
+        html+=`<div class="mc-blocked" style="top:${slotTop+2}px;height:${slotH-4}px" onclick="unblockSlot('${dstr}','${timeStr}')">Blocked</div>`;
       } else {
-        html+=`<div class="m-slot-free">
+        html+=`<div class="mc-free" style="position:absolute;left:2px;right:2px;top:${slotTop+1}px;height:${slotH-2}px">
           <button class="m-btn m-btn-book" onclick="bookAtTime('${dstr}',${h},${half*30})">Book</button>
           <button class="m-btn m-btn-block" onclick="blockSlot('${dstr}',${h},${half*30})">Block</button>
         </div>`;
       }
-
-      html+=`</div></div>`;
     }
   }
+
+  // Now line
+  if(showNow){
+    const nowTop=((nowMins-CAL_S*60)/60)*ROW_H;
+    html+=`<div class="mc-now" style="top:${nowTop}px" id="mcNowLine"></div>`;
+  }
+
+  html+=`</div>`;
   return html;
 }
 
-function renderMobileWeekViewHTML(){
-  const days=[];
-  for(let i=0;i<7;i++) days.push(add(ws,i));
-  const todayStr=ds(today),selStr=ds(sel);
-
-  // Week header with nav
-  const weekEnd=add(ws,6);
-  const weekLbl=ws.getMonth()===weekEnd.getMonth()?`${MN[ws.getMonth()]} ${ws.getFullYear()}`:`${MS[ws.getMonth()]}–${MS[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
-  let html=`<div class="m-day-nav">
-    <button class="m-day-arr" onclick="changeWeek(-1)">‹</button>
-    <div style="flex:1;text-align:center"><div class="m-day-title">${weekLbl}</div></div>
-    <button class="m-day-arr" onclick="changeWeek(1)">›</button>
-  </div>`;
-
-  // Day headers + mini slot map
-  html+=`<div class="m-week-grid">`;
-  days.forEach(d=>{
-    const dstr=ds(d);
-    const daySess=SESSIONS.filter(s=>s.date===dstr);
-    const isT=dstr===todayStr;
-    const isS=dstr===selStr;
-    // Compact block indicators
-    let dots='';
-    if(isDayOff(dstr)){
-      dots=`<div class="m-week-slots"><div class="m-week-dot" style="background:var(--border);width:100%;border-radius:2px"></div></div>`;
-    } else {
-      const blocks=daySess.slice(0,5).map(()=>`<div class="m-week-dot" style="background:var(--p)"></div>`).join('');
-      dots=`<div class="m-week-slots">${blocks||'<div class="m-week-dot" style="background:transparent"></div>'}</div>`;
+function scrollToMobileNow(){
+  // Scroll to current time line or first lesson
+  const nowLine=document.getElementById('mcNowLine');
+  const timeline=document.getElementById('mcTimeline');
+  if(!timeline) return;
+  const screen=timeline.closest('.screen');
+  if(!screen) return;
+  if(nowLine){
+    const offset=nowLine.offsetTop-120;
+    screen.scrollTop=Math.max(0,offset);
+  } else {
+    // Scroll to first lesson
+    const firstEvent=timeline.querySelector('.mc-event');
+    if(firstEvent){
+      const offset=firstEvent.offsetTop+timeline.offsetTop-120;
+      screen.scrollTop=Math.max(0,offset);
     }
-    html+=`<div class="m-week-day${isT?' today':''}${isS?' sel':''}" onclick="sel=new Date('${dstr}T00:00:00');mobileSchedView='day';renderSchedule()">
-      <div class="m-week-day-name">${DW[((d.getDay()+6)%7)]}</div>
-      <div class="m-week-day-num">${d.getDate()}</div>
-      ${dots}
-    </div>`;
-  });
-  html+=`</div>`;
-
-  // Summary for each day
-  days.forEach(d=>{
-    const dstr=ds(d);
-    const daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
-    if(daySess.length===0) return;
-    const dayLabel=`${DS_[d.getDay()]} ${d.getDate()}`;
-    html+=`<div style="padding:8px 12px;border-bottom:1px solid var(--border)">
-      <div style="font-size:12px;font-weight:800;color:var(--soft);margin-bottom:4px">${dayLabel} · ${daySess.length} lesson${daySess.length!==1?'s':''}</div>`;
-    daySess.forEach(s=>{
-      html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer" onclick="sel=new Date('${dstr}T00:00:00');mobileSchedView='day';renderSchedule()">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);width:50px">${fmt(s.time)}</div>
-        <div style="flex:1;font-size:13px;font-weight:800;color:var(--text)">${s.student}</div>
-      </div>`;
-    });
-    html+=`</div>`;
-  });
-
-  return html;
+  }
 }
 
 function renderSchedule(){
@@ -2548,7 +2559,8 @@ function renderSchedule(){
     nudge=`<div class="sched-nudge"><div class="sched-nudge-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Your students can view this schedule and book lessons</span><a onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="color:var(--s-dk);font-weight:900;cursor:pointer;white-space:nowrap">Share Schedule →</a></div><button onclick="dismissSchedNudge()" class="sched-nudge-close">✕</button></div>`;
   }
   if(isMobile()){
-    document.getElementById('sBody').innerHTML=nudge+(mobileSchedView==='week'?renderMobileWeekViewHTML():renderMobileDayViewHTML());
+    document.getElementById('sBody').innerHTML=nudge+renderMobileScheduleHTML();
+    setTimeout(scrollToMobileNow,50);
   } else {
     document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
   }
@@ -4125,7 +4137,7 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
   if(schedEl){
     schedEl.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
     schedEl.addEventListener('touchend',e=>{
-      if(!isMobile()||mobileSchedView!=='day') return;
+      if(!isMobile()) return;
       const dx=e.changedTouches[0].clientX-sx;
       const dy=e.changedTouches[0].clientY-sy;
       if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
