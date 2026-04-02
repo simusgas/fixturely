@@ -600,10 +600,86 @@
   .topnav { display:none; }
   .sidebar { display:none; }
   .main-col { display:contents; }
-  /* Two-col wrappers transparent on mobile */
   .dsk-split { display:contents; }
-  /* Desktop-only panels hidden on mobile */
   #dsk-stu-placeholder { display:none; }
+
+  /* ══════════════════════════════════════════
+     MOBILE-SPECIFIC OVERRIDES (< 1024px)
+  ══════════════════════════════════════════ */
+  @media (max-width:1023px) {
+    /* ── Compact headers ── */
+    .t-hdr,.s-hdr,.u-hdr,.c-hdr,.sh-hdr{padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 10px;border-radius:0;}
+    .t-title,.s-title,.u-title,.c-title,.sh-title{font-size:20px;}
+    .t-sub,.s-sub,.c-sub{display:none;}
+    .hdr-stats{gap:6px;}
+    .hst{padding:8px 6px;}
+    .hst-n{font-size:16px;}
+    .hst-l{font-size:9px;}
+    .t-hdr-top,.s-hdr-top,.u-hdr-top,.c-hdr-top{margin-bottom:8px;}
+    .s-hdr-acts,.c-hdr-acts{gap:4px;}
+    .hdr-btn{padding:6px 12px;font-size:12px;min-height:36px;display:flex;align-items:center;}
+
+    /* ── Touch targets — 44px minimum ── */
+    .pill{min-height:44px;display:flex;align-items:center;justify-content:center;}
+    .modal-close{width:36px;height:36px;font-size:16px;}
+    .sv-nav-arr{width:36px;height:36px;}
+    .sg-book-btn,.sg-block-btn{min-height:36px;padding:6px 14px;font-size:11px;}
+    .cg-req-btn,.cg-sel-btn{min-height:40px;min-width:48px;font-size:12px;}
+
+    /* ── Hover → always visible on mobile ── */
+    .sg-slot-time{opacity:0.6 !important;}
+    .sg-slot-btns{opacity:1 !important;pointer-events:auto !important;}
+    .cg-slot-time{opacity:0.6 !important;}
+    .cg-req-btn,.cg-sel-btn{opacity:1 !important;pointer-events:auto !important;}
+
+    /* ── Modals — taller bottom sheet ── */
+    .overlay .modal{max-height:95vh;border-radius:20px 20px 0 0;}
+
+    /* ── Courts — one court at a time with snap scroll ── */
+    .cg-courts{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
+    .cg-courts::-webkit-scrollbar{display:none;}
+    .cg-court{min-width:calc(100vw - 56px);scroll-snap-align:start;flex-shrink:0;}
+
+    /* ── Home kanban — stack vertically on small screens ── */
+    .hk-board{flex-direction:column;height:auto;}
+    .hk-col{min-height:0;}
+    .hk-col-scroll{max-height:none;overflow:visible;}
+    .hk-col-hd{position:static;}
+
+    /* ── Mobile schedule day view ── */
+    .m-day-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+    .m-day-title{font-size:15px;font-weight:900;color:var(--text);text-align:center;}
+    .m-day-sub{font-size:11px;font-weight:600;color:var(--muted);text-align:center;}
+    .m-day-arr{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--soft);cursor:pointer;}
+    .m-day-arr:active{background:var(--off);}
+    .m-day-toggle{padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:11px;font-weight:800;color:var(--soft);cursor:pointer;font-family:'Inter',sans-serif;}
+    .m-day-toggle:active{background:var(--off);}
+    .m-slot{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);min-height:56px;}
+    .m-slot-time{width:60px;flex-shrink:0;font-size:13px;font-weight:800;color:var(--soft);}
+    .m-slot-content{flex:1;min-width:0;}
+    .m-slot-booked{background:var(--p-lt);border-radius:10px;padding:10px 12px;cursor:pointer;}
+    .m-slot-booked:active{opacity:0.8;}
+    .m-slot-booked .m-slot-name{font-size:15px;font-weight:900;color:var(--p-dk);}
+    .m-slot-booked .m-slot-meta{font-size:12px;font-weight:600;color:var(--soft);margin-top:2px;}
+    .m-slot-blocked{background:var(--off);border-radius:10px;padding:10px 12px;border:1px dashed var(--border);cursor:pointer;}
+    .m-slot-blocked:active{opacity:0.8;}
+    .m-slot-blocked .m-slot-lbl{font-size:12px;font-weight:700;color:var(--muted);}
+    .m-slot-free{display:flex;gap:8px;}
+    .m-slot-free .m-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;}
+    .m-btn-book{background:var(--p);color:#fff;border:none;}
+    .m-btn-book:active{background:var(--p-dk);}
+    .m-btn-block{background:var(--white);color:var(--soft);border:1.5px solid var(--border);}
+    .m-btn-block:active{background:var(--off);}
+    /* Compact week mini-map */
+    .m-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:8px 12px;}
+    .m-week-day{text-align:center;cursor:pointer;padding:4px 0;}
+    .m-week-day-name{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;}
+    .m-week-day-num{font-size:12px;font-weight:900;color:var(--text);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto;}
+    .m-week-day.today .m-week-day-num{background:var(--p);color:#fff;}
+    .m-week-day.sel .m-week-day-num{border:2px solid var(--p);}
+    .m-week-slots{display:flex;gap:1px;margin-top:2px;justify-content:center;height:4px;}
+    .m-week-dot{width:4px;height:4px;border-radius:2px;}
+  }
 
   @media (min-width:1024px) {
     html,body { overflow:hidden; }
@@ -2035,7 +2111,7 @@ function renderSharePage(){
       const hasSlots=wd.slots.length>0;
       const isSel=wd.dstr===sharePreviewDate;
       const isToday=wd.dstr===ds(today);
-      return `<div onclick="${hasSlots?`selectShareDay('${wd.dstr}')`:''}" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;cursor:${hasSlots?'pointer':'default'};transition:all 0.15s;${isSel?'background:var(--p)':''};${wd.isPast?'opacity:0.3':''}"><div style="font-size:9px;font-weight:800;color:${isSel?'rgba(255,255,255,0.8)':'var(--muted)'};text-transform:uppercase;margin-bottom:4px">${DW[((wd.d.getDay()+6)%7)]}</div><div style="font-size:14px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${isSel?'#fff':isToday?'var(--p)':'var(--text)'};${isToday&&!isSel?'border:2px solid var(--p)':''}">${wd.d.getDate()}</div>${hasSlots?`<div style="width:4px;height:4px;border-radius:50%;background:${isSel?'rgba(255,255,255,0.7)':'var(--p)'};margin-top:3px"></div>`:''}</div>`;
+      return `<div data-sh-day="${wd.dstr}" onclick="${hasSlots?`selectShareDay('${wd.dstr}')`:''}" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;cursor:${hasSlots?'pointer':'default'};transition:all 0.15s;${isSel?'background:var(--p)':''};${wd.isPast?'opacity:0.3':''};${hasSlots&&!isSel?'border:1.5px solid transparent':''}${isSel?';border:1.5px solid var(--p)':''}"><div class="sh-day-name" style="font-size:9px;font-weight:800;color:${isSel?'rgba(255,255,255,0.8)':'var(--muted)'};text-transform:uppercase;margin-bottom:4px;transition:color 0.15s">${DW[((wd.d.getDay()+6)%7)]}</div><div class="sh-day-num" style="font-size:14px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${isSel?'#fff':isToday?'var(--p)':'var(--text)'};${isToday&&!isSel?'border:2px solid var(--p)':''};transition:color 0.15s">${wd.d.getDate()}</div>${hasSlots?`<div class="sh-day-dot" style="width:4px;height:4px;border-radius:50%;background:${isSel?'rgba(255,255,255,0.7)':'var(--p)'};margin-top:3px;transition:background 0.15s"></div>`:''}</div>`;
     }).join('');
 
     previewHTML=`<div style="padding:20px">
@@ -2046,7 +2122,7 @@ function renderSharePage(){
         <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
       </div>
       <div style="display:flex;gap:2px;margin-bottom:16px">${dayGrid}</div>
-      <div id="shPreviewSlots"></div>
+      <div id="shPreviewSlots" style="transition:opacity 0.15s"></div>
     </div>`;
   } else {
     previewHTML=`<div class="sh-preview-empty"><div class="sh-preview-empty-icon">📅</div><div class="sh-preview-empty-t">Your schedule is empty</div><div class="sh-preview-empty-s">Add some lessons first and your students<br>will see your availability here</div></div>`;
@@ -2126,8 +2202,25 @@ function renderSharePreviewSlots(){
 }
 function selectShareDay(dstr){
   sharePreviewDate=dstr;
-  renderSharePage();
-  setTimeout(()=>{const el=document.getElementById('shPreviewSlots');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+  // Update day strip active states without full re-render
+  document.querySelectorAll('[data-sh-day]').forEach(el=>{
+    const d=el.dataset.shDay;
+    const isSel=d===dstr;
+    el.style.background=isSel?'var(--p)':'';
+    el.style.borderColor=isSel?'var(--p)':'transparent';
+    const nm=el.querySelector('.sh-day-name');if(nm) nm.style.color=isSel?'rgba(255,255,255,0.85)':'';
+    const num=el.querySelector('.sh-day-num');if(num) num.style.color=isSel?'#fff':'';
+    const dot=el.querySelector('.sh-day-dot');
+    if(dot) dot.style.background=isSel?'rgba(255,255,255,0.7)':'var(--p)';
+  });
+  // Fade out, swap content, fade in
+  const el=document.getElementById('shPreviewSlots');
+  if(el){
+    el.style.opacity='0';
+    setTimeout(()=>{renderSharePreviewSlots();el.style.opacity='1';},120);
+  } else {
+    renderSharePreviewSlots();
+  }
 }
 function changeShareWeek(n){
   const newWeek=add(shareWeekStart,n*7);
@@ -2333,12 +2426,132 @@ async function saveWorkingHours(){
   fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({workStart:s,workEnd:e})}).catch(()=>{});
   toast(`Hours: ${fmtHour(s)} – ${fmtHour(e)}`);
 }
+function isMobile(){return window.innerWidth<1024;}
+let mobileSchedView='day';
+
+function renderMobileDayViewHTML(){
+  const dstr=ds(sel);
+  const d=sel;
+  const dateLabel=`${DF[d.getDay()]}, ${d.getDate()} ${MN[d.getMonth()]}`;
+  const daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+
+  // Nav header with day toggle
+  let html=`<div class="m-day-nav">
+    <button class="m-day-arr" onclick="prevDay()">‹</button>
+    <div style="flex:1;text-align:center" onclick="mobileSchedView='week';renderSchedule()">
+      <div class="m-day-title">${dateLabel}</div>
+      <div class="m-day-sub">${daySess.length} lesson${daySess.length!==1?'s':''} · Tap for week</div>
+    </div>
+    <button class="m-day-arr" onclick="nextDay()">›</button>
+  </div>`;
+
+  // Time slots from CAL_S to CAL_E
+  for(let h=CAL_S;h<CAL_E;h++){
+    for(let half=0;half<2;half++){
+      const m=h*60+half*30;
+      const timeStr=`${h.toString().padStart(2,'0')}:${(half*30).toString().padStart(2,'0')}`;
+      const lbl=half===0?fmtHour(h):'';
+
+      // Check if a session starts at this time
+      const sess=daySess.find(s=>t2m(s.time)===m);
+      // Check if slot is within an ongoing session
+      const ongoing=!sess&&daySess.find(s=>{const sM=t2m(s.time),eM=sM+dm(s.dur);return m>sM&&m<eM;});
+      const blocked=isSlotBlocked(dstr,timeStr);
+
+      if(ongoing) continue; // skip slots inside a multi-slot session
+
+      html+=`<div class="m-slot">`;
+      html+=`<div class="m-slot-time">${lbl}</div>`;
+      html+=`<div class="m-slot-content">`;
+
+      if(sess){
+        const durSlots=Math.ceil(dm(sess.dur)/30);
+        html+=`<div class="m-slot-booked" onclick="openSessDetail('${sess.id}')">
+          <div class="m-slot-name">${sess.student}</div>
+          <div class="m-slot-meta">${fmt(sess.time)} – ${et(sess.time,sess.dur)}${sess.court?' · '+sess.court:''}</div>
+        </div>`;
+      } else if(blocked){
+        html+=`<div class="m-slot-blocked" onclick="unblockSlot('${dstr}','${timeStr}')"><div class="m-slot-lbl">Blocked</div></div>`;
+      } else {
+        html+=`<div class="m-slot-free">
+          <button class="m-btn m-btn-book" onclick="bookAtTime('${dstr}',${h},${half*30})">Book</button>
+          <button class="m-btn m-btn-block" onclick="blockSlot('${dstr}',${h},${half*30})">Block</button>
+        </div>`;
+      }
+
+      html+=`</div></div>`;
+    }
+  }
+  return html;
+}
+
+function renderMobileWeekViewHTML(){
+  const days=[];
+  for(let i=0;i<7;i++) days.push(add(ws,i));
+  const todayStr=ds(today),selStr=ds(sel);
+
+  // Week header with nav
+  const weekEnd=add(ws,6);
+  const weekLbl=ws.getMonth()===weekEnd.getMonth()?`${MN[ws.getMonth()]} ${ws.getFullYear()}`:`${MS[ws.getMonth()]}–${MS[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  let html=`<div class="m-day-nav">
+    <button class="m-day-arr" onclick="changeWeek(-1)">‹</button>
+    <div style="flex:1;text-align:center"><div class="m-day-title">${weekLbl}</div></div>
+    <button class="m-day-arr" onclick="changeWeek(1)">›</button>
+  </div>`;
+
+  // Day headers + mini slot map
+  html+=`<div class="m-week-grid">`;
+  days.forEach(d=>{
+    const dstr=ds(d);
+    const daySess=SESSIONS.filter(s=>s.date===dstr);
+    const isT=dstr===todayStr;
+    const isS=dstr===selStr;
+    // Compact block indicators
+    let dots='';
+    if(isDayOff(dstr)){
+      dots=`<div class="m-week-slots"><div class="m-week-dot" style="background:var(--border);width:100%;border-radius:2px"></div></div>`;
+    } else {
+      const blocks=daySess.slice(0,5).map(()=>`<div class="m-week-dot" style="background:var(--p)"></div>`).join('');
+      dots=`<div class="m-week-slots">${blocks||'<div class="m-week-dot" style="background:transparent"></div>'}</div>`;
+    }
+    html+=`<div class="m-week-day${isT?' today':''}${isS?' sel':''}" onclick="sel=new Date('${dstr}T00:00:00');mobileSchedView='day';renderSchedule()">
+      <div class="m-week-day-name">${DW[((d.getDay()+6)%7)]}</div>
+      <div class="m-week-day-num">${d.getDate()}</div>
+      ${dots}
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // Summary for each day
+  days.forEach(d=>{
+    const dstr=ds(d);
+    const daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+    if(daySess.length===0) return;
+    const dayLabel=`${DS_[d.getDay()]} ${d.getDate()}`;
+    html+=`<div style="padding:8px 12px;border-bottom:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:800;color:var(--soft);margin-bottom:4px">${dayLabel} · ${daySess.length} lesson${daySess.length!==1?'s':''}</div>`;
+    daySess.forEach(s=>{
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer" onclick="sel=new Date('${dstr}T00:00:00');mobileSchedView='day';renderSchedule()">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);width:50px">${fmt(s.time)}</div>
+        <div style="flex:1;font-size:13px;font-weight:800;color:var(--text)">${s.student}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
+  return html;
+}
+
 function renderSchedule(){
   let nudge='';
   if(!schedNudgeDismissed){
     nudge=`<div class="sched-nudge"><div class="sched-nudge-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Your students can view this schedule and book lessons</span><a onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="color:var(--s-dk);font-weight:900;cursor:pointer;white-space:nowrap">Share Schedule →</a></div><button onclick="dismissSchedNudge()" class="sched-nudge-close">✕</button></div>`;
   }
-  document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
+  if(isMobile()){
+    document.getElementById('sBody').innerHTML=nudge+(mobileSchedView==='week'?renderMobileWeekViewHTML():renderMobileDayViewHTML());
+  } else {
+    document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
+  }
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
 function goToday(){sel=new Date(today);ws=wkStart(today);renderSchedule();}
@@ -3904,6 +4117,23 @@ async function importSelectedIcs(){
 
 // ══ TOAST ══
 function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══ SWIPE HANDLER ══
+(function(){
+  let sx=0,sy=0;
+  const schedEl=document.getElementById('screen-schedule');
+  if(schedEl){
+    schedEl.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+    schedEl.addEventListener('touchend',e=>{
+      if(!isMobile()||mobileSchedView!=='day') return;
+      const dx=e.changedTouches[0].clientX-sx;
+      const dy=e.changedTouches[0].clientY-sy;
+      if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
+        if(dx>0) prevDay(); else nextDay();
+      }
+    },{passive:true});
+  }
+})();
 
 // ══ INIT ══
 loadCachedData();
