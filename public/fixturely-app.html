@@ -607,6 +607,8 @@
      MOBILE-SPECIFIC OVERRIDES (< 1024px)
   ══════════════════════════════════════════ */
   @media (max-width:1023px) {
+    /* ── Profile icon below status bar ── */
+    .mob-pf-btn{top:calc(env(safe-area-inset-top,12px) + 4px);}
     /* ── Compact headers ── */
     .t-hdr,.s-hdr,.u-hdr,.c-hdr,.sh-hdr{padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 10px;border-radius:0;}
     .t-title,.s-title,.u-title,.c-title,.sh-title{font-size:20px;}
@@ -654,7 +656,7 @@
     .mc-nav-arr:active{color:var(--p);}
     .mc-week-btn{padding:3px 10px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--p);}
     .mc-week-btn:active{opacity:0.6;}
-    .mc-tl-header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 2px 50px;}
+    .mc-tl-header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 2px 48px;}
     .mc-tl-book{font-size:12px;font-weight:600;color:var(--p);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;}
     .mc-tl-book:active{opacity:0.5;}
     .mc-tl-block{font-size:12px;font-weight:600;color:#999;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;}
@@ -668,17 +670,17 @@
     .mc-day-dot{width:3px;height:3px;border-radius:50%;background:var(--p);margin:2px auto 0;}
     .mc-day-dot.empty{background:transparent;}
     /* Timeline */
-    .mc-timeline{position:relative;padding-left:50px;min-height:200px;}
-    .mc-hour-lbl{position:absolute;left:-50px;top:-7px;width:44px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
-    .mc-event{position:absolute;left:1px;right:6px;border-radius:4px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#D6DEFF;border-left:3px solid var(--p);}
+    .mc-timeline{position:relative;min-height:200px;}
+    .mc-hour-lbl{position:absolute;left:0;top:-7px;width:44px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
+    .mc-event{position:absolute;left:50px;right:6px;border-radius:4px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#D6DEFF;border-left:3px solid var(--p);}
     .mc-event:active{opacity:0.7;}
     .mc-event-name{font-size:12px;font-weight:600;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
     .mc-event-meta{font-size:10px;font-weight:400;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .mc-event.paid{background:#D1FAE5;border-left-color:var(--ok);}
     .mc-event.paid .mc-event-name{color:#065F46;}
-    .mc-now{position:absolute;left:0;right:0;height:1px;background:#FF3B30;z-index:3;pointer-events:none;}
+    .mc-now{position:absolute;left:44px;right:0;height:1px;background:#FF3B30;z-index:3;pointer-events:none;}
     .mc-now::before{content:'';position:absolute;left:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:#FF3B30;}
-    .mc-blocked{position:absolute;left:1px;right:6px;border-radius:3px;background:#F8F8F8;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:500;color:#C0C0C0;cursor:pointer;}
+    .mc-blocked{position:absolute;left:50px;right:6px;border-radius:3px;background:#F8F8F8;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:500;color:#C0C0C0;cursor:pointer;}
     .mc-blocked:active{background:#F0F0F0;}
   }
 
@@ -1336,6 +1338,36 @@
   </div>
 </div>
 
+<!-- BLOCK TIME MODAL -->
+<div class="overlay" id="blockOvl" onclick="if(event.target===this)closeBlockModal()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeBlockModal()">✕</button>
+    <div class="modal-title">Block Time</div>
+    <div class="field">
+      <label class="field-label">From</label>
+      <input type="time" class="field-input" id="blockFrom" value="12:00" oninput="updateBlockDuration()" />
+    </div>
+    <div class="field">
+      <label class="field-label">To</label>
+      <input type="time" class="field-input" id="blockTo" value="13:00" oninput="updateBlockDuration()" />
+    </div>
+    <div id="blockDurLabel" style="font-size:13px;font-weight:700;color:var(--soft);margin:-6px 0 16px;padding-left:2px"></div>
+    <div class="field">
+      <label class="field-label">Repeat</label>
+      <div class="pill-group" id="blockRepeatPills">
+        <button class="pill active" onclick="setBlockRepeat(this,'thisday')">This day only</button>
+        <button class="pill" onclick="setBlockRepeat(this,'daily')">Every day</button>
+        <button class="pill" onclick="setBlockRepeat(this,'select')">Select days</button>
+      </div>
+    </div>
+    <div id="blockDaysPicker" style="display:none;margin-bottom:16px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="blockDaysRow"></div>
+    </div>
+    <button class="submit-btn" onclick="saveBlock()">Block Time ✓</button>
+  </div>
+</div>
+
 <!-- SHARE REQUEST MODAL -->
 <div class="overlay" id="shReqOvl" onclick="if(event.target===this)closeShReq()">
   <div class="modal" style="max-width:420px">
@@ -1938,10 +1970,10 @@ function isSlotBlocked(dstr,timeStr){
   // Check blocks (one-time and recurring)
   return BLOCKS.some(b=>{
     const bM=t2m(b.time),bE=bM+dm(b.dur);
-    if(b.recur==='daily'||(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5)){
-      return tM<bE&&tM+30>bM;
-    }
-    if(b.date===dstr) return tM<bE&&tM+30>bM;
+    if(b.recur==='daily') return tM<bE&&tM+30>bM;
+    if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM<bE&&tM+30>bM;
+    if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return tM<bE&&tM+30>bM;
+    if(b.date===dstr&&(b.recur==='once'||!b.recur)) return tM<bE&&tM+30>bM;
     return false;
   });
 }
@@ -1966,6 +1998,7 @@ function unblockSlot(dstr,timeStr){
       const bM=t2m(b.time),tM=t2m(timeStr);
       if(b.recur==='daily') return tM>=bM&&tM<bM+dm(b.dur);
       if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM>=bM&&tM<bM+dm(b.dur);
+      if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return tM>=bM&&tM<bM+dm(b.dur);
       return false;
     });
     if(idx>=0&&!confirm(`This is a recurring block (${BLOCKS[idx].time}, ${BLOCKS[idx].recur}). Remove the entire recurring block?`)) return;
@@ -1976,16 +2009,75 @@ function unblockSlot(dstr,timeStr){
     toast('Block removed');
   }
 }
+let blockRepeatMode='thisday';
+let blockSelectedDays=[];
 function blockRecurring(){
-  const time=prompt('Block time (e.g. 12:00):','12:00');
-  if(!time) return;
-  const dur=prompt('Duration (e.g. 1h, 30m):','1h');
-  if(!dur) return;
-  const recur=prompt('Recurrence (weekdays or daily):','weekdays');
-  if(!recur) return;
-  BLOCKS.push({date:'',time,dur,recur});
+  openBlockModal();
+}
+function openBlockModal(){
+  blockRepeatMode='thisday';
+  blockSelectedDays=[];
+  document.getElementById('blockFrom').value='12:00';
+  document.getElementById('blockTo').value='13:00';
+  document.querySelectorAll('#blockRepeatPills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
+  document.getElementById('blockDaysPicker').style.display='none';
+  renderBlockDaysPicker();
+  updateBlockDuration();
+  document.getElementById('blockOvl').classList.add('open');
+}
+function closeBlockModal(){document.getElementById('blockOvl').classList.remove('open');}
+function updateBlockDuration(){
+  const from=document.getElementById('blockFrom').value;
+  const to=document.getElementById('blockTo').value;
+  if(!from||!to){document.getElementById('blockDurLabel').textContent='';return;}
+  const fM=t2m(from),tM=t2m(to);
+  const diff=tM-fM;
+  if(diff<=0){document.getElementById('blockDurLabel').textContent='End must be after start';return;}
+  const h=Math.floor(diff/60),m=diff%60;
+  let lbl='';
+  if(h>0) lbl+=h+' hour'+(h>1?'s':'');
+  if(m>0) lbl+=(h>0?' ':'')+m+' min';
+  document.getElementById('blockDurLabel').textContent=lbl;
+}
+function setBlockRepeat(btn,mode){
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  blockRepeatMode=mode;
+  document.getElementById('blockDaysPicker').style.display=mode==='select'?'block':'none';
+}
+function renderBlockDaysPicker(){
+  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayNums=[1,2,3,4,5,6,0]; // JS day numbers
+  document.getElementById('blockDaysRow').innerHTML=dayNames.map((n,i)=>{
+    const sel=blockSelectedDays.includes(dayNums[i]);
+    return `<button onclick="toggleBlockDay(${dayNums[i]},this)" style="width:40px;height:40px;border-radius:50%;border:1.5px solid ${sel?'var(--p)':'var(--border)'};background:${sel?'var(--p-lt)':'var(--white)'};color:${sel?'var(--p)':'var(--soft)'};font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">${n}</button>`;
+  }).join('');
+}
+function toggleBlockDay(day,btn){
+  const idx=blockSelectedDays.indexOf(day);
+  if(idx>=0) blockSelectedDays.splice(idx,1); else blockSelectedDays.push(day);
+  renderBlockDaysPicker();
+}
+function saveBlock(){
+  const from=document.getElementById('blockFrom').value;
+  const to=document.getElementById('blockTo').value;
+  if(!from||!to){toast('Set start and end times');return;}
+  const fM=t2m(from),tM=t2m(to);
+  if(tM<=fM){toast('End must be after start');return;}
+  const durMins=tM-fM;
+  const dur=durMins+'m';
+
+  if(blockRepeatMode==='thisday'){
+    BLOCKS.push({date:ds(sel),time:from,dur,recur:'once'});
+  } else if(blockRepeatMode==='daily'){
+    BLOCKS.push({date:'',time:from,dur,recur:'daily'});
+  } else if(blockRepeatMode==='select'){
+    if(blockSelectedDays.length===0){toast('Select at least one day');return;}
+    BLOCKS.push({date:'',time:from,dur,recur:'days',days:blockSelectedDays});
+  }
   saveCache();renderSchedule();syncAvailability();
-  toast(`Blocked ${time} ${recur}`);
+  closeBlockModal();
+  toast('Time blocked');
 }
 function unblock(idx){
   BLOCKS.splice(idx,1);
@@ -2478,11 +2570,12 @@ function renderMobileScheduleHTML(){
   for(let h=CAL_S;h<CAL_E;h++){
     const top=(h-CAL_S)*ROW_H;
     const lbl=fmtHour(h);
-    html+=`<div style="position:absolute;left:0;right:0;top:${top}px;height:${ROW_H}px;border-top:1px solid #EBEBEB">
+    html+=`<div style="position:absolute;left:0;right:0;top:${top}px;height:${ROW_H}px">
       <div class="mc-hour-lbl">${lbl}</div>
+      <div style="position:absolute;left:48px;right:0;top:0;border-top:1px solid #EBEBEB;height:0"></div>
     </div>`;
   }
-  html+=`<div style="position:absolute;top:${totalH}px;left:0;right:0;border-top:1px solid #EBEBEB"></div>`;
+  html+=`<div style="position:absolute;top:${totalH}px;left:48px;right:0;border-top:1px solid #EBEBEB"></div>`;
 
   // Session blocks — slim bars
   daySess.forEach(s=>{

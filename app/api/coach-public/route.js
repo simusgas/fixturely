@@ -83,10 +83,10 @@ export async function GET(request) {
       const [bh, bm] = (b.time || '00:00').split(':').map(Number)
       const bStart = bh * 60 + bm
       const bEnd = bStart + parseDur(b.dur || '30m')
-      if (b.recur === 'daily' || (b.recur === 'weekdays' && dow >= 1 && dow <= 5)) {
-        return tM < bEnd && tM + 30 > bStart
-      }
-      if (b.date === dateStr) return tM < bEnd && tM + 30 > bStart
+      if (b.recur === 'daily') return tM < bEnd && tM + 30 > bStart
+      if (b.recur === 'weekdays' && dow >= 1 && dow <= 5) return tM < bEnd && tM + 30 > bStart
+      if (b.recur === 'days' && Array.isArray(b.days) && b.days.includes(dow)) return tM < bEnd && tM + 30 > bStart
+      if (b.date === dateStr && (b.recur === 'once' || !b.recur)) return tM < bEnd && tM + 30 > bStart
       return false
     })
   }
