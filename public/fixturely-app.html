@@ -1707,6 +1707,21 @@ async function dbDelete(table,id){
 // ══ HELPERS ══
 function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function getSessionsForDate(dstr){
+  const target=new Date(dstr+'T00:00:00');
+  return SESSIONS.filter(s=>{
+    if(s.date===dstr) return true;
+    if(s.recur==='Weekly'||s.recur==='Fortnightly'){
+      const orig=new Date(s.date+'T00:00:00');
+      if(target<=orig) return false; // only future occurrences
+      if(target.getDay()!==orig.getDay()) return false; // same day of week
+      const diffDays=Math.round((target-orig)/(86400000));
+      if(s.recur==='Weekly') return diffDays%7===0;
+      if(s.recur==='Fortnightly') return diffDays%14===0;
+    }
+    return false;
+  });
+}
 function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2);}
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1814,7 +1829,7 @@ function renderToday(){
   const dstr=ds(today);
   document.getElementById('todayTitle').textContent=DF[today.getDay()];
   document.getElementById('todaySub').textContent=`${MN[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
-  const todaySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+  const todaySess=getSessionsForDate(dstr).sort((a,b)=>a.time.localeCompare(b.time));
   const cnt=todaySess.length;
   const totalMins=todaySess.reduce((a,s)=>a+dm(s.dur),0);
   const totalHrs=Math.round(totalMins/60*10)/10;
@@ -1826,7 +1841,7 @@ function renderToday(){
   let weekLessons=0,weekStudentsSet=new Set(),weekMins=0;
   for(let i=0;i<7;i++){
     const wd=ds(add(weekS,i));
-    const wSess=SESSIONS.filter(s=>s.date===wd);
+    const wSess=getSessionsForDate(wd);
     weekLessons+=wSess.length;
     wSess.forEach(s=>{weekStudentsSet.add(s.student);weekMins+=dm(s.dur);});
   }
@@ -1858,7 +1873,7 @@ function renderToday(){
   const upcoming=todaySess.filter(s=>t2m(s.time)>nowM);
   const nextLesson=upcoming.length>0?upcoming[0]:null;
   const tmrwStr=ds(add(today,1));
-  const tmrwSess=SESSIONS.filter(s=>s.date===tmrwStr).sort((a,b)=>a.time.localeCompare(b.time));
+  const tmrwSess=getSessionsForDate(tmrwStr).sort((a,b)=>a.time.localeCompare(b.time));
 
   // ── Pending requests ──
   html+=renderPendingRequestsHTML();
@@ -2106,7 +2121,7 @@ function renderDaysOff(){
 
 function getAvailableSlots(dstr){
   if(isDayOff(dstr)) return [];
-  const booked=SESSIONS.filter(s=>s.date===dstr);
+  const booked=getSessionsForDate(dstr);
   const slots=[];
   const isToday=dstr===ds(today);
   const nowM=isToday?(new Date().getHours()*60+new Date().getMinutes()):0;
@@ -2471,7 +2486,7 @@ function buildDstrip(container){
   for(let i=0;i<7;i++){
     const d=add(ws,i),dstr=ds(d);
     const isSel=dstr===ds(sel),isT=dstr===ds(today),hol=getHol(d);
-    const dc=SESSIONS.filter(s=>s.date===dstr);
+    const dc=getSessionsForDate(dstr);
     const cell=document.createElement('div');
     cell.className='dcell'+(isSel?' sel':'')+(isT&&!isSel?' tod':'')+(hol&&!isSel?' hol':'');
     cell.onclick=()=>selectDay(d);
@@ -2525,7 +2540,7 @@ function renderMobileScheduleHTML(){
   const days=[];
   for(let i=0;i<7;i++) days.push(add(ws,i));
   const todayStr=ds(today),selStr=ds(sel),dstr=ds(sel);
-  const daySess=SESSIONS.filter(s=>s.date===dstr).sort((a,b)=>a.time.localeCompare(b.time));
+  const daySess=getSessionsForDate(dstr).sort((a,b)=>a.time.localeCompare(b.time));
 
   // Week label
   const weekEnd=add(ws,6);
@@ -2734,7 +2749,7 @@ function renderWeekViewHTML(weekStart){
 
   const colsHTML=days.map(d=>{
     const dstr=ds(d);
-    const daySess=SESSIONS.filter(s=>s.date===dstr);
+    const daySess=getSessionsForDate(dstr);
     const isToday=dstr===todayStr;
 
     const linesHTML=slots.map((m,i)=>
