@@ -85,20 +85,26 @@
 
   .t-body{padding:16px;}
   .hk-board{display:flex;gap:12px;min-height:0;height:calc(100vh - 260px);height:calc(100dvh - 260px);}
-  .hk-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
-  .hk-col-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+  .hk-col{min-width:0;display:flex;flex-direction:column;gap:8px;}
+  .hk-col--narrow{flex:0 0 220px;}
+  .hk-col--wide{flex:1;min-width:0;}
+  .hk-col-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch;}
   .hk-col-hd{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.8px;color:var(--soft);padding:0 2px 6px;border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--off);z-index:1;}
-  .hk-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.15s;}
+  .hk-card{background:var(--card);border-radius:10px;padding:10px 12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.15s;}
   .hk-card:hover{transform:translateY(-1px);}
-  .hk-card-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:3px;}
-  .hk-card-meta{font-size:12px;font-weight:600;color:var(--soft);}
-  .hk-card-cd{font-size:11px;font-weight:800;color:var(--t-dk);margin-top:6px;}
-  .hk-card.hk-hero{border-left:4px solid var(--t-a);padding:16px;}
-  .hk-card.hk-hero .hk-card-name{font-size:18px;}
-  .hk-card.hk-hero .hk-card-cd{font-size:13px;}
+  .hk-card-name{font-size:14px;font-weight:900;color:var(--text);margin-bottom:2px;}
+  .hk-card-meta{font-size:11px;font-weight:600;color:var(--soft);}
+  .hk-card-cd{font-size:11px;font-weight:800;color:var(--t-dk);margin-top:4px;}
+  .hk-card.hk-hero{border-left:4px solid var(--t-a);padding:12px;}
+  .hk-card.hk-hero .hk-card-name{font-size:16px;}
+  .hk-card.hk-hero .hk-card-cd{font-size:12px;}
   .hk-card.hk-tmrw{border-left:4px solid var(--s-a);}
   .hk-card.hk-tmrw .hk-card-cd{color:var(--s-dk);}
   .hk-card.hk-paid{border-left:3px solid var(--ok);}
+  .hk-view-more{background:none;border:none;font-size:12px;font-weight:700;color:var(--p);cursor:pointer;padding:4px 2px;font-family:'Inter',sans-serif;text-align:left;}
+  .hk-view-more:hover{text-decoration:underline;}
+  .hk-hidden-lessons{display:none;}
+  .hk-hidden-lessons.expanded{display:flex;flex-direction:column;gap:6px;}
   .hk-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .hk-stat{background:var(--card);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
   .hk-stat-n{font-size:20px;font-weight:900;color:var(--text);}
@@ -107,6 +113,24 @@
   .hk-action:hover{background:var(--off);}
   .hk-empty{text-align:center;padding:20px 10px;color:var(--muted);font-size:13px;font-weight:600;}
   .t-date-label{font-size:13px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+
+  /* This Week page */
+  .tw-wrap{max-width:600px;margin:0 auto;padding:16px;}
+  .tw-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .tw-back{background:none;border:none;font-size:13px;font-weight:700;color:var(--p);cursor:pointer;padding:4px 0;font-family:'Inter',sans-serif;}
+  .tw-back:hover{text-decoration:underline;}
+  .tw-nav{display:flex;align-items:center;gap:10px;}
+  .tw-nav-btn{background:none;border:1.5px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--soft);font-family:'Inter',sans-serif;}
+  .tw-nav-btn:hover{background:var(--off);}
+  .tw-range{font-size:14px;font-weight:800;color:var(--text);}
+  .tw-total{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:16px;}
+  .tw-day{margin-bottom:14px;}
+  .tw-day-hd{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.6px;color:var(--soft);padding-bottom:6px;border-bottom:1.5px solid var(--border);margin-bottom:6px;}
+  .tw-lesson{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--card);border-radius:8px;cursor:pointer;margin-bottom:4px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+  .tw-lesson:hover{background:var(--off);}
+  .tw-lesson-name{font-size:13px;font-weight:800;color:var(--text);}
+  .tw-lesson-time{font-size:12px;font-weight:600;color:var(--soft);}
+  .tw-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;font-weight:600;}
 
   /* Today dashboard */
   .td-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
@@ -529,7 +553,7 @@
   .dialog-icon{font-size:36px;margin-bottom:10px;}
   .dialog-title{font-size:17px;font-weight:900;margin-bottom:7px;}
   .dialog-sub{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:22px;line-height:1.5;}
-  .dialog-btns{display:flex;gap:10px;}
+  .dialog-btns{display:flex;gap:8px;flex-wrap:wrap;}
   .dbtn-no{flex:1;padding:12px;border-radius:100px;background:var(--off);border:1.5px solid var(--border);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
   .dbtn-yes{flex:1;padding:12px;border-radius:100px;background:#C07878;color:var(--white);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
   .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(28,20,7,0.9);color:var(--white);padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;z-index:500;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
@@ -611,6 +635,7 @@
     .mob-pf-btn{top:calc(env(safe-area-inset-top,12px) + 4px);}
     /* ── Compact headers ── */
     .t-hdr,.s-hdr,.u-hdr,.c-hdr,.sh-hdr{padding:calc(env(safe-area-inset-top,20px) + 10px) 16px 10px;border-radius:0;}
+    .tw-body{padding:16px;overflow-y:auto;}
     .t-title,.s-title,.u-title,.c-title,.sh-title{font-size:20px;}
     .t-sub,.s-sub,.c-sub{display:none;}
     .hdr-stats{gap:6px;}
@@ -645,6 +670,7 @@
     /* ── Home kanban — stack vertically on small screens ── */
     .hk-board{flex-direction:column;height:auto;}
     .hk-col{min-height:0;}
+    .hk-col--narrow{flex:none;width:100%;}
     .hk-col-scroll{max-height:none;overflow:visible;}
     .hk-col-hd{position:static;}
 
@@ -771,6 +797,9 @@
     /* ── TODAY ── */
     .t-body { flex:1; overflow:hidden; padding:20px 24px; }
     .hk-board { height:100%; }
+
+    /* ── THIS WEEK ── */
+    .tw-body { flex:1; overflow-y:auto; padding:20px 24px; }
 
     /* ── SCHEDULE ── */
     .s-body { flex:1; overflow-y:auto; }
@@ -953,6 +982,16 @@
       </div>
     </div>
     <div class="t-body" id="tBody"></div>
+  </div>
+
+  <!-- ══ THIS WEEK ══ -->
+  <div class="screen" id="screen-thisweek">
+    <div class="t-hdr">
+      <div class="t-hdr-top">
+        <div><div class="t-title">This Week</div><div class="t-sub">Weekly summary</div></div>
+      </div>
+    </div>
+    <div class="tw-body" id="twBody"></div>
   </div>
 
   <!-- ══ SCHEDULE ══ -->
@@ -1245,9 +1284,9 @@
 <div class="dialog-ovl" id="cancelOvl">
   <div class="dialog">
     <div class="dialog-icon">🗓</div>
-    <div class="dialog-title">Cancel this lesson?</div>
+    <div class="dialog-title" id="cancelTitle">Cancel this lesson?</div>
     <div class="dialog-sub" id="cancelSub">They'll be notified automatically.</div>
-    <div class="dialog-btns">
+    <div class="dialog-btns" id="cancelBtns">
       <button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
       <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>
     </div>
@@ -1710,11 +1749,13 @@ function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function getSessionsForDate(dstr){
   const target=new Date(dstr+'T00:00:00');
   return SESSIONS.filter(s=>{
+    if(s.cancelledDates&&s.cancelledDates.includes(dstr)) return false;
+    if(s.recurEnd&&dstr>s.recurEnd) return false;
     if(s.date===dstr) return true;
     if(s.recur==='Weekly'||s.recur==='Fortnightly'){
       const orig=new Date(s.date+'T00:00:00');
-      if(target<=orig) return false; // only future occurrences
-      if(target.getDay()!==orig.getDay()) return false; // same day of week
+      if(target<=orig) return false;
+      if(target.getDay()!==orig.getDay()) return false;
       const diffDays=Math.round((target-orig)/(86400000));
       if(s.recur==='Weekly') return diffDays%7===0;
       if(s.recur==='Fortnightly') return diffDays%14===0;
@@ -1746,7 +1787,7 @@ function getHol(d){const s=ds(d);return HOLIDAYS.find(h=>s>=h.start&&s<=h.end)||
 function wksLeft(e){return Math.max(0,Math.ceil((new Date(e)-today)/(7*24*3600*1000)));}
 
 // ══ TABS ══
-const VALID_TABS=['today','schedule','students','courts','share','profile'];
+const VALID_TABS=['today','thisweek','schedule','students','courts','share','profile'];
 function switchTab(tab,btn,skipHash){
   if(!VALID_TABS.includes(tab)) tab='today';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1757,6 +1798,7 @@ function switchTab(tab,btn,skipHash){
   if(!skipHash && location.hash!=='#'+tab) history.replaceState(null,'','#'+tab);
   if(tab==='students') renderStudents();
   if(tab==='today')    renderToday();
+  if(tab==='thisweek') renderThisWeek();
   if(tab==='courts') { updateCourtsHoursCtrl(); if(!courtsLoaded){ courtsLoaded=true; loadCourts(); } }
   if(tab==='share')    renderSharePage();
   if(tab==='profile')  renderProfile();
@@ -1770,10 +1812,12 @@ function updateTopbar(tab){
   const titleEl=document.getElementById('topnavTitle');
   const actsEl=document.getElementById('topnavActs');
   if(!titleEl||!actsEl) return;
-  const titles={today:'Home',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule',profile:'Profile'};
+  const titles={today:'Home',thisweek:'This Week',schedule:'My Schedule',students:'Students',courts:'Courts',share:'Share Schedule',profile:'Profile'};
   titleEl.textContent=titles[tab]||tab;
   if(tab==='today'){
     actsEl.innerHTML=``;
+  } else if(tab==='thisweek'){
+    actsEl.innerHTML=`<button class="tb-btn" onclick="switchTab('today')">← Home</button>`;
   } else if(tab==='schedule'){
     actsEl.innerHTML=`<button class="tb-btn tb-btn-primary" onclick="openBookModal()">+ Add Lesson</button><button class="tb-btn" onclick="openCalConnect()">📅 Connect</button><button class="tb-btn" onclick="goToday()">Today</button>`;
   } else if(tab==='students'){
@@ -1799,6 +1843,17 @@ function setCoachRate(){
     localStorage.setItem('fixturely_hourly_rate',coachRate);
     renderToday();
     toast('Rate set to $'+coachRate+'/hr');
+  }
+}
+function toggleHkSection(id,btn){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const expanded=el.classList.toggle('expanded');
+  if(expanded){
+    btn.textContent='Show less';
+  } else {
+    const count=el.children.length;
+    btn.textContent='View '+count+' more';
   }
 }
 let homeCountdownInterval=null;
@@ -1882,53 +1937,78 @@ function renderToday(){
   html+=`<div class="hk-board">`;
 
   // ── Column 1: Today ──
-  html+=`<div class="hk-col"><div class="hk-col-hd">Today · ${cnt}</div><div class="hk-col-scroll">`;
-  // Hero card for next upcoming
+  html+=`<div class="hk-col hk-col--narrow"><div class="hk-col-hd">Today · ${cnt}</div><div class="hk-col-scroll">`;
+  // Hero card for next upcoming (or tomorrow's first if none left today)
   if(nextLesson){
     const minsUntil=t2m(nextLesson.time)-nowM;
-    html+=`<div class="hk-card hk-hero" onclick="openSessDetail('${nextLesson.id}')">
+    html+=`<div class="hk-card hk-hero" onclick="openSessDetail('${nextLesson.id}','${dstr}')">
       <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--t-dk);margin-bottom:4px">Next Up</div>
       <div class="hk-card-name">${nextLesson.student}</div>
       <div class="hk-card-meta">${fmt(nextLesson.time)} – ${et(nextLesson.time,nextLesson.dur)}${nextLesson.court?' · '+nextLesson.court:''}</div>
       <div class="hk-card-cd" id="hc-next" data-mins="${t2m(nextLesson.time)}">${fmtCountdown(minsUntil)}</div>
     </div>`;
+  } else if(tmrwSess.length>0){
+    const firstTmrw=tmrwSess[0];
+    const minsToMidnight=(24*60)-nowM;
+    const tmrwMins=t2m(firstTmrw.time);
+    html+=`<div class="hk-card hk-hero" onclick="openSessDetail('${firstTmrw.id}','${tmrwStr}')">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--t-dk);margin-bottom:4px">Next: Tomorrow</div>
+      <div class="hk-card-name">${firstTmrw.student}</div>
+      <div class="hk-card-meta">${fmt(firstTmrw.time)} – ${et(firstTmrw.time,firstTmrw.dur)}${firstTmrw.court?' · '+firstTmrw.court:''}</div>
+      <div class="hk-card-cd" id="hc-next" data-mins="${tmrwMins}">${fmtCountdown(minsToMidnight+tmrwMins)}</div>
+    </div>`;
   }
-  // All today's lessons
-  if(cnt===0){
-    html+=`<div class="hk-empty">🎾 No lessons today</div>`;
+  // Remaining today's lessons (collapsed)
+  if(cnt===0 && tmrwSess.length===0){
+    html+=`<div class="hk-empty">No lessons today</div>`;
   } else {
-    todaySess.forEach(s=>{
-      if(s===nextLesson) return; // already shown as hero
-      const isPaid=s.payStatus==='paid';
-      const past=t2m(s.time)+dm(s.dur)<=nowM;
-      html+=`<div class="hk-card${isPaid?' hk-paid':''}" onclick="openSessDetail('${s.id}')"${past?' style="opacity:0.6"':''}>
-        <div class="hk-card-name">${s.student}</div>
-        <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
-      </div>`;
-    });
+    const restToday=todaySess.filter(s=>s!==nextLesson);
+    if(restToday.length>0){
+      html+=`<div class="hk-hidden-lessons" id="hk-today-rest">`;
+      restToday.forEach(s=>{
+        const isPaid=s.payStatus==='paid';
+        const past=t2m(s.time)+dm(s.dur)<=nowM;
+        html+=`<div class="hk-card${isPaid?' hk-paid':''}" onclick="openSessDetail('${s.id}','${dstr}')"${past?' style="opacity:0.6"':''}>
+          <div class="hk-card-name">${s.student}</div>
+          <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+      html+=`<button class="hk-view-more" onclick="toggleHkSection('hk-today-rest',this)">View ${restToday.length} more</button>`;
+    }
   }
   html+=`</div></div>`;
 
   // ── Column 2: Tomorrow ──
-  html+=`<div class="hk-col"><div class="hk-col-hd">Tomorrow · ${tmrwSess.length}</div><div class="hk-col-scroll">`;
+  html+=`<div class="hk-col hk-col--narrow"><div class="hk-col-hd">Tomorrow · ${tmrwSess.length}</div><div class="hk-col-scroll">`;
   if(tmrwSess.length===0){
     html+=`<div class="hk-empty">No lessons tomorrow</div>`;
   } else {
     const minsToMidnight=(24*60)-nowM;
-    tmrwSess.forEach((s,i)=>{
-      const tmrwMins=t2m(s.time);
-      const cdId=i===0?'hc-tmrw':'';
-      html+=`<div class="hk-card hk-tmrw" onclick="openSessDetail('${s.id}')">
-        <div class="hk-card-name">${s.student}</div>
-        <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
-        ${i===0?`<div class="hk-card-cd" id="hc-tmrw" data-mins="${tmrwMins}">${fmtCountdown(minsToMidnight+tmrwMins)}</div>`:''}
-      </div>`;
-    });
+    const firstTmrw=tmrwSess[0];
+    const tmrwMins=t2m(firstTmrw.time);
+    html+=`<div class="hk-card hk-tmrw" onclick="openSessDetail('${firstTmrw.id}','${tmrwStr}')">
+      <div class="hk-card-name">${firstTmrw.student}</div>
+      <div class="hk-card-meta">${fmt(firstTmrw.time)}${firstTmrw.court?' · '+firstTmrw.court:''} · ${firstTmrw.dur}</div>
+      <div class="hk-card-cd" id="hc-tmrw" data-mins="${tmrwMins}">${fmtCountdown(minsToMidnight+tmrwMins)}</div>
+    </div>`;
+    if(tmrwSess.length>1){
+      const restTmrw=tmrwSess.slice(1);
+      html+=`<div class="hk-hidden-lessons" id="hk-tmrw-rest">`;
+      restTmrw.forEach(s=>{
+        html+=`<div class="hk-card hk-tmrw" onclick="openSessDetail('${s.id}','${tmrwStr}')">
+          <div class="hk-card-name">${s.student}</div>
+          <div class="hk-card-meta">${fmt(s.time)}${s.court?' · '+s.court:''} · ${s.dur}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+      html+=`<button class="hk-view-more" onclick="toggleHkSection('hk-tmrw-rest',this)">View ${restTmrw.length} more</button>`;
+    }
   }
   html+=`</div></div>`;
 
   // ── Column 3: Stats & Actions ──
-  html+=`<div class="hk-col"><div class="hk-col-hd">Dashboard</div><div class="hk-col-scroll">`;
+  html+=`<div class="hk-col hk-col--wide"><div class="hk-col-hd">Dashboard</div><div class="hk-col-scroll">`;
   // Stats
   html+=`<div class="hk-stat-grid">
     <div class="hk-stat"><div class="hk-stat-n">${cnt}</div><div class="hk-stat-l">Today</div></div>
@@ -1937,6 +2017,7 @@ function renderToday(){
     <div class="hk-stat"${!hasRate?' style="cursor:pointer" onclick="setCoachRate()"':''}><div class="hk-stat-n">${hasRate?'$'+earnings:'—'}</div><div class="hk-stat-l">${hasRate?'Earnings':'Set rate'}</div></div>
   </div>`;
   // Actions
+  html+=`<button class="hk-action" onclick="switchTab('thisweek')">This Week →</button>`;
   html+=`<button class="hk-action" onclick="openBookModal()">+ Add Lesson</button>`;
   html+=`<button class="hk-action" onclick="switchTab('students',document.querySelector('[data-t=students]'));setTimeout(()=>openAddStudentModal(),300)">+ Add Student</button>`;
   html+=`<button class="hk-action" onclick="switchTab('schedule',document.querySelector('[data-t=schedule]'))">View Schedule</button>`;
@@ -1946,6 +2027,60 @@ function renderToday(){
 
   document.getElementById('tBody').innerHTML=html;
   homeCountdownInterval=setInterval(updateHomeCountdowns,60000);
+}
+
+// ══ THIS WEEK ══
+let twWeekOffset=0;
+function renderThisWeek(){
+  const ref=add(today,twWeekOffset*7);
+  const mon=wkStart(ref);
+  const isCurrentWeek=ds(wkStart(today))===ds(mon);
+  const maxDay=isCurrentWeek?today:add(mon,6);
+  // Week range label
+  const rangeStart=`${mon.getDate()} ${MS[mon.getMonth()]}`;
+  const rangeEndD=add(mon,6);
+  const rangeEnd=`${rangeEndD.getDate()} ${MS[rangeEndD.getMonth()]}`;
+  // Gather lessons Mon–maxDay
+  const days=[];
+  let totalLessons=0;
+  for(let i=0;i<7;i++){
+    const d=add(mon,i);
+    if(d>maxDay) break;
+    const sess=getSessionsForDate(ds(d)).sort((a,b)=>a.time.localeCompare(b.time));
+    if(sess.length>0){
+      days.push({date:d,dayName:DF[d.getDay()],sessions:sess});
+      totalLessons+=sess.length;
+    }
+  }
+  let html=`<div class="tw-wrap">`;
+  // Top nav
+  html+=`<div class="tw-top">
+    <button class="tw-back" onclick="twWeekOffset=0;switchTab('today')">← Home</button>
+    <div class="tw-nav">
+      <button class="tw-nav-btn" onclick="twWeekOffset--;renderThisWeek()">‹</button>
+      <span class="tw-range">${rangeStart} – ${rangeEnd}</span>
+      <button class="tw-nav-btn" onclick="twWeekOffset++;renderThisWeek()"${isCurrentWeek?' disabled style="opacity:0.3;cursor:default"':''}>›</button>
+    </div>
+  </div>`;
+  html+=`<div class="tw-total">${totalLessons} lesson${totalLessons!==1?'s':''}</div>`;
+  if(days.length===0){
+    html+=`<div class="tw-empty">No lessons this week</div>`;
+  } else {
+    days.forEach(day=>{
+      html+=`<div class="tw-day">`;
+      html+=`<div class="tw-day-hd">${day.dayName} · ${day.date.getDate()} ${MS[day.date.getMonth()]}</div>`;
+      const dayStr=ds(day.date);
+      day.sessions.forEach(s=>{
+        html+=`<div class="tw-lesson" onclick="openSessDetail('${s.id}','${dayStr}')">
+          <span class="tw-lesson-name">${s.student}</span>
+          <span class="tw-lesson-time">${fmt(s.time)} · ${s.dur}</span>
+        </div>`;
+      });
+      html+=`</div>`;
+    });
+  }
+  html+=`</div>`;
+  document.getElementById('twBody').innerHTML=html;
 }
 
 function setPayStatus(id, status){
@@ -2601,7 +2736,7 @@ function renderMobileScheduleHTML(){
     if(top+height<=0||top>=totalH) return;
     const isPaid=s.payStatus==='paid';
     const showMeta=height>28;
-    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openSessDetail('${s.id}')">
+    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openSessDetail('${s.id}','${dstr}')">
       <div class="mc-event-name">${s.student}</div>
       ${showMeta?`<div class="mc-event-meta">${fmt(s.time)}${s.court?' · '+s.court:''}</div>`:''}
     </div>`;
@@ -2710,7 +2845,7 @@ function renderDayViewHTML(date, daySess, hol){
     if(top+height<=0||top>=totalH) return '';
     const isPaid=s.payStatus==='paid';
     const showInfo=height>34;
-    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}</div>`;
+    return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}</div>`;
   }).join('');
 
   const nowHTML=showNow?`<div class="sv-now-line" style="top:${nowTop}px"><div class="sv-now-dot"></div></div>`:'';
@@ -2776,7 +2911,7 @@ function renderWeekViewHTML(weekStart){
       if(top+height<=0||top>=totalH) return '';
       const isPaid=s.payStatus==='paid';
       const showTime=height>34;
-      return `<div class="sg-sess${isPaid?' sg-paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}')"><div class="sg-sess-name">${s.student}</div>${showTime?`<div class="sg-sess-time">${fmt(s.time)}–${et(s.time,s.dur)}</div>`:''}`+(showTime&&s.court?`<div class="sg-sess-court">${s.court}</div>`:'')+`</div>`;
+      return `<div class="sg-sess${isPaid?' sg-paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sg-sess-name">${s.student}</div>${showTime?`<div class="sg-sess-time">${fmt(s.time)}–${et(s.time,s.dur)}</div>`:''}`+(showTime&&s.court?`<div class="sg-sess-court">${s.court}</div>`:'')+`</div>`;
     }).join('');
 
     const nowLine=isToday&&showNow?`<div class="sg-now-line" style="top:${nowTop}px"><div class="sg-now-dot"></div></div>`:'';
@@ -2810,14 +2945,14 @@ function bookAtTime(dstr,h,m){
   },150);
 }
 
-function openSessDetail(id){ openEditLsnModal(id); }
+function openSessDetail(id,dateCtx){ openEditLsnModal(id,dateCtx); }
 
 // ══ EDIT LESSON ══
-let editLsnTarget=null,editLsnDur='1 hour',editLsnRecur='One-time';
-function openEditLsnModal(id){
+let editLsnTarget=null,editLsnDur='1 hour',editLsnRecur='One-time',editLsnDate=null;
+function openEditLsnModal(id,dateCtx){
   const s=SESSIONS.find(s=>s.id==id);
   if(!s) return;
-  editLsnTarget=id; editLsnDur=s.dur; editLsnRecur=s.recur;
+  editLsnTarget=id; editLsnDur=s.dur; editLsnRecur=s.recur; editLsnDate=dateCtx||s.date;
   document.getElementById('editLsnStu').textContent=`✏️  ${s.student}`;
   document.getElementById('editLsnTime').value=s.time;
   updateEditAmPm();
@@ -2856,13 +2991,31 @@ function saveEditLesson(){
   if(s.id) dbUpdate('sessions',s.id,{time:s.time,court:s.court,dur:s.dur,recur:s.recur});
   saveCache();
 }
+let cancelDate=null;
 function cancelFromEdit(){
   const id=editLsnTarget;
+  const dateCtx=editLsnDate;
   closeEditLsnModal();
   if(!id) return;
   cancelTarget=id;
+  cancelDate=dateCtx;
   const s=SESSIONS.find(s=>s.id===id);
-  document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed.`;
+  const isRecurring=s.recur==='Weekly'||s.recur==='Fortnightly';
+  const titleEl=document.getElementById('cancelTitle');
+  const subEl=document.getElementById('cancelSub');
+  const btnsEl=document.getElementById('cancelBtns');
+  if(isRecurring){
+    titleEl.textContent='Cancel recurring lesson?';
+    subEl.textContent=`${s.student}'s ${s.recur.toLowerCase()} lesson at ${fmt(s.time)}.`;
+    btnsEl.innerHTML=`<button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+      <button class="dbtn-yes" style="background:var(--p);font-size:13px" onclick="cancelSingleOccurrence()">This lesson only</button>
+      <button class="dbtn-yes" style="font-size:13px" onclick="cancelAllFuture()">All future</button>`;
+  } else {
+    titleEl.textContent='Cancel this lesson?';
+    subEl.textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed.`;
+    btnsEl.innerHTML=`<button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+      <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>`;
+  }
   document.getElementById('cancelOvl').classList.add('open');
 }
 
@@ -2985,14 +3138,59 @@ async function bookLesson(){
   saveCache();
 }
 
-function openCancelDialog(e,id){e.stopPropagation();cancelTarget=id;const s=SESSIONS.find(s=>s.id==id);document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed and they'll be notified.`;document.getElementById('cancelOvl').classList.add('open');}
-function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;}
+function openCancelDialog(e,id,dateCtx){
+  e.stopPropagation();cancelTarget=id;cancelDate=dateCtx||null;
+  const s=SESSIONS.find(s=>s.id==id);
+  const isRecurring=s.recur==='Weekly'||s.recur==='Fortnightly';
+  const titleEl=document.getElementById('cancelTitle');
+  const subEl=document.getElementById('cancelSub');
+  const btnsEl=document.getElementById('cancelBtns');
+  if(isRecurring&&cancelDate){
+    titleEl.textContent='Cancel recurring lesson?';
+    subEl.textContent=`${s.student}'s ${s.recur.toLowerCase()} lesson at ${fmt(s.time)}.`;
+    btnsEl.innerHTML=`<button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+      <button class="dbtn-yes" style="background:var(--p);font-size:13px" onclick="cancelSingleOccurrence()">This lesson only</button>
+      <button class="dbtn-yes" style="font-size:13px" onclick="cancelAllFuture()">All future</button>`;
+  } else {
+    titleEl.textContent='Cancel this lesson?';
+    subEl.textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed.`;
+    btnsEl.innerHTML=`<button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+      <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>`;
+  }
+  document.getElementById('cancelOvl').classList.add('open');
+}
+function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;cancelDate=null;}
 function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);saveCache();}
+function cancelSingleOccurrence(){
+  const s=SESSIONS.find(s=>s.id==cancelTarget);
+  if(!s||!cancelDate) return;
+  if(!s.cancelledDates) s.cancelledDates=[];
+  s.cancelledDates.push(cancelDate);
+  const name=s.student;
+  closeCancelDialog();renderSchedule();renderToday();
+  toast(`Cancelled ${name}'s lesson on ${cancelDate}`);
+  if(s.id) dbUpdate('sessions',s.id,{cancelledDates:s.cancelledDates});
+  saveCache();
+}
+function cancelAllFuture(){
+  const s=SESSIONS.find(s=>s.id==cancelTarget);
+  if(!s||!cancelDate) return;
+  const prevDay=ds(add(new Date(cancelDate+'T00:00:00'),-1));
+  s.recurEnd=prevDay;
+  const name=s.student;
+  closeCancelDialog();renderSchedule();renderToday();
+  toast(`All future lessons for ${name} cancelled`);
+  if(s.id) dbUpdate('sessions',s.id,{recurEnd:s.recurEnd});
+  saveCache();
+}
 function confirmRemove(id){
   const s=SESSIONS.find(s=>s.id==id);
   if(!s) return;
-  cancelTarget=id;
+  cancelTarget=id;cancelDate=null;
+  document.getElementById('cancelTitle').textContent='Cancel this lesson?';
   document.getElementById('cancelSub').textContent=`${s.student}'s lesson at ${fmt(s.time)} will be removed. Are you sure?`;
+  document.getElementById('cancelBtns').innerHTML=`<button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
+    <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>`;
   document.getElementById('cancelOvl').classList.add('open');
 }
 
