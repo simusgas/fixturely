@@ -301,11 +301,14 @@
   .sv-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.7);}
   .sv-free-slot{position:absolute;left:0;right:0;z-index:1;cursor:pointer;transition:background 0.18s;}
   .sv-free-slot:hover{background:rgba(0,0,0,0.04);}
-  .sv-sess-block{position:absolute;left:4px;right:4px;border-radius:8px;padding:5px 8px;overflow:hidden;cursor:pointer;z-index:2;background:var(--s-pl);border-left:3px solid var(--s-a);box-shadow:0 1px 5px rgba(0,0,0,0.07);transition:opacity 0.15s;}
+  .sv-sess-block{position:absolute;left:4px;right:4px;border-radius:10px;padding:3px 7px;overflow:hidden;cursor:pointer;z-index:2;background:var(--s-pl);border-left:2.5px solid var(--s-a);box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:opacity 0.15s;}
   .sv-sess-block.paid{background:var(--ok-lt);border-left-color:var(--ok);}
   .sv-sess-block:hover{opacity:0.85;}
-  .sv-sb-name{font-size:12px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-  .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sv-sb-name{font-size:12px;font-weight:700;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .sv-sb-info{font-size:10px;font-weight:600;color:var(--soft);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sv-sess-block.sv-compact{display:flex;align-items:center;gap:6px;padding:2px 7px;}
+  .sv-sess-block.sv-compact .sv-sb-name{font-size:11px;font-weight:700;}
+  .sv-sess-block.sv-compact .sv-sb-info{font-size:10px;margin-top:0;}
   .sv-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:3;pointer-events:none;}
   .sv-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
   .sv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;}
@@ -335,15 +338,18 @@
   .sg-cols{display:flex;flex:1;}
   .sg-col{position:relative;flex:1;border-right:1px solid var(--border);}
   .sg-col.sg-col-today{background:rgba(79,70,229,0.03);}
-  .sg-sess{position:absolute;left:2px;right:2px;border-radius:10px;overflow:hidden;padding:6px 9px;background:var(--s-pl);border-left:3px solid var(--s-a);display:flex;flex-direction:column;justify-content:flex-start;z-index:2;cursor:pointer;transition:opacity 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+  .sg-sess{position:absolute;left:2px;right:2px;border-radius:8px;overflow:hidden;padding:3px 7px;background:var(--s-pl);border-left:2.5px solid var(--s-a);display:flex;flex-direction:column;justify-content:flex-start;z-index:2;cursor:pointer;transition:opacity 0.15s;box-shadow:0 1px 2px rgba(0,0,0,0.05);}
   .sg-sess.sg-paid{background:var(--ok-lt);border-left-color:var(--ok);}
   .sg-sess.sg-paid .sg-sess-name{color:var(--c-dk);}
   .sg-sess.sg-paid .sg-sess-time{color:var(--soft);opacity:0.8;}
   .sg-sess.sg-paid .sg-sess-court{color:var(--soft);opacity:0.65;}
-  .sg-sess-name{font-size:17px;font-weight:900;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-  .sg-sess-time{font-size:14px;font-weight:800;color:var(--soft);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-  .sg-sess-court{font-size:13px;font-weight:700;color:var(--soft);opacity:0.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sg-sess-name{font-size:13px;font-weight:700;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .sg-sess-time{font-size:11px;font-weight:600;color:var(--soft);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .sg-sess-court{font-size:10px;font-weight:600;color:var(--soft);opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0;}
   .sg-sess:hover{opacity:0.85;}
+  .sg-sess.sg-compact{flex-direction:row;align-items:center;gap:5px;padding:2px 6px;}
+  .sg-sess.sg-compact .sg-sess-name{font-size:11px;}
+  .sg-sess.sg-compact .sg-sess-time{font-size:10px;margin-top:0;}
   .sg-slot-free{position:absolute;left:0;right:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:background 0.18s;}
   .sg-slot-free:hover{background:rgba(0,0,0,0.035);}
   .sg-slot-time{opacity:0;transition:opacity 0.18s;font-size:10px;font-weight:700;color:var(--soft);pointer-events:none;}
@@ -698,12 +704,15 @@
     /* Timeline */
     .mc-timeline{position:relative;min-height:200px;}
     .mc-hour-lbl{position:absolute;left:0;top:-7px;width:44px;text-align:right;font-size:10px;font-weight:400;color:#C0C0C0;padding-right:6px;}
-    .mc-event{position:absolute;left:50px;right:6px;border-radius:4px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#D6DEFF;border-left:3px solid var(--p);}
+    .mc-event{position:absolute;left:50px;right:6px;border-radius:6px;padding:3px 8px;z-index:2;cursor:pointer;overflow:hidden;background:#E8ECFF;border-left:2.5px solid var(--s-b);}
     .mc-event:active{opacity:0.7;}
-    .mc-event-name{font-size:12px;font-weight:600;color:var(--p-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
-    .mc-event-meta{font-size:10px;font-weight:400;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .mc-event-name{font-size:12px;font-weight:600;color:var(--s-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
+    .mc-event-meta{font-size:10px;font-weight:500;color:var(--soft);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .mc-event.paid{background:#D1FAE5;border-left-color:var(--ok);}
     .mc-event.paid .mc-event-name{color:#065F46;}
+    .mc-event.mc-compact{display:flex;align-items:center;gap:6px;padding:2px 8px;}
+    .mc-event.mc-compact .mc-event-name{font-size:11px;}
+    .mc-event.mc-compact .mc-event-meta{font-size:10px;}
     .mc-now{position:absolute;left:44px;right:0;height:1px;background:#FF3B30;z-index:3;pointer-events:none;}
     .mc-now::before{content:'';position:absolute;left:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:#FF3B30;}
     .mc-blocked{position:absolute;left:50px;right:6px;border-radius:3px;background:#F8F8F8;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:500;color:#C0C0C0;cursor:pointer;}
@@ -1148,6 +1157,12 @@
         <div id="pfCalendars"></div>
       </div>
 
+      <div class="pf-section">
+        <div class="pf-section-title">Danger Zone</div>
+        <button class="pf-logout-btn" style="color:var(--err);margin-bottom:10px" onclick="openResetScheduleDialog()">Reset Schedule</button>
+        <div style="font-size:11px;color:var(--muted);font-weight:600">Permanently delete all lessons (one-time and recurring). Students are kept.</div>
+      </div>
+
       <button class="pf-logout-btn" onclick="logOut()">Log Out</button>
     </div>
   </div>
@@ -1233,6 +1248,12 @@
         <div class="ac-list" id="acList"></div>
       </div>
     </div>
+    <div id="addStuToggleWrap" style="display:none;margin:-6px 0 10px;padding:0 2px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:700;color:var(--soft)">
+        <input type="checkbox" id="addStuToggle" checked style="width:16px;height:16px;accent-color:var(--p);cursor:pointer" />
+        Add to Students
+      </label>
+    </div>
     <div class="field"><label class="field-label">Start Time</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input type="time" class="field-input" id="startTime" value="09:00" onclick="this.select()" oninput="checkOverlap();updateAmPmBtn()" style="flex:1" />
@@ -1289,6 +1310,19 @@
     <div class="dialog-btns" id="cancelBtns">
       <button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
       <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET SCHEDULE DIALOG -->
+<div class="dialog-ovl" id="resetSchedOvl">
+  <div class="dialog">
+    <div class="dialog-icon">⚠️</div>
+    <div class="dialog-title">Reset entire schedule?</div>
+    <div class="dialog-sub">This will <strong>permanently delete all lessons</strong> — one-time and recurring. This cannot be undone. Your students will be kept.</div>
+    <div class="dialog-btns" style="flex-direction:column;gap:8px">
+      <button class="dbtn-no" style="width:100%" onclick="closeResetScheduleDialog()">Cancel</button>
+      <button class="dbtn-yes" style="width:100%;background:var(--err)" id="resetSchedBtn" onclick="confirmResetSchedule()">Delete All Lessons</button>
     </div>
   </div>
 </div>
@@ -2754,10 +2788,11 @@ function renderMobileScheduleHTML(){
     const height=Math.max((durM/60)*ROW_H-2,20);
     if(top+height<=0||top>=totalH) return;
     const isPaid=s.payStatus==='paid';
+    const compact=height<=32;
     const showMeta=height>28;
-    html+=`<div class="mc-event${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openSessDetail('${s.id}','${dstr}')">
+    html+=`<div class="mc-event${isPaid?' paid':''}${compact?' mc-compact':''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openSessDetail('${s.id}','${dstr}')">
       <div class="mc-event-name">${s.student}</div>
-      ${showMeta?`<div class="mc-event-meta">${fmt(s.time)}${s.court?' · '+s.court:''}</div>`:''}
+      ${compact?`<div class="mc-event-meta">${fmt(s.time)}</div>`:(showMeta?`<div class="mc-event-meta">${fmt(s.time)}${s.court?' · '+s.court:''}</div>`:'')}
     </div>`;
   });
 
@@ -2863,7 +2898,9 @@ function renderDayViewHTML(date, daySess, hol){
     const height=Math.max((durM/60)*DAY_SH-2,20);
     if(top+height<=0||top>=totalH) return '';
     const isPaid=s.payStatus==='paid';
+    const compact=height<=30;
     const showInfo=height>34;
+    if(compact) return `<div class="sv-sess-block sv-compact${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sv-sb-name">${s.student}</div><div class="sv-sb-info">${fmt(s.time)}</div></div>`;
     return `<div class="sv-sess-block${isPaid?' paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sv-sb-name">${s.student}</div>${showInfo?`<div class="sv-sb-info">${fmt(s.time)}–${et(s.time,s.dur)}${s.court?' · '+s.court:''}</div>`:''}</div>`;
   }).join('');
 
@@ -2929,7 +2966,9 @@ function renderWeekViewHTML(weekStart){
       const height=Math.max((durM/30)*SG_SH-2,20);
       if(top+height<=0||top>=totalH) return '';
       const isPaid=s.payStatus==='paid';
+      const compact=height<=35;
       const showTime=height>34;
+      if(compact) return `<div class="sg-sess sg-compact${isPaid?' sg-paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sg-sess-name">${s.student}</div><div class="sg-sess-time">${fmt(s.time)}</div></div>`;
       return `<div class="sg-sess${isPaid?' sg-paid':''}" style="top:${top}px;height:${height}px" onclick="openSessDetail('${s.id}','${dstr}')"><div class="sg-sess-name">${s.student}</div>${showTime?`<div class="sg-sess-time">${fmt(s.time)}–${et(s.time,s.dur)}</div>`:''}`+(showTime&&s.court?`<div class="sg-sess-court">${s.court}</div>`:'')+`</div>`;
     }).join('');
 
@@ -3104,6 +3143,8 @@ function openBookModal(){
   const d=sel;
   document.getElementById('bookForDate').textContent=`Booking for ${DF[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
   document.getElementById('acList').classList.remove('open');
+  document.getElementById('addStuToggleWrap').style.display='none';
+  document.getElementById('addStuToggle').checked=true;
   document.getElementById('owarn').classList.remove('show');
   document.getElementById('bookOvl').classList.add('open');
   setTimeout(()=>document.getElementById('stuIn').focus(),400);
@@ -3114,14 +3155,22 @@ function handleBookBg(e){if(e.target===document.getElementById('bookOvl'))closeB
 function filterAC(val){
   const list=document.getElementById('acList'),q=val.trim().toLowerCase();
   const fil=q===''?STUDENTS:STUDENTS.filter(s=>s.name.toLowerCase().includes(q));
-  if(!fil.length){list.innerHTML=`<div class="no-res">No students found</div>`;list.classList.add('open');return;}
+  if(!fil.length){list.innerHTML=`<div class="no-res">No students found</div>`;list.classList.add('open');updateAddStuToggle(q);return;}
   list.innerHTML=fil.map((s,i)=>{
     const hi=q?s.name.replace(new RegExp(`(${q})`,'gi'),'<span class="hl">$1</span>'):s.name;
     return `<div class="ac-item" onmousedown="pickStu('${s.name}','${s.level}')" data-idx="${i}"><div class="ac-av">${ini(s.name)}</div><div><div>${hi}</div><div class="ac-sub">${s.level} · ${s.credits} credits left</div></div></div>`;
   }).join('');
   list.classList.add('open');acIdx=-1;
+  updateAddStuToggle(q);
 }
-function pickStu(name,level){document.getElementById('stuIn').value=name;document.getElementById('acList').classList.remove('open');checkOverlap();}
+function updateAddStuToggle(q){
+  const wrap=document.getElementById('addStuToggleWrap');
+  if(!q){wrap.style.display='none';return;}
+  const exact=STUDENTS.some(s=>s.name.toLowerCase()===q);
+  wrap.style.display=exact?'none':'block';
+  if(!exact) document.getElementById('addStuToggle').checked=true;
+}
+function pickStu(name,level){document.getElementById('stuIn').value=name;document.getElementById('acList').classList.remove('open');document.getElementById('addStuToggleWrap').style.display='none';checkOverlap();}
 function acKey(e){
   const list=document.getElementById('acList'),items=list.querySelectorAll('.ac-item');
   if(!list.classList.contains('open')) return;
@@ -3150,9 +3199,19 @@ async function bookLesson(){
   const court=document.getElementById('courtIn').value.trim();
   let durLabel=selDur;
   if(selDur==='custom'){const cv=document.getElementById('customDurIn').value.trim();durLabel=cv||'60m';}
+  // Auto-add student if toggle is on and name is new
+  const addStu=document.getElementById('addStuToggle').checked&&!STUDENTS.some(s=>s.name.toLowerCase()===name.toLowerCase());
   const sess={id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'};
   SESSIONS.push(sess);
-  closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
+  if(addStu){
+    const stu={name,phone:'',level:'',credits:0,sessions:0,owing:0};
+    STUDENTS.push(stu);
+    dbInsert('students',{name,phone:'',level:'',credits:0,sessions:0,owing:0}).then(saved=>{
+      if(saved){const idx=STUDENTS.indexOf(stu);if(idx>=0) STUDENTS[idx]=Object.assign(stu,{id:saved.id});}
+      saveCache();
+    });
+  }
+  closeBookModal();renderSchedule();renderToday();renderStudents();toast(`✓ Lesson booked for ${name}`);
   const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
   if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; renderSchedule();renderToday(); }
   saveCache();
@@ -3907,6 +3966,26 @@ function renderNotifSection(){
     html+=`<div class="notif-item"><div class="notif-info"><div class="notif-name">${n.name}</div><div class="notif-desc">${n.desc}</div></div><label class="notif-toggle"><input type="checkbox" id="notif-${n.id}" ${on?'checked':''} onchange="toggleNotif('${n.id}',this.checked)"${!hasPush?' disabled':''}><span class="slider"></span></label></div>`;
   });
   el.innerHTML=html;
+}
+
+function openResetScheduleDialog(){document.getElementById('resetSchedOvl').classList.add('open');}
+function closeResetScheduleDialog(){document.getElementById('resetSchedOvl').classList.remove('open');}
+async function confirmResetSchedule(){
+  const btn=document.getElementById('resetSchedBtn');
+  btn.disabled=true;btn.textContent='Deleting…';
+  try {
+    const ids=SESSIONS.map(s=>s.id).filter(Boolean);
+    for(const id of ids) await dbDelete('sessions',id);
+    SESSIONS=[];
+    closeResetScheduleDialog();
+    renderSchedule();renderToday();renderStudents();
+    saveCache();
+    toast('Schedule reset — all lessons deleted');
+  } catch(e){
+    console.error('Reset schedule failed',e);
+    toast('Failed to reset schedule');
+  }
+  btn.disabled=false;btn.textContent='Delete All Lessons';
 }
 
 function renderProfile(){
