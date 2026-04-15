@@ -32,6 +32,8 @@ create table if not exists public.sessions (
   date        text    not null,       -- stored as YYYY-MM-DD string to match app format
   pay_status  text    not null default 'unpaid',
   notes       text    not null default '',
+  cancelled_dates jsonb not null default '[]'::jsonb,
+  recur_end   text,
   created_at  timestamptz not null default now()
 );
 

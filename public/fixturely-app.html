@@ -1693,8 +1693,20 @@ async function loadAllData(){
     }
     const d=await r.json();
     console.log('loadAllData loaded:',{students:d.students?.length,sessions:d.sessions?.length});
+    // Preserve local cancellation state that may not have synced yet
+    const localState={};
+    SESSIONS.forEach(s=>{
+      if((s.cancelledDates&&s.cancelledDates.length>0)||s.recurEnd)
+        localState[s.id]={cd:s.cancelledDates||[],re:s.recurEnd||null};
+    });
     STUDENTS=d.students||[];
     SESSIONS=d.sessions||[];
+    SESSIONS.forEach(s=>{
+      const lc=localState[s.id];
+      if(!lc) return;
+      if(lc.cd.length>0) s.cancelledDates=[...new Set([...(s.cancelledDates||[]),...lc.cd])];
+      if(lc.re&&(!s.recurEnd||lc.re<s.recurEnd)) s.recurEnd=lc.re;
+    });
     TERMS=d.terms||[];
     HOLIDAYS=d.holidays||[];
     INVOICES=d.invoices||[];
@@ -1736,14 +1748,18 @@ async function dbUpdate(table,id,record){
   try {
     const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',table,id,record})});
     const d=await r.json();
-    if(!d.success) console.error('dbUpdate',table,id,'error:',d.error);
-    else console.log('dbUpdate',table,id,'ok');
-  } catch(e){ console.error('dbUpdate failed',e); }
+    if(!d.success){ console.error('dbUpdate',table,id,'error:',d.error); return false; }
+    console.log('dbUpdate',table,id,'ok');
+    return true;
+  } catch(e){ console.error('dbUpdate failed',e); return false; }
 }
 async function dbDelete(table,id){
   try {
-    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',table,id})});
-  } catch(e){ console.error('dbDelete failed',e); }
+    const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',table,id})});
+    const d=await r.json();
+    if(!d.success){ console.error('dbDelete',table,id,'error:',d.error); return false; }
+    return true;
+  } catch(e){ console.error('dbDelete failed',e); return false; }
 }
 
 // ══ HELPERS ══
@@ -3002,7 +3018,8 @@ function cancelFromEdit(){
   if(!id) return;
   cancelTarget=id;
   cancelDate=dateCtx;
-  const s=SESSIONS.find(s=>s.id===id);
+  const s=SESSIONS.find(s=>s.id==id);
+  if(!s) return;
   const isRecurring=s.recur==='Weekly'||s.recur==='Fortnightly';
   const titleEl=document.getElementById('cancelTitle');
   const subEl=document.getElementById('cancelSub');
@@ -3137,7 +3154,7 @@ async function bookLesson(){
   SESSIONS.push(sess);
   closeBookModal();renderSchedule();renderToday();toast(`✓ Lesson booked for ${name}`);
   const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
-  if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; }
+  if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; renderSchedule();renderToday(); }
   saveCache();
 }
 
@@ -3163,19 +3180,32 @@ function openCancelDialog(e,id,dateCtx){
   document.getElementById('cancelOvl').classList.add('open');
 }
 function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;cancelDate=null;}
-function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast('Lesson cancelled');if(s&&s.id) dbDelete('sessions',s.id);saveCache();}
-function cancelSingleOccurrence(){
+async function confirmCancel(){
+  const s=SESSIONS.find(s=>s.id==cancelTarget);
+  SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);
+  closeCancelDialog();renderSchedule();renderToday();
+  toast('Lesson cancelled');
+  saveCache();
+  if(s&&s.id){
+    const ok=await dbDelete('sessions',s.id);
+    if(!ok) console.warn('Cancel did not persist to database — will reappear on refresh');
+  }
+}
+async function cancelSingleOccurrence(){
   const s=SESSIONS.find(s=>s.id==cancelTarget);
   if(!s||!cancelDate) return;
   if(!s.cancelledDates) s.cancelledDates=[];
   s.cancelledDates.push(cancelDate);
-  const sid=s.id, cd=s.cancelledDates;
+  const sid=s.id, cd=[...s.cancelledDates];
   closeCancelDialog();renderSchedule();renderToday();
   toast('Lesson cancelled');
-  if(sid) dbUpdate('sessions',sid,{cancelledDates:cd});
   saveCache();
+  if(sid){
+    const ok=await dbUpdate('sessions',sid,{cancelledDates:cd});
+    if(!ok) console.warn('Cancel did not persist to database — run migration_session_cancellation.sql in Supabase');
+  }
 }
-function cancelAllFuture(){
+async function cancelAllFuture(){
   const s=SESSIONS.find(s=>s.id==cancelTarget);
   if(!s||!cancelDate) return;
   const prevDay=ds(add(new Date(cancelDate+'T00:00:00'),-1));
@@ -3183,8 +3213,11 @@ function cancelAllFuture(){
   const sid=s.id, re=s.recurEnd;
   closeCancelDialog();renderSchedule();renderToday();
   toast('All future lessons cancelled');
-  if(sid) dbUpdate('sessions',sid,{recurEnd:re});
   saveCache();
+  if(sid){
+    const ok=await dbUpdate('sessions',sid,{recurEnd:re});
+    if(!ok) console.warn('Cancel did not persist to database — run migration_session_cancellation.sql in Supabase');
+  }
 }
 function confirmRemove(id){
   const s=SESSIONS.find(s=>s.id==id);
