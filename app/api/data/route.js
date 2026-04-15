@@ -32,6 +32,8 @@ export async function GET() {
     sessions: sessions.map(s => ({
       ...s,
       payStatus: s.pay_status,
+      cancelledDates: s.cancelled_dates || [],
+      recurEnd: s.recur_end || null,
     })),
     terms,
     holidays,
@@ -64,10 +66,11 @@ export async function POST(request) {
 
   if (action === 'insert') {
     const row = { ...record, coach_id: user.id }
-    // Map payStatus -> pay_status for sessions table
-    if (table === 'sessions' && 'payStatus' in row) {
-      row.pay_status = row.payStatus
-      delete row.payStatus
+    // Map camelCase -> snake_case for sessions table
+    if (table === 'sessions') {
+      if ('payStatus' in row) { row.pay_status = row.payStatus; delete row.payStatus }
+      if ('cancelledDates' in row) { row.cancelled_dates = row.cancelledDates; delete row.cancelledDates }
+      if ('recurEnd' in row) { row.recur_end = row.recurEnd; delete row.recurEnd }
     }
     // Remove id field if present — let Supabase generate it
     delete row.id
@@ -78,7 +81,7 @@ export async function POST(request) {
       // Strip to known columns per table
       const known = {
         students: ['coach_id', 'name', 'level', 'credits', 'sessions', 'owing'],
-        sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes'],
+        sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes', 'cancelled_dates', 'recur_end'],
         terms: ['coach_id', 'name', 'start', 'end', 'weeks'],
         holidays: ['coach_id', 'name', 'start', 'end'],
         invoices: ['coach_id', 'invoice_number', 'student', 'amount', 'status', 'date', 'items'],
@@ -106,9 +109,10 @@ export async function POST(request) {
   if (action === 'update') {
     if (!id) return Response.json({ error: 'Missing id' }, { status: 400 })
     const updates = { ...record }
-    if (table === 'sessions' && 'payStatus' in updates) {
-      updates.pay_status = updates.payStatus
-      delete updates.payStatus
+    if (table === 'sessions') {
+      if ('payStatus' in updates) { updates.pay_status = updates.payStatus; delete updates.payStatus }
+      if ('cancelledDates' in updates) { updates.cancelled_dates = updates.cancelledDates; delete updates.cancelledDates }
+      if ('recurEnd' in updates) { updates.recur_end = updates.recurEnd; delete updates.recurEnd }
     }
     const { data, error } = await supabase.from(table).update(updates).eq('id', id).select().single()
     if (error) {

@@ -1285,7 +1285,7 @@
   <div class="dialog">
     <div class="dialog-icon">🗓</div>
     <div class="dialog-title" id="cancelTitle">Cancel this lesson?</div>
-    <div class="dialog-sub" id="cancelSub">They'll be notified automatically.</div>
+    <div class="dialog-sub" id="cancelSub"></div>
     <div class="dialog-btns" id="cancelBtns">
       <button class="dbtn-no" onclick="closeCancelDialog()">Keep it</button>
       <button class="dbtn-yes" onclick="confirmCancel()">Yes, cancel</button>
@@ -1734,7 +1734,10 @@ async function dbInsert(table,record){
 }
 async function dbUpdate(table,id,record){
   try {
-    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',table,id,record})});
+    const r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update',table,id,record})});
+    const d=await r.json();
+    if(!d.success) console.error('dbUpdate',table,id,'error:',d.error);
+    else console.log('dbUpdate',table,id,'ok');
   } catch(e){ console.error('dbUpdate failed',e); }
 }
 async function dbDelete(table,id){
@@ -3160,16 +3163,16 @@ function openCancelDialog(e,id,dateCtx){
   document.getElementById('cancelOvl').classList.add('open');
 }
 function closeCancelDialog(){document.getElementById('cancelOvl').classList.remove('open');cancelTarget=null;cancelDate=null;}
-function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast(`Cancelled — ${s.student} notified`);if(s&&s.id) dbDelete('sessions',s.id);saveCache();}
+function confirmCancel(){const s=SESSIONS.find(s=>s.id==cancelTarget);SESSIONS=SESSIONS.filter(s=>s.id!=cancelTarget);closeCancelDialog();renderSchedule();renderToday();toast('Lesson cancelled');if(s&&s.id) dbDelete('sessions',s.id);saveCache();}
 function cancelSingleOccurrence(){
   const s=SESSIONS.find(s=>s.id==cancelTarget);
   if(!s||!cancelDate) return;
   if(!s.cancelledDates) s.cancelledDates=[];
   s.cancelledDates.push(cancelDate);
-  const name=s.student;
+  const sid=s.id, cd=s.cancelledDates;
   closeCancelDialog();renderSchedule();renderToday();
-  toast(`Cancelled ${name}'s lesson on ${cancelDate}`);
-  if(s.id) dbUpdate('sessions',s.id,{cancelledDates:s.cancelledDates});
+  toast('Lesson cancelled');
+  if(sid) dbUpdate('sessions',sid,{cancelledDates:cd});
   saveCache();
 }
 function cancelAllFuture(){
@@ -3177,10 +3180,10 @@ function cancelAllFuture(){
   if(!s||!cancelDate) return;
   const prevDay=ds(add(new Date(cancelDate+'T00:00:00'),-1));
   s.recurEnd=prevDay;
-  const name=s.student;
+  const sid=s.id, re=s.recurEnd;
   closeCancelDialog();renderSchedule();renderToday();
-  toast(`All future lessons for ${name} cancelled`);
-  if(s.id) dbUpdate('sessions',s.id,{recurEnd:s.recurEnd});
+  toast('All future lessons cancelled');
+  if(sid) dbUpdate('sessions',sid,{recurEnd:re});
   saveCache();
 }
 function confirmRemove(id){
