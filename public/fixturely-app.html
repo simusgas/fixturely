@@ -620,8 +620,7 @@
   .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
-  /* Mobile-only courts nav, queue button + "Yours" legend chip — hidden on desktop */
-  .cgm-nav{display:none;}
+  /* Mobile-only courts queue button + "Yours" legend chip — hidden on desktop */
   .cgm-queue-btn{display:none;}
   .c-leg-item.c-leg-mine{display:none;}
 
@@ -671,27 +670,24 @@
     /* ── Modals — taller bottom sheet ── */
     .overlay .modal{max-height:95vh;border-radius:20px 20px 0 0;}
 
-    /* ── Courts — mobile: All-courts overview + single-court view ── */
-    .cgm-nav{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--white);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;}
-    .cgm-nav::-webkit-scrollbar{display:none;}
-    .cgm-chip{flex:1;min-width:40px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;color:var(--soft);cursor:pointer;white-space:nowrap;padding:0 8px;transition:background 0.15s,color 0.15s;}
-    .cgm-chip.active{background:var(--c-a);border-color:var(--c-a);color:#fff;}
-    /* All mobile zoom levels: compact time gutter, tappable headers, desktop-style blocks */
-    .cgm .cg-corner,.cgm .cg-times{width:40px;}
-    .cgm .cg-time{font-size:10px;padding-right:4px;}
-    .cgm .cg-court-hd{padding:12px 2px;font-size:12px;cursor:pointer;}
-    .cgm .cg-sess,.cgm .cg-mine{padding:4px 5px;}
+    /* ── Courts — mobile: All-courts overview + single-court view, whole day fits the screen ── */
+    /* flex:none so height wins over .screen's flex-basis:0 (else the screen grows with content) */
+    #screen-courts.active{flex:none;height:100vh;height:100dvh;}
+    .cgm .cg-corner,.cgm .cg-times{width:38px;}
+    .cgm .cg-time{font-size:9px;padding-right:3px;padding-top:1px;}
+    .cgm .cg-court-hd{padding:11px 2px;font-size:12px;cursor:pointer;}
+    .cgm .cg-sess,.cgm .cg-mine{padding:1px 4px;border-radius:5px;}
+    .cgm .cg-sess-name,.cgm .cg-mine-name{line-height:1.25;}
     .cgm .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
-    /* Zoomed out (4-6 courts): shrink names, hide times */
-    .cgm-all .cg-sess-name,.cgm-all .cg-mine-name{font-size:10px;}
+    /* All-courts view: shrink names, hide times */
+    .cgm-all .cg-sess-name,.cgm-all .cg-mine-name{font-size:9px;}
     .cgm-all .cg-sess-time,.cgm-all .cg-mine-time{display:none;}
-    /* Mid zoom (2-3 courts): full labels, slightly smaller */
-    .cgm-mid .cg-sess-name,.cgm-mid .cg-mine-name{font-size:12px;}
-    /* Single-court header: name + prev/next arrows */
-    .cgm-one-hd{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-left:1px solid var(--border);}
-    .cgm-one-title{font-size:15px;font-weight:900;color:var(--text);}
-    .cgm-arr{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);font-size:17px;font-weight:800;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Inter',sans-serif;padding:0;}
+    /* Single-court header: All button + prev/next arrows + name */
+    .cgm-one-hd{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-left:1px solid var(--border);}
+    .cgm-one-title{flex:1;text-align:center;font-size:14px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cgm-arr{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);font-size:15px;font-weight:800;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Inter',sans-serif;padding:0;}
     .cgm-arr:disabled{opacity:0.3;}
+    .cgm-allbtn{width:auto;border-radius:100px;padding:0 12px;font-size:12px;}
     /* "Add to queue" secondary action inside the book modal (mobile only) */
     .cgm-queue-btn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:100px;background:var(--white);border:1.5px solid var(--c-a);color:var(--c-dk);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
     .c-leg-item.c-leg-mine{display:flex;}
@@ -1102,7 +1098,6 @@
         <div class="c-leg-item c-leg-mine"><div class="c-leg-dot" style="background:var(--c-pl);border:2px solid var(--c-a)"></div>Yours</div>
       </div>
     </div>
-    <div class="cgm-nav" id="cgmNav"></div>
     <div class="courts-outer" id="cBody">
       <div style="text-align:center;padding:60px 20px;color:var(--muted)">Select the Courts tab to load availability</div>
     </div>
@@ -1657,7 +1652,7 @@
       </div>
       <div id="cbError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
       <button class="submit-btn" id="cbSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="submitCourtBooking()">Book Court ✓</button>
-      <button class="cgm-queue-btn" id="cbQueueBtn" onclick="cbAddToQueue()">＋ Add to queue instead</button>
+      <button class="cgm-queue-btn" id="cbQueueBtn" onclick="cbAddToQueue()">＋ Add to booking queue</button>
     </div>
     <!-- LOADING VIEW -->
     <div id="cbLoadingView" style="display:none">
@@ -3501,13 +3496,11 @@ function sessTextCol(hex) {
   return (r*299+g*587+b*114)/1000 > 160 ? '#0F172A' : '#fff';
 }
 let courtsCache = null;      // {date, resources, myBookings, gridS, gridE} — last fetched data
-let courtsVisCount = 6;      // mobile zoom level: how many courts visible (6 = all … 1 = single)
+let courtsVisCount = 6;      // mobile: how many courts visible (6 = all, 1 = single court)
 let courtsStartIdx = 0;      // first court of the visible window
-let cgmHintShown = false;    // one-time "pinch to zoom" toast guard
 const cgSlotFmt = m => { const h=Math.floor(m/60)%24,mn=m%60; return `${h%12||12}:${mn.toString().padStart(2,'0')}${h>=12?'pm':'am'}`; };
 async function loadCourts() {
   const body = document.getElementById('cBody');
-  renderCourtsMobileNav();
   body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><div class="wx-loading-icon">⏳</div><div style="margin-top:8px;font-size:13px">Loading court availability…</div></div>';
   try {
     // Fetch availability and coach's bookings in parallel
@@ -3546,7 +3539,6 @@ async function loadCourts() {
     }
 
     courtsCache = { date: courtsDate, resources, myBookings, gridS: GRID_S, gridE: GRID_E };
-    renderCourtsMobileNav();
     renderCourtsBody();
   } catch(e) {
     body.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;font-weight:700">Could not load court data</div></div>`;
@@ -3620,8 +3612,8 @@ function courtColHTML(r, opts) {
   return `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${pendingBlocks}</div>`;
 }
 // Render the courts grid from cache. Desktop: full 6-court grid (unchanged).
-// Mobile: shows a window of `courtsVisCount` courts starting at `courtsStartIdx`.
-// Pinch zooms in discrete steps (6→5→…→1 courts); row height never changes.
+// Mobile: All view (default) or single-court view via tapping a court header.
+// Row height is computed so the whole day fits the screen — nothing cut off.
 function renderCourtsBody() {
   const body = document.getElementById('cBody');
   if (!body) return;
@@ -3633,12 +3625,22 @@ function renderCourtsBody() {
     body.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;font-weight:700">No courts available for this day</div>`;
     return;
   }
-  const SLOT_H = mode === 'mobile' ? 32 : 60;
   const slots = [];
   for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
+  let SLOT_H, spacer;
+  if (mode === 'mobile') {
+    // Fit the full day into the visible area: available height minus the sticky header row
+    const HDR = 44;
+    const usable = Math.max(120, (body.clientHeight || 600) - HDR);
+    SLOT_H = Math.max(16, Math.floor(usable / slots.length));
+    spacer = '';
+  } else {
+    SLOT_H = 60;
+    spacer = `<div style="height:calc(var(--nav-h,70px) + 8px)"></div>`;
+  }
   const totalH = slots.length * SLOT_H;
   const opts = { slotH: SLOT_H, slots, gridS: GRID_S, myBookings, totalH, showText: true, cellButtons: mode === 'desktop' };
-  const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}<div style="height:calc(var(--nav-h,70px) + 8px)"></div></div>`;
+  const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}${spacer}</div>`;
 
   let wrapClass, header, cols;
   if (mode === 'mobile') {
@@ -3649,13 +3651,12 @@ function renderCourtsBody() {
     if (vis === 1) {
       const r = win[0];
       wrapClass = ' cgm cgm-one';
-      header = `<div class="cg-corner"></div><div class="cgm-one-hd"><button class="cgm-arr" onclick="cgmStep(-1)"${courtsStartIdx===0?' disabled':''}>‹</button><div class="cgm-one-title">${r.Name}</div><button class="cgm-arr" onclick="cgmStep(1)"${courtsStartIdx>=total-1?' disabled':''}>›</button></div>`;
+      header = `<div class="cg-corner"></div><div class="cgm-one-hd"><button class="cgm-arr cgm-allbtn" onclick="setCourtsMobileView('all')">All</button><button class="cgm-arr" onclick="cgmStep(-1)"${courtsStartIdx===0?' disabled':''}>‹</button><div class="cgm-one-title">${r.Name}</div><button class="cgm-arr" onclick="cgmStep(1)"${courtsStartIdx>=total-1?' disabled':''}>›</button></div>`;
     } else {
-      wrapClass = vis >= 4 ? ' cgm cgm-all' : ' cgm cgm-mid';
+      wrapClass = ' cgm cgm-all';
       header = `<div class="cg-corner"></div>` + win.map((r,j)=>{
         const gi = courtsStartIdx + j;
-        const lbl = vis >= 4 ? (r.Name.replace(/\D/g,'')||r.Name) : r.Name;
-        return `<div class="cg-court-hd" onclick="setCourtsMobileView(${gi})">${lbl}</div>`;
+        return `<div class="cg-court-hd" onclick="setCourtsMobileView(${gi})">${r.Name.replace(/\D/g,'')||r.Name}</div>`;
       }).join('');
     }
     cols = win.map(r => courtColHTML(r, opts)).join('');
@@ -3665,96 +3666,32 @@ function renderCourtsBody() {
     cols = resources.map(r => courtColHTML(r, opts)).join('');
   }
   body.innerHTML = `<div class="cg-wrap${wrapClass}"><div class="cg-header">${header}</div><div class="cg-body">${timesCol}<div class="cg-courts">${cols}</div></div></div>`;
-  // One-time hint so pinch-zoom is discoverable
-  if (mode === 'mobile' && !cgmHintShown) {
-    cgmHintShown = true;
-    try {
-      if (!localStorage.getItem('fixturely_pinch_hint')) {
-        localStorage.setItem('fixturely_pinch_hint', '1');
-        setTimeout(() => toast('💡 Pinch the grid to zoom in on courts'), 800);
-      }
-    } catch(e) {}
-  }
-}
-// ── Mobile courts navigation: chips bar (All | 13 | 14 | ...) ──
-function renderCourtsMobileNav() {
-  const nav = document.getElementById('cgmNav');
-  if (!nav) return;
-  const names = (courtsCache && courtsCache.resources.length)
-    ? courtsCache.resources.map(r => r.Name)
-    : ['Court 13','Court 14','Court 15','Court 16','Court 17','Court 18'];
-  const total = names.length;
-  const vis = Math.max(1, Math.min(courtsVisCount, total));
-  courtsStartIdx = Math.max(0, Math.min(courtsStartIdx, total - vis));
-  let html = `<div class="cgm-chip${vis===total?' active':''}" onclick="setCourtsMobileView('all')">All</div>`;
-  names.forEach((n,i) => {
-    const inWin = vis < total && i >= courtsStartIdx && i < courtsStartIdx + vis;
-    html += `<div class="cgm-chip${inWin?' active':''}" onclick="setCourtsMobileView(${i})">${n.replace(/\D/g,'')||n}</div>`;
-  });
-  nav.innerHTML = html;
 }
 function setCourtsMobileView(v) {
   const total = courtsCache ? courtsCache.resources.length : 6;
   if (v === 'all') { courtsVisCount = total; courtsStartIdx = 0; }
   else { courtsVisCount = 1; courtsStartIdx = v; }
-  renderCourtsMobileNav();
   renderCourtsBody();
 }
-// Pan the visible window left/right by one court (arrows + swipe)
+// Move to the previous/next court in single-court view (arrows + swipe)
 function cgmStep(n) {
   const total = courtsCache ? courtsCache.resources.length : 6;
   const next = Math.max(0, Math.min(courtsStartIdx + n, total - courtsVisCount));
   if (next === courtsStartIdx) return;
   courtsStartIdx = next;
-  renderCourtsMobileNav();
   renderCourtsBody();
 }
-// Stepped zoom: change how many courts are visible by one, keeping the court
-// under the pinch midpoint (focalX) inside the new window. Vertical scale unchanged.
-function cgmZoom(delta, focalX) {
-  if (!courtsCache) return;
-  const total = courtsCache.resources.length;
-  const cur = Math.max(1, Math.min(courtsVisCount, total));
-  const next = Math.max(1, Math.min(total, cur + delta));
-  if (next === cur) return;
-  const body = document.getElementById('cBody');
-  const rect = body.getBoundingClientRect();
-  const GUT = 40; // mobile time-gutter width
-  const colW = (rect.width - GUT) / cur;
-  let focal = courtsStartIdx + Math.floor((focalX - rect.left - GUT) / colW);
-  focal = Math.max(0, Math.min(total - 1, focal));
-  courtsVisCount = next;
-  courtsStartIdx = Math.max(0, Math.min(Math.round(focal - (next - 1) / 2), total - next));
-  renderCourtsMobileNav();
-  renderCourtsBody();
-}
-// Touch gestures on the courts grid: pinch = stepped zoom, swipe = pan window.
-// Also re-render when the viewport crosses the mobile/desktop breakpoint.
+// Swipe left/right to switch courts in single-court view; re-render on breakpoint change
 (function() {
   const el = document.getElementById('cBody');
   if (!el) return;
-  let tx = 0, ty = 0, pinching = false, pzDist = 0;
-  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  let tx = 0, ty = 0;
   el.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) { pinching = true; pzDist = dist(e.touches); }
-    else if (e.touches.length === 1 && !pinching) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }
+    if (e.touches.length === 1) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }
   }, { passive: true });
-  el.addEventListener('touchmove', e => {
-    if (e.touches.length !== 2 || window.innerWidth >= 1024 || !courtsCache) return;
-    e.preventDefault(); // keep the browser from scrolling/zooming mid-pinch
-    const d = dist(e.touches);
-    if (!pzDist) { pzDist = d; return; }
-    const ratio = d / pzDist;
-    const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    // Snap one step per 25% spread change, then re-baseline so a long pinch steps again
-    if (ratio > 1.25) { cgmZoom(-1, midX); pzDist = d; }
-    else if (ratio < 0.8) { cgmZoom(1, midX); pzDist = d; }
-  }, { passive: false });
   el.addEventListener('touchend', e => {
-    if (e.touches.length > 0) return;                    // fingers still down
-    if (pinching) { pinching = false; pzDist = 0; return; } // pinch just ended — not a swipe
     if (window.innerWidth >= 1024 || !courtsCache) return;
-    if (courtsVisCount >= courtsCache.resources.length) return; // full view — nothing to pan
+    if (courtsVisCount >= courtsCache.resources.length) return; // all view — nothing to pan
     const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
     if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) cgmStep(dx < 0 ? 1 : -1);
   }, { passive: true });
