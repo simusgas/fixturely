@@ -620,6 +620,9 @@
   .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
+  /* Mobile-only courts nav + "Yours" legend chip — hidden on desktop */
+  .cgm-nav{display:none;}
+  .c-leg-item.c-leg-mine{display:none;}
 
   /* Lock body scroll when any modal is open */
   body:has(.overlay.open), body:has(.dialog-ovl.open){overflow:hidden !important;}
@@ -670,10 +673,29 @@
     /* ── Modals — taller bottom sheet ── */
     .overlay .modal{max-height:95vh;border-radius:20px 20px 0 0;}
 
-    /* ── Courts — one court at a time with snap scroll ── */
-    .cg-courts{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
-    .cg-courts::-webkit-scrollbar{display:none;}
-    .cg-court{min-width:calc(100vw - 56px);scroll-snap-align:start;flex-shrink:0;}
+    /* ── Courts — mobile: All-courts overview + single-court view ── */
+    .cgm-nav{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--white);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;}
+    .cgm-nav::-webkit-scrollbar{display:none;}
+    .cgm-chip{flex:1;min-width:40px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;color:var(--soft);cursor:pointer;white-space:nowrap;padding:0 8px;transition:background 0.15s,color 0.15s;}
+    .cgm-chip.active{background:var(--c-a);border-color:var(--c-a);color:#fff;}
+    /* Overview: compact time gutter + tappable court headers */
+    .cgm-all .cg-corner,.cgm-all .cg-times{width:40px;}
+    .cgm-all .cg-time{font-size:10px;padding-right:4px;}
+    .cgm-all .cg-court-hd{padding:12px 2px;font-size:12px;cursor:pointer;}
+    .cgm-all .cg-sess,.cgm-all .cg-mine{padding:2px 3px;border-radius:4px;}
+    .cgm-all .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
+    /* Single-court header: name + prev/next arrows */
+    .cgm-one-hd{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-left:1px solid var(--border);}
+    .cgm-one-title{font-size:15px;font-weight:900;color:var(--text);}
+    .cgm-arr{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);font-size:17px;font-weight:800;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Inter',sans-serif;padding:0;}
+    .cgm-arr:disabled{opacity:0.3;}
+    /* Single-court free cells: time left, tap-to-book hint centre, queue "+" right */
+    .cgm-one .cg-slot-free{justify-content:flex-end;padding-right:10px;}
+    .cgm-one .cg-slot-time{position:static;margin-right:auto;padding-left:10px;font-size:12px;}
+    .cgm-book-hint{font-size:12px;font-weight:800;color:var(--c-a);opacity:0.55;margin-right:12px;}
+    .cgm-plus{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--c-a);background:var(--white);color:var(--c-dk);font-size:19px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;padding:0;flex-shrink:0;line-height:1;}
+    .cg-slot-free.cg-selected .cgm-plus,.cg-slot-free.cg-selected .cgm-book-hint{display:none;}
+    .c-leg-item.c-leg-mine{display:flex;}
 
     /* ── Home kanban — stack vertically on small screens ── */
     .hk-board{flex-direction:column;height:auto;}
@@ -1078,8 +1100,10 @@
         <div class="c-leg-item"><div class="c-leg-dot" style="background:#fdd4ff"></div>League</div>
         <div class="c-leg-item"><div class="c-leg-dot" style="background:#cdfdff"></div>Events</div>
         <div class="c-leg-item"><div class="c-leg-dot" style="background:#d1d1d1"></div>Closed</div>
+        <div class="c-leg-item c-leg-mine"><div class="c-leg-dot" style="background:var(--c-pl);border:2px solid var(--c-a)"></div>Yours</div>
       </div>
     </div>
+    <div class="cgm-nav" id="cgmNav"></div>
     <div class="courts-outer" id="cBody">
       <div style="text-align:center;padding:60px 20px;color:var(--muted)">Select the Courts tab to load availability</div>
     </div>
@@ -3476,8 +3500,14 @@ function sessTextCol(hex) {
   const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
   return (r*299+g*587+b*114)/1000 > 160 ? '#0F172A' : '#fff';
 }
+let courtsCache = null;      // {date, resources, myBookings, gridS, gridE} — last fetched data
+let courtsView = 'all';      // mobile view: 'all' (overview) | 'one' (single court)
+try { const _cv = localStorage.getItem('fixturely_courts_view'); if (_cv === 'one' || _cv === 'all') courtsView = _cv; } catch(e) {}
+let courtsCourtIdx = 0;      // selected court in mobile 'one' view
+const cgSlotFmt = m => { const h=Math.floor(m/60)%24,mn=m%60; return `${h%12||12}:${mn.toString().padStart(2,'0')}${h>=12?'pm':'am'}`; };
 async function loadCourts() {
   const body = document.getElementById('cBody');
+  renderCourtsMobileNav();
   body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><div class="wx-loading-icon">⏳</div><div style="margin-top:8px;font-size:13px">Loading court availability…</div></div>';
   try {
     // Fetch availability and coach's bookings in parallel
@@ -3495,81 +3525,11 @@ async function loadCourts() {
     });
     // Clear optimistic bookings for this date now that server data is loaded
     optimisticBookings = optimisticBookings.filter(ob => ob.date !== courtsDate);
-    const SLOT_H = 60;
     const GRID_S = Math.max(data.EarliestStartTime || 360, CAL_S * 60);
     const GRID_E = Math.min(data.LatestEndTime || 1350, CAL_E * 60);
     const resources = (data.Resources || [])
       .filter(r => { const n = parseInt(r.Name.replace(/\D/g,'')); return n >= 13 && n <= 18; })
       .sort((a,b) => (parseInt(a.Name.replace(/\D/g,''))||0) - (parseInt(b.Name.replace(/\D/g,''))||0));
-    const slots = [];
-    for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
-    const totalH = slots.length * SLOT_H;
-    const slotFmt = m => { const h=Math.floor(m/60)%24,mn=m%60; return `${h%12||12}:${mn.toString().padStart(2,'0')}${h>=12?'pm':'am'}`; };
-
-    let html = `<div class="cg-wrap"><div class="cg-header">
-      <div class="cg-corner"></div>
-      ${resources.map(r=>`<div class="cg-court-hd">${r.Name}</div>`).join('')}
-    </div><div class="cg-body">
-      <div class="cg-times">
-        ${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}
-        <div style="height:calc(var(--nav-h,70px) + 8px)"></div>
-      </div>
-      <div class="cg-courts">`;
-
-    resources.forEach(r => {
-      const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []).filter(s => s.Category !== 0);
-      const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
-
-      // Grid lines
-      const lines = slots.map((m,i) =>
-        `<div style="position:absolute;top:${i*SLOT_H}px;left:0;right:0;height:${SLOT_H}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#F1F5F9'}"></div>`
-      ).join('');
-
-      // Free-slot hover cells (not covered by any ClubSpark session or our pending booking)
-      const freeCells = slots.map((m,i) => {
-        const isBusy = sessions.some(s => s.StartTime < m+30 && s.EndTime > m);
-        if (isBusy) return '';
-        const isMine = myBooked.some(b => b.start_mins < m+30 && b.end_mins > m);
-        if (isMine) return '';
-        const selKey=`${r.Name}|${m}|${courtsDate}`;
-        const isSel=mbSlots.some(s=>s.key===selKey);
-        const selClass=isSel?' cg-selected':'';
-        const selBadge=isSel?`<div class="cg-sel-badge">✓</div>`:'';
-        return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*SLOT_H}px;height:${SLOT_H}px" onclick="requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')"><span class="cg-slot-time">${slotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>${selBadge}</div>`;
-      }).join('');
-
-      // Merged session blocks: ClubSpark is source of truth, Supabase identifies ours
-      const blocks = sessions.map(s => {
-        const top = Math.max(0, (s.StartTime - GRID_S) / 30 * SLOT_H);
-        const h = Math.max((s.EndTime - s.StartTime) / 30 * SLOT_H - 2, 14);
-        // Check if this ClubSpark session matches one of our Supabase bookings
-        const mine = myBooked.find(b => b.start_mins < s.EndTime && b.end_mins > s.StartTime);
-        const timeStr = `${slotFmt(s.StartTime)} – ${slotFmt(s.EndTime)}`;
-        if (mine) {
-          const isPending = mine.status === 'pending';
-          const pendingClass = isPending ? ' cg-pending' : '';
-          const nameLabel = isPending ? 'Booking...' : 'Your Booking';
-          return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px"><div class="cg-mine-name">${nameLabel}</div>${h > 36 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}</div>`;
-        }
-        const color = sessColor(s);
-        const label = (s.Name && !s.Name.includes('-')) ? s.Name : (s.Category === 8000 ? 'Closed' : '');
-        const tc = sessTextCol(color);
-        return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}"><div class="cg-sess-name" style="color:${tc}">${label}</div>${h > 36 ? `<div class="cg-sess-time" style="color:${tc}">${timeStr}</div>` : ''}</div>`;
-      }).join('');
-
-      // Pending bookings not yet reflected in ClubSpark (bot still processing)
-      const pendingNotOnCS = myBooked.filter(b =>
-        b.status === 'pending' &&
-        !sessions.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins)
-      );
-      const pendingBlocks = pendingNotOnCS.map(b => {
-        const top = Math.max(0, (b.start_mins - GRID_S) / 30 * SLOT_H);
-        const h = Math.max((b.end_mins - b.start_mins) / 30 * SLOT_H - 2, 14);
-        return `<div class="cg-mine cg-pending" style="top:${top}px;height:${h}px"><div class="cg-mine-name">Booking...</div></div>`;
-      }).join('');
-
-      html += `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${pendingBlocks}</div>`;
-    });
 
     // Detect and cancel stale bookings (confirmed in Supabase but gone from ClubSpark)
     const staleIds = myBookings.filter(b => {
@@ -3585,12 +3545,165 @@ async function loadCourts() {
       fetch('/api/courts/bookings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cancelIds: staleIds }) }).catch(() => {});
     }
 
-    html += `</div></div></div>`;
-    body.innerHTML = html;
+    courtsCache = { date: courtsDate, resources, myBookings, gridS: GRID_S, gridE: GRID_E };
+    renderCourtsMobileNav();
+    renderCourtsBody();
   } catch(e) {
     body.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:32px">🌐</div><div style="margin-top:10px;font-size:14px;font-weight:700">Could not load court data</div></div>`;
   }
 }
+// Re-render from cache when only the view/highlights changed (mobile) — full refetch otherwise (desktop behavior unchanged)
+function rerenderCourts() {
+  if (window.innerWidth < 1024 && courtsCache && courtsCache.date === courtsDate) renderCourtsBody();
+  else loadCourts();
+}
+// Build one court column (grid lines + free cells + session blocks).
+// showText: names/times inside blocks; cellButtons: Book/Select buttons + time label in free cells.
+function courtColHTML(r, opts) {
+  const { slotH, slots, gridS, myBookings, totalH, showText, cellButtons } = opts;
+  const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []).filter(s => s.Category !== 0);
+  const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
+
+  // Grid lines
+  const lines = slots.map((m,i) =>
+    `<div style="position:absolute;top:${i*slotH}px;left:0;right:0;height:${slotH}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#F1F5F9'}"></div>`
+  ).join('');
+
+  // Free-slot cells (not covered by any ClubSpark session or our pending booking)
+  const freeCells = slots.map((m,i) => {
+    const isBusy = sessions.some(s => s.StartTime < m+30 && s.EndTime > m);
+    if (isBusy) return '';
+    const isMine = myBooked.some(b => b.start_mins < m+30 && b.end_mins > m);
+    if (isMine) return '';
+    const selKey=`${r.Name}|${m}|${courtsDate}`;
+    const isSel=mbSlots.some(s=>s.key===selKey);
+    const selClass=isSel?' cg-selected':'';
+    const selBadge=isSel?`<div class="cg-sel-badge">✓</div>`:'';
+    const inner=cellButtons==='full'?`<span class="cg-slot-time">${cgSlotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>`
+      :cellButtons==='compact'?`<span class="cg-slot-time">${cgSlotFmt(m)}</span><span class="cgm-book-hint">Book</span><button class="cgm-plus" title="Add to queue" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">+</button>`
+      :'';
+    return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*slotH}px;height:${slotH}px" onclick="requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">${inner}${selBadge}</div>`;
+  }).join('');
+
+  // Merged session blocks: ClubSpark is source of truth, Supabase identifies ours
+  const blocks = sessions.map(s => {
+    const top = Math.max(0, (s.StartTime - gridS) / 30 * slotH);
+    const h = Math.max((s.EndTime - s.StartTime) / 30 * slotH - 2, 14);
+    // Check if this ClubSpark session matches one of our Supabase bookings
+    const mine = myBooked.find(b => b.start_mins < s.EndTime && b.end_mins > s.StartTime);
+    const timeStr = `${cgSlotFmt(s.StartTime)} – ${cgSlotFmt(s.EndTime)}`;
+    if (mine) {
+      const isPending = mine.status === 'pending';
+      const pendingClass = isPending ? ' cg-pending' : '';
+      const nameLabel = isPending ? 'Booking...' : 'Your Booking';
+      const txt = showText ? `<div class="cg-mine-name">${nameLabel}</div>${h > 36 ? `<div class="cg-mine-time">${timeStr}</div>` : ''}` : '';
+      return `<div class="cg-mine${pendingClass}" style="top:${top}px;height:${h}px">${txt}</div>`;
+    }
+    const color = sessColor(s);
+    const label = (s.Name && !s.Name.includes('-')) ? s.Name : (s.Category === 8000 ? 'Closed' : '');
+    const tc = sessTextCol(color);
+    const txt = showText ? `<div class="cg-sess-name" style="color:${tc}">${label}</div>${h > 36 ? `<div class="cg-sess-time" style="color:${tc}">${timeStr}</div>` : ''}` : '';
+    return `<div class="cg-sess" style="top:${top}px;height:${h}px;background:${color}">${txt}</div>`;
+  }).join('');
+
+  // Pending bookings not yet reflected in ClubSpark (bot still processing)
+  const pendingNotOnCS = myBooked.filter(b =>
+    b.status === 'pending' &&
+    !sessions.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins)
+  );
+  const pendingBlocks = pendingNotOnCS.map(b => {
+    const top = Math.max(0, (b.start_mins - gridS) / 30 * slotH);
+    const h = Math.max((b.end_mins - b.start_mins) / 30 * slotH - 2, 14);
+    return `<div class="cg-mine cg-pending" style="top:${top}px;height:${h}px">${showText?'<div class="cg-mine-name">Booking...</div>':''}</div>`;
+  }).join('');
+
+  return `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${pendingBlocks}</div>`;
+}
+// Render the courts grid from cache. Desktop: full 6-court grid (unchanged).
+// Mobile: 'all' = compact 6-court overview; 'one' = single court, full width.
+function renderCourtsBody() {
+  const body = document.getElementById('cBody');
+  if (!body) return;
+  if (!courtsCache || courtsCache.date !== courtsDate) { loadCourts(); return; }
+  const { resources, myBookings, gridS: GRID_S, gridE: GRID_E } = courtsCache;
+  const isMobile = window.innerWidth < 1024;
+  const mode = isMobile ? courtsView : 'desktop';
+  if (mode !== 'desktop' && !resources.length) {
+    body.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;font-weight:700">No courts available for this day</div>`;
+    return;
+  }
+  const SLOT_H = mode === 'all' ? 32 : 60;
+  const slots = [];
+  for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
+  const totalH = slots.length * SLOT_H;
+  const opts = { slotH: SLOT_H, slots, gridS: GRID_S, myBookings, totalH, showText: mode !== 'all', cellButtons: mode === 'desktop' ? 'full' : (mode === 'one' ? 'compact' : false) };
+  const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}<div style="height:calc(var(--nav-h,70px) + 8px)"></div></div>`;
+
+  let wrapClass, header, cols;
+  if (mode === 'one') {
+    courtsCourtIdx = Math.max(0, Math.min(courtsCourtIdx, resources.length - 1));
+    const r = resources[courtsCourtIdx];
+    wrapClass = ' cgm-one';
+    header = `<div class="cg-corner"></div><div class="cgm-one-hd"><button class="cgm-arr" onclick="cgmStep(-1)"${courtsCourtIdx===0?' disabled':''}>‹</button><div class="cgm-one-title">${r.Name}</div><button class="cgm-arr" onclick="cgmStep(1)"${courtsCourtIdx>=resources.length-1?' disabled':''}>›</button></div>`;
+    cols = courtColHTML(r, opts);
+  } else if (mode === 'all') {
+    wrapClass = ' cgm-all';
+    header = `<div class="cg-corner"></div>` + resources.map((r,i)=>`<div class="cg-court-hd" onclick="setCourtsMobileView(${i})">${r.Name.replace(/\D/g,'')||r.Name}</div>`).join('');
+    cols = resources.map(r => courtColHTML(r, opts)).join('');
+  } else {
+    wrapClass = '';
+    header = `<div class="cg-corner"></div>` + resources.map(r=>`<div class="cg-court-hd">${r.Name}</div>`).join('');
+    cols = resources.map(r => courtColHTML(r, opts)).join('');
+  }
+  body.innerHTML = `<div class="cg-wrap${wrapClass}"><div class="cg-header">${header}</div><div class="cg-body">${timesCol}<div class="cg-courts">${cols}</div></div></div>`;
+}
+// ── Mobile courts navigation: chips bar (All | 13 | 14 | ...) ──
+function renderCourtsMobileNav() {
+  const nav = document.getElementById('cgmNav');
+  if (!nav) return;
+  const names = (courtsCache && courtsCache.resources.length)
+    ? courtsCache.resources.map(r => r.Name)
+    : ['Court 13','Court 14','Court 15','Court 16','Court 17','Court 18'];
+  if (courtsCourtIdx > names.length - 1) courtsCourtIdx = names.length - 1;
+  if (courtsCourtIdx < 0) courtsCourtIdx = 0;
+  let html = `<div class="cgm-chip${courtsView==='all'?' active':''}" onclick="setCourtsMobileView('all')">All</div>`;
+  names.forEach((n,i) => {
+    html += `<div class="cgm-chip${(courtsView==='one'&&i===courtsCourtIdx)?' active':''}" onclick="setCourtsMobileView(${i})">${n.replace(/\D/g,'')||n}</div>`;
+  });
+  nav.innerHTML = html;
+}
+function setCourtsMobileView(v) {
+  if (v === 'all') { courtsView = 'all'; }
+  else { courtsView = 'one'; courtsCourtIdx = v; }
+  try { localStorage.setItem('fixturely_courts_view', courtsView); } catch(e) {}
+  renderCourtsMobileNav();
+  renderCourtsBody();
+}
+function cgmStep(n) {
+  const max = (courtsCache ? courtsCache.resources.length : 6) - 1;
+  const next = courtsCourtIdx + n;
+  if (next < 0 || next > max) return;
+  courtsCourtIdx = next;
+  renderCourtsMobileNav();
+  renderCourtsBody();
+}
+// Swipe left/right to switch courts in single-court view; re-render on breakpoint change
+(function() {
+  const el = document.getElementById('cBody');
+  if (!el) return;
+  let tx = 0, ty = 0;
+  el.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if (window.innerWidth >= 1024 || courtsView !== 'one' || !courtsCache) return;
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) cgmStep(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  let wasMobile = window.innerWidth < 1024;
+  window.addEventListener('resize', () => {
+    const m = window.innerWidth < 1024;
+    if (m !== wasMobile) { wasMobile = m; if (courtsCache && courtsLoaded) renderCourtsBody(); }
+  });
+})();
 // ══ COURT BOOKING ══
 let cbCourt='',cbResourceId='',cbStartMins=0,cbDate='',cbDuration=60;
 let cbMode='book'; // 'book' or 'select'
@@ -3683,7 +3796,7 @@ function selectCourtSlot(court, resourceId, startMins, date) {
   if(idx>=0){
     mbSlots.splice(idx,1);
     updateMultiBar();
-    loadCourts(); // re-render to remove highlight
+    rerenderCourts(); // re-render to remove highlight
     return;
   }
   openCourtModal(court, resourceId, startMins, date, 'select');
@@ -3848,7 +3961,7 @@ async function submitCourtBooking(){
     }
     closeCourtBookModal();
     updateMultiBar();
-    loadCourts(); // re-render to show highlight
+    rerenderCourts(); // re-render to show highlight
     return;
   }
 
@@ -4083,14 +4196,14 @@ function updateMultiBar(){
 function clearMultiSelect(){
   mbSlots=[];
   updateMultiBar();
-  loadCourts();
+  rerenderCourts();
 }
 function removeFromQueue(idx){
   mbSlots.splice(idx,1);
   if(mbSlots.length===0){
     document.getElementById('mbConfirmOvl').classList.remove('open');
     updateMultiBar();
-    loadCourts();
+    rerenderCourts();
   } else {
     renderMbSummary();
     updateMultiBar();
