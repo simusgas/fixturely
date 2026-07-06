@@ -620,8 +620,9 @@
   .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
-  /* Mobile-only courts nav + "Yours" legend chip — hidden on desktop */
+  /* Mobile-only courts nav, queue button + "Yours" legend chip — hidden on desktop */
   .cgm-nav{display:none;}
+  .cgm-queue-btn{display:none;}
   .c-leg-item.c-leg-mine{display:none;}
 
   /* Lock body scroll when any modal is open */
@@ -662,13 +663,10 @@
     .modal-close{width:36px;height:36px;font-size:16px;}
     .sv-nav-arr{width:36px;height:36px;}
     .sg-book-btn,.sg-block-btn{min-height:36px;padding:6px 14px;font-size:11px;}
-    .cg-req-btn,.cg-sel-btn{min-height:40px;min-width:48px;font-size:12px;}
 
     /* ── Hover → always visible on mobile ── */
     .sg-slot-time{opacity:0.6 !important;}
     .sg-slot-btns{opacity:1 !important;pointer-events:auto !important;}
-    .cg-slot-time{opacity:0.6 !important;}
-    .cg-req-btn,.cg-sel-btn{opacity:1 !important;pointer-events:auto !important;}
 
     /* ── Modals — taller bottom sheet ── */
     .overlay .modal{max-height:95vh;border-radius:20px 20px 0 0;}
@@ -678,23 +676,21 @@
     .cgm-nav::-webkit-scrollbar{display:none;}
     .cgm-chip{flex:1;min-width:40px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;color:var(--soft);cursor:pointer;white-space:nowrap;padding:0 8px;transition:background 0.15s,color 0.15s;}
     .cgm-chip.active{background:var(--c-a);border-color:var(--c-a);color:#fff;}
-    /* Overview: compact time gutter + tappable court headers */
+    /* Overview: compact time gutter + tappable court headers, desktop-style blocks */
     .cgm-all .cg-corner,.cgm-all .cg-times{width:40px;}
     .cgm-all .cg-time{font-size:10px;padding-right:4px;}
     .cgm-all .cg-court-hd{padding:12px 2px;font-size:12px;cursor:pointer;}
-    .cgm-all .cg-sess,.cgm-all .cg-mine{padding:2px 3px;border-radius:4px;}
+    .cgm-all .cg-sess,.cgm-all .cg-mine{padding:4px 5px;}
+    .cgm-all .cg-sess-name,.cgm-all .cg-mine-name{font-size:10px;}
+    .cgm-all .cg-sess-time,.cgm-all .cg-mine-time{display:none;}
     .cgm-all .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
     /* Single-court header: name + prev/next arrows */
     .cgm-one-hd{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-left:1px solid var(--border);}
     .cgm-one-title{font-size:15px;font-weight:900;color:var(--text);}
     .cgm-arr{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);font-size:17px;font-weight:800;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Inter',sans-serif;padding:0;}
     .cgm-arr:disabled{opacity:0.3;}
-    /* Single-court free cells: time left, tap-to-book hint centre, queue "+" right */
-    .cgm-one .cg-slot-free{justify-content:flex-end;padding-right:10px;}
-    .cgm-one .cg-slot-time{position:static;margin-right:auto;padding-left:10px;font-size:12px;}
-    .cgm-book-hint{font-size:12px;font-weight:800;color:var(--c-a);opacity:0.55;margin-right:12px;}
-    .cgm-plus{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--c-a);background:var(--white);color:var(--c-dk);font-size:19px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;padding:0;flex-shrink:0;line-height:1;}
-    .cg-slot-free.cg-selected .cgm-plus,.cg-slot-free.cg-selected .cgm-book-hint{display:none;}
+    /* "Add to queue" secondary action inside the book modal (mobile only) */
+    .cgm-queue-btn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:100px;background:var(--white);border:1.5px solid var(--c-a);color:var(--c-dk);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
     .c-leg-item.c-leg-mine{display:flex;}
 
     /* ── Home kanban — stack vertically on small screens ── */
@@ -1658,6 +1654,7 @@
       </div>
       <div id="cbError" style="display:none;background:var(--err-lt);border:1px solid var(--err);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--err)"></div>
       <button class="submit-btn" id="cbSubmitBtn" style="background:linear-gradient(135deg,var(--c-a),var(--c-dk));box-shadow:0 4px 14px rgba(74,124,89,0.3)" onclick="submitCourtBooking()">Book Court ✓</button>
+      <button class="cgm-queue-btn" id="cbQueueBtn" onclick="cbAddToQueue()">＋ Add to queue instead</button>
     </div>
     <!-- LOADING VIEW -->
     <div id="cbLoadingView" style="display:none">
@@ -3579,10 +3576,10 @@ function courtColHTML(r, opts) {
     const isSel=mbSlots.some(s=>s.key===selKey);
     const selClass=isSel?' cg-selected':'';
     const selBadge=isSel?`<div class="cg-sel-badge">✓</div>`:'';
-    const inner=cellButtons==='full'?`<span class="cg-slot-time">${cgSlotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>`
-      :cellButtons==='compact'?`<span class="cg-slot-time">${cgSlotFmt(m)}</span><span class="cgm-book-hint">Book</span><button class="cgm-plus" title="Add to queue" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">+</button>`
-      :'';
-    return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*slotH}px;height:${slotH}px" onclick="requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">${inner}${selBadge}</div>`;
+    const inner=cellButtons?`<span class="cg-slot-time">${cgSlotFmt(m)}</span><button class="cg-req-btn" onclick="event.stopPropagation();requestCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Book</button><button class="cg-sel-btn" onclick="event.stopPropagation();selectCourtSlot('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">Select</button>`:'';
+    // On mobile (no buttons): tap free slot = book modal; tap a queued slot = remove from queue
+    const cellFn=(!cellButtons&&isSel)?'selectCourtSlot':'requestCourtSlot';
+    return `<div class="cg-slot-free${selClass}" id="slot-${selKey.replace(/[| ]/g,'_')}" style="top:${i*slotH}px;height:${slotH}px" onclick="${cellFn}('${r.Name}','${r.ID||''}',${m},'${courtsDate}')">${inner}${selBadge}</div>`;
   }).join('');
 
   // Merged session blocks: ClubSpark is source of truth, Supabase identifies ours
@@ -3636,7 +3633,7 @@ function renderCourtsBody() {
   const slots = [];
   for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
   const totalH = slots.length * SLOT_H;
-  const opts = { slotH: SLOT_H, slots, gridS: GRID_S, myBookings, totalH, showText: mode !== 'all', cellButtons: mode === 'desktop' ? 'full' : (mode === 'one' ? 'compact' : false) };
+  const opts = { slotH: SLOT_H, slots, gridS: GRID_S, myBookings, totalH, showText: true, cellButtons: mode === 'desktop' };
   const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}<div style="height:calc(var(--nav-h,70px) + 8px)"></div></div>`;
 
   let wrapClass, header, cols;
@@ -3784,6 +3781,9 @@ function openCourtModal(court, resourceId, startMins, date, mode) {
     btn.textContent='Book Court ✓';
     document.querySelector('#cbFormView .modal-title').textContent='Book Court';
   }
+  // Queue shortcut only makes sense in book mode ('' = fall back to stylesheet: mobile-only)
+  const qb=document.getElementById('cbQueueBtn');
+  if(qb) qb.style.display=(mode==='select')?'none':'';
   document.getElementById('courtBookOvl').classList.add('open');
 }
 function requestCourtSlot(court, resourceId, startMins, date) {
@@ -3940,6 +3940,26 @@ function finishCbLoading(success){
   }
 }
 
+// Mobile "Add to queue instead" button in the book modal — same as select-mode submit
+function cbAddToQueue(){
+  if(cbCustomOpen){
+    let v=parseInt(document.getElementById('cbCustomInput').value);
+    if(isNaN(v)||v<15||v>240){
+      const errEl=document.getElementById('cbError');
+      errEl.textContent='Duration must be between 15 and 240 minutes.';
+      errEl.style.display='block';
+      return;
+    }
+    cbDuration=Math.round(v/15)*15;
+  }
+  const key=`${cbCourt}|${cbStartMins}|${cbDate}`;
+  if(!mbSlots.some(s=>s.key===key)){
+    mbSlots.push({key, court:cbCourt, resourceId:cbResourceId, startMins:cbStartMins, date:cbDate, duration:cbDuration});
+  }
+  closeCourtBookModal();
+  updateMultiBar();
+  rerenderCourts();
+}
 async function submitCourtBooking(){
   // Validate custom duration
   if(cbCustomOpen){
@@ -3967,6 +3987,7 @@ async function submitCourtBooking(){
 
   document.getElementById('cbError').style.display='none';
   startCbLoading();
+
 
   try {
     const res=await fetch('/api/courts/book',{
