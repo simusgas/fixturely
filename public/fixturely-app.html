@@ -676,14 +676,17 @@
     .cgm-nav::-webkit-scrollbar{display:none;}
     .cgm-chip{flex:1;min-width:40px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:800;color:var(--soft);cursor:pointer;white-space:nowrap;padding:0 8px;transition:background 0.15s,color 0.15s;}
     .cgm-chip.active{background:var(--c-a);border-color:var(--c-a);color:#fff;}
-    /* Overview: compact time gutter + tappable court headers, desktop-style blocks */
-    .cgm-all .cg-corner,.cgm-all .cg-times{width:40px;}
-    .cgm-all .cg-time{font-size:10px;padding-right:4px;}
-    .cgm-all .cg-court-hd{padding:12px 2px;font-size:12px;cursor:pointer;}
-    .cgm-all .cg-sess,.cgm-all .cg-mine{padding:4px 5px;}
+    /* All mobile zoom levels: compact time gutter, tappable headers, desktop-style blocks */
+    .cgm .cg-corner,.cgm .cg-times{width:40px;}
+    .cgm .cg-time{font-size:10px;padding-right:4px;}
+    .cgm .cg-court-hd{padding:12px 2px;font-size:12px;cursor:pointer;}
+    .cgm .cg-sess,.cgm .cg-mine{padding:4px 5px;}
+    .cgm .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
+    /* Zoomed out (4-6 courts): shrink names, hide times */
     .cgm-all .cg-sess-name,.cgm-all .cg-mine-name{font-size:10px;}
     .cgm-all .cg-sess-time,.cgm-all .cg-mine-time{display:none;}
-    .cgm-all .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
+    /* Mid zoom (2-3 courts): full labels, slightly smaller */
+    .cgm-mid .cg-sess-name,.cgm-mid .cg-mine-name{font-size:12px;}
     /* Single-court header: name + prev/next arrows */
     .cgm-one-hd{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-left:1px solid var(--border);}
     .cgm-one-title{font-size:15px;font-weight:900;color:var(--text);}
@@ -3498,9 +3501,9 @@ function sessTextCol(hex) {
   return (r*299+g*587+b*114)/1000 > 160 ? '#0F172A' : '#fff';
 }
 let courtsCache = null;      // {date, resources, myBookings, gridS, gridE} — last fetched data
-let courtsView = 'all';      // mobile view: 'all' (overview) | 'one' (single court)
-try { const _cv = localStorage.getItem('fixturely_courts_view'); if (_cv === 'one' || _cv === 'all') courtsView = _cv; } catch(e) {}
-let courtsCourtIdx = 0;      // selected court in mobile 'one' view
+let courtsVisCount = 6;      // mobile zoom level: how many courts visible (6 = all … 1 = single)
+let courtsStartIdx = 0;      // first court of the visible window
+let cgmHintShown = false;    // one-time "pinch to zoom" toast guard
 const cgSlotFmt = m => { const h=Math.floor(m/60)%24,mn=m%60; return `${h%12||12}:${mn.toString().padStart(2,'0')}${h>=12?'pm':'am'}`; };
 async function loadCourts() {
   const body = document.getElementById('cBody');
@@ -3617,19 +3620,20 @@ function courtColHTML(r, opts) {
   return `<div class="cg-court" style="height:${totalH}px">${lines}${freeCells}${blocks}${pendingBlocks}</div>`;
 }
 // Render the courts grid from cache. Desktop: full 6-court grid (unchanged).
-// Mobile: 'all' = compact 6-court overview; 'one' = single court, full width.
+// Mobile: shows a window of `courtsVisCount` courts starting at `courtsStartIdx`.
+// Pinch zooms in discrete steps (6→5→…→1 courts); row height never changes.
 function renderCourtsBody() {
   const body = document.getElementById('cBody');
   if (!body) return;
   if (!courtsCache || courtsCache.date !== courtsDate) { loadCourts(); return; }
   const { resources, myBookings, gridS: GRID_S, gridE: GRID_E } = courtsCache;
   const isMobile = window.innerWidth < 1024;
-  const mode = isMobile ? courtsView : 'desktop';
+  const mode = isMobile ? 'mobile' : 'desktop';
   if (mode !== 'desktop' && !resources.length) {
     body.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;font-weight:700">No courts available for this day</div>`;
     return;
   }
-  const SLOT_H = mode === 'all' ? 32 : 60;
+  const SLOT_H = mode === 'mobile' ? 32 : 60;
   const slots = [];
   for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
   const totalH = slots.length * SLOT_H;
@@ -3637,22 +3641,40 @@ function renderCourtsBody() {
   const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}<div style="height:calc(var(--nav-h,70px) + 8px)"></div></div>`;
 
   let wrapClass, header, cols;
-  if (mode === 'one') {
-    courtsCourtIdx = Math.max(0, Math.min(courtsCourtIdx, resources.length - 1));
-    const r = resources[courtsCourtIdx];
-    wrapClass = ' cgm-one';
-    header = `<div class="cg-corner"></div><div class="cgm-one-hd"><button class="cgm-arr" onclick="cgmStep(-1)"${courtsCourtIdx===0?' disabled':''}>‹</button><div class="cgm-one-title">${r.Name}</div><button class="cgm-arr" onclick="cgmStep(1)"${courtsCourtIdx>=resources.length-1?' disabled':''}>›</button></div>`;
-    cols = courtColHTML(r, opts);
-  } else if (mode === 'all') {
-    wrapClass = ' cgm-all';
-    header = `<div class="cg-corner"></div>` + resources.map((r,i)=>`<div class="cg-court-hd" onclick="setCourtsMobileView(${i})">${r.Name.replace(/\D/g,'')||r.Name}</div>`).join('');
-    cols = resources.map(r => courtColHTML(r, opts)).join('');
+  if (mode === 'mobile') {
+    const total = resources.length;
+    const vis = Math.max(1, Math.min(courtsVisCount, total));
+    courtsStartIdx = Math.max(0, Math.min(courtsStartIdx, total - vis));
+    const win = resources.slice(courtsStartIdx, courtsStartIdx + vis);
+    if (vis === 1) {
+      const r = win[0];
+      wrapClass = ' cgm cgm-one';
+      header = `<div class="cg-corner"></div><div class="cgm-one-hd"><button class="cgm-arr" onclick="cgmStep(-1)"${courtsStartIdx===0?' disabled':''}>‹</button><div class="cgm-one-title">${r.Name}</div><button class="cgm-arr" onclick="cgmStep(1)"${courtsStartIdx>=total-1?' disabled':''}>›</button></div>`;
+    } else {
+      wrapClass = vis >= 4 ? ' cgm cgm-all' : ' cgm cgm-mid';
+      header = `<div class="cg-corner"></div>` + win.map((r,j)=>{
+        const gi = courtsStartIdx + j;
+        const lbl = vis >= 4 ? (r.Name.replace(/\D/g,'')||r.Name) : r.Name;
+        return `<div class="cg-court-hd" onclick="setCourtsMobileView(${gi})">${lbl}</div>`;
+      }).join('');
+    }
+    cols = win.map(r => courtColHTML(r, opts)).join('');
   } else {
     wrapClass = '';
     header = `<div class="cg-corner"></div>` + resources.map(r=>`<div class="cg-court-hd">${r.Name}</div>`).join('');
     cols = resources.map(r => courtColHTML(r, opts)).join('');
   }
   body.innerHTML = `<div class="cg-wrap${wrapClass}"><div class="cg-header">${header}</div><div class="cg-body">${timesCol}<div class="cg-courts">${cols}</div></div></div>`;
+  // One-time hint so pinch-zoom is discoverable
+  if (mode === 'mobile' && !cgmHintShown) {
+    cgmHintShown = true;
+    try {
+      if (!localStorage.getItem('fixturely_pinch_hint')) {
+        localStorage.setItem('fixturely_pinch_hint', '1');
+        setTimeout(() => toast('💡 Pinch the grid to zoom in on courts'), 800);
+      }
+    } catch(e) {}
+  }
 }
 // ── Mobile courts navigation: chips bar (All | 13 | 14 | ...) ──
 function renderCourtsMobileNav() {
@@ -3661,37 +3683,78 @@ function renderCourtsMobileNav() {
   const names = (courtsCache && courtsCache.resources.length)
     ? courtsCache.resources.map(r => r.Name)
     : ['Court 13','Court 14','Court 15','Court 16','Court 17','Court 18'];
-  if (courtsCourtIdx > names.length - 1) courtsCourtIdx = names.length - 1;
-  if (courtsCourtIdx < 0) courtsCourtIdx = 0;
-  let html = `<div class="cgm-chip${courtsView==='all'?' active':''}" onclick="setCourtsMobileView('all')">All</div>`;
+  const total = names.length;
+  const vis = Math.max(1, Math.min(courtsVisCount, total));
+  courtsStartIdx = Math.max(0, Math.min(courtsStartIdx, total - vis));
+  let html = `<div class="cgm-chip${vis===total?' active':''}" onclick="setCourtsMobileView('all')">All</div>`;
   names.forEach((n,i) => {
-    html += `<div class="cgm-chip${(courtsView==='one'&&i===courtsCourtIdx)?' active':''}" onclick="setCourtsMobileView(${i})">${n.replace(/\D/g,'')||n}</div>`;
+    const inWin = vis < total && i >= courtsStartIdx && i < courtsStartIdx + vis;
+    html += `<div class="cgm-chip${inWin?' active':''}" onclick="setCourtsMobileView(${i})">${n.replace(/\D/g,'')||n}</div>`;
   });
   nav.innerHTML = html;
 }
 function setCourtsMobileView(v) {
-  if (v === 'all') { courtsView = 'all'; }
-  else { courtsView = 'one'; courtsCourtIdx = v; }
-  try { localStorage.setItem('fixturely_courts_view', courtsView); } catch(e) {}
+  const total = courtsCache ? courtsCache.resources.length : 6;
+  if (v === 'all') { courtsVisCount = total; courtsStartIdx = 0; }
+  else { courtsVisCount = 1; courtsStartIdx = v; }
   renderCourtsMobileNav();
   renderCourtsBody();
 }
+// Pan the visible window left/right by one court (arrows + swipe)
 function cgmStep(n) {
-  const max = (courtsCache ? courtsCache.resources.length : 6) - 1;
-  const next = courtsCourtIdx + n;
-  if (next < 0 || next > max) return;
-  courtsCourtIdx = next;
+  const total = courtsCache ? courtsCache.resources.length : 6;
+  const next = Math.max(0, Math.min(courtsStartIdx + n, total - courtsVisCount));
+  if (next === courtsStartIdx) return;
+  courtsStartIdx = next;
   renderCourtsMobileNav();
   renderCourtsBody();
 }
-// Swipe left/right to switch courts in single-court view; re-render on breakpoint change
+// Stepped zoom: change how many courts are visible by one, keeping the court
+// under the pinch midpoint (focalX) inside the new window. Vertical scale unchanged.
+function cgmZoom(delta, focalX) {
+  if (!courtsCache) return;
+  const total = courtsCache.resources.length;
+  const cur = Math.max(1, Math.min(courtsVisCount, total));
+  const next = Math.max(1, Math.min(total, cur + delta));
+  if (next === cur) return;
+  const body = document.getElementById('cBody');
+  const rect = body.getBoundingClientRect();
+  const GUT = 40; // mobile time-gutter width
+  const colW = (rect.width - GUT) / cur;
+  let focal = courtsStartIdx + Math.floor((focalX - rect.left - GUT) / colW);
+  focal = Math.max(0, Math.min(total - 1, focal));
+  courtsVisCount = next;
+  courtsStartIdx = Math.max(0, Math.min(Math.round(focal - (next - 1) / 2), total - next));
+  renderCourtsMobileNav();
+  renderCourtsBody();
+}
+// Touch gestures on the courts grid: pinch = stepped zoom, swipe = pan window.
+// Also re-render when the viewport crosses the mobile/desktop breakpoint.
 (function() {
   const el = document.getElementById('cBody');
   if (!el) return;
-  let tx = 0, ty = 0;
-  el.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  let tx = 0, ty = 0, pinching = false, pzDist = 0;
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  el.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) { pinching = true; pzDist = dist(e.touches); }
+    else if (e.touches.length === 1 && !pinching) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if (e.touches.length !== 2 || window.innerWidth >= 1024 || !courtsCache) return;
+    e.preventDefault(); // keep the browser from scrolling/zooming mid-pinch
+    const d = dist(e.touches);
+    if (!pzDist) { pzDist = d; return; }
+    const ratio = d / pzDist;
+    const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    // Snap one step per 25% spread change, then re-baseline so a long pinch steps again
+    if (ratio > 1.25) { cgmZoom(-1, midX); pzDist = d; }
+    else if (ratio < 0.8) { cgmZoom(1, midX); pzDist = d; }
+  }, { passive: false });
   el.addEventListener('touchend', e => {
-    if (window.innerWidth >= 1024 || courtsView !== 'one' || !courtsCache) return;
+    if (e.touches.length > 0) return;                    // fingers still down
+    if (pinching) { pinching = false; pzDist = 0; return; } // pinch just ended — not a swipe
+    if (window.innerWidth >= 1024 || !courtsCache) return;
+    if (courtsVisCount >= courtsCache.resources.length) return; // full view — nothing to pan
     const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
     if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) cgmStep(dx < 0 ? 1 : -1);
   }, { passive: true });
