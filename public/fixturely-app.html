@@ -2,6 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* Early error trap: never fail to a silent white page — show a red banner instead. */
+window.__bootErrors=[];
+(function(){
+  function show(msg){
+    try{
+      var b=document.getElementById('bootErrBanner');
+      if(!b){
+        b=document.createElement('div');
+        b.id='bootErrBanner';
+        b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#B91C1C;color:#fff;font:12px/1.5 -apple-system,Menlo,monospace;padding:8px 12px;white-space:pre-wrap;word-break:break-all;max-height:45vh;overflow:auto';
+        (document.body||document.documentElement).appendChild(b);
+      }
+      b.textContent+=msg+'\n';
+    }catch(_){}
+  }
+  window.__bootShow=show;
+  window.addEventListener('error',function(e){window.__bootErrors.push(e.message);show('⚠️ '+e.message+(e.lineno?' (line '+e.lineno+')':''));});
+  window.addEventListener('unhandledrejection',function(e){var m=(e.reason&&e.reason.message)||String(e.reason);window.__bootErrors.push(m);show('⚠️ (async) '+m);});
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      if(!window.__appBooted) show('⚠️ App script did not finish starting.'+(window.__bootErrors.length?'':' No error was thrown — likely the script never ran.'));
+    },1000);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Fixturely</title>
@@ -4959,6 +4985,7 @@ loadAllData();
 
 // ══ PWA ══
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+window.__appBooted=true; // boot-complete marker for the early error trap
 </script>
 </body>
 </html>
