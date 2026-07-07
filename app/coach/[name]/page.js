@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 
 const P = '#4F46E5', P_LT = '#EEF2FF', P_DK = '#3730A3'
 const TEXT = '#0F172A', SOFT = '#475569', MUTED = '#94A3B8', BORDER = '#E2E8F0', OFF = '#F8FAFC'
@@ -13,7 +13,7 @@ function fmt(t) {
 }
 
 export default function CoachPage({ params }) {
-  const { name } = params
+  const { name } = use(params)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [coachName, setCoachName] = useState('')
