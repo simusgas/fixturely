@@ -366,6 +366,8 @@
   .sg-hr-line{position:absolute;left:0;right:0;border-top:1px solid var(--border);}
   .sg-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(238,232,220,0.7);}
   .sg-block{position:absolute;left:2px;right:2px;border-radius:6px;background:var(--off);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;z-index:1;transition:background 0.15s;}
+  /* Lesson bookings in the share grid — same blocked look, blue outline only the coach sees */
+  .sg-lesson-blk{outline:2px solid var(--s-a);outline-offset:-2px;border-radius:8px;z-index:2;}
   .sg-block:hover{background:var(--border);}
   .sg-block-lbl{font-size:10px;font-weight:700;color:var(--muted);}
   .sg-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
@@ -613,15 +615,16 @@
   .cg-sel-badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--c-a);color:#fff;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1;}
   .cg-slot-time{opacity:0;transition:opacity 0.18s;font-size:11px;font-weight:700;color:var(--soft);position:absolute;top:6px;left:7px;pointer-events:none;}
   .cg-slot-free:hover .cg-slot-time{opacity:1;}
-  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:5px 12px;border-radius:100px;border:none;font-size:11px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;min-height:36px;min-width:44px;}
+  .cg-req-btn,.cg-sel-btn{opacity:0;pointer-events:none;transition:opacity 0.18s;padding:3px 10px;border-radius:100px;border:none;font-size:10px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;min-height:24px;min-width:40px;}
   .cg-req-btn{background:var(--c-a);color:#fff;box-shadow:0 2px 6px rgba(79,70,229,0.25);}
   .cg-sel-btn{background:var(--white);color:var(--c-dk);border:1.5px solid var(--c-a);}
   .cg-slot-free:hover .cg-req-btn,.cg-slot-free:hover .cg-sel-btn{opacity:1;pointer-events:auto;}
   .cg-slot-free.cg-selected .cg-req-btn,.cg-slot-free.cg-selected .cg-sel-btn{display:none;}
   #screen-courts{display:none;}
   #screen-courts.active{display:flex !important;flex-direction:column;overflow:hidden;}
-  /* Mobile-only courts queue button + "Yours" legend chip — hidden on desktop */
+  /* Mobile-only courts queue button, 15-min time stepper + "Yours" legend chip — hidden on desktop */
   .cgm-queue-btn{display:none;}
+  .cb-time-step{display:none;}
   .c-leg-item.c-leg-mine{display:none;}
 
   /* Lock body scroll when any modal is open */
@@ -666,6 +669,8 @@
     /* ── Hover → always visible on mobile ── */
     .sg-slot-time{opacity:0.6 !important;}
     .sg-slot-btns{opacity:1 !important;pointer-events:auto !important;}
+    /* Share grid: keep free cells clean on mobile — whole cell is the tap target */
+    #shBody .sg-slot-time{display:none !important;}
 
     /* ── Modals — taller bottom sheet ── */
     .overlay .modal{max-height:95vh;border-radius:20px 20px 0 0;}
@@ -678,7 +683,7 @@
     .cgm .cg-court-hd{padding:11px 2px;font-size:12px;cursor:pointer;}
     .cgm .cg-sess,.cgm .cg-mine{padding:1px 4px;border-radius:5px;}
     .cgm .cg-sess-name,.cgm .cg-mine-name{line-height:1.25;}
-    .cgm .cg-sel-badge{width:14px;height:14px;font-size:8px;top:2px;right:2px;}
+    .cgm .cg-sel-badge{width:10px;height:10px;font-size:7px;top:1px;right:1px;}
     /* All-courts view: shrink names, hide times */
     .cgm-all .cg-sess-name,.cgm-all .cg-mine-name{font-size:9px;}
     .cgm-all .cg-sess-time,.cgm-all .cg-mine-time{display:none;}
@@ -690,6 +695,8 @@
     .cgm-allbtn{width:auto;border-radius:100px;padding:0 12px;font-size:12px;}
     /* "Add to queue" secondary action inside the book modal (mobile only) */
     .cgm-queue-btn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:100px;background:var(--white);border:1.5px solid var(--c-a);color:var(--c-dk);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
+    /* 15-min start-time stepper in the book modal (mobile only — desktop grid is already 15-min) */
+    .cb-time-step{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--c-a);background:var(--white);color:var(--c-dk);font-size:18px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;padding:0;}
     .c-leg-item.c-leg-mine{display:flex;}
 
     /* ── Home kanban — stack vertically on small screens ── */
@@ -890,6 +897,8 @@
   .sh-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
   .sh-preview-url{flex:1;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .sh-preview-label{font-size:14px;font-weight:900;color:var(--p-dk);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;background:var(--p-lt);padding:10px 16px;border-radius:10px;border:1.5px solid rgba(79,70,229,0.15);}
+  /* Availability-editing hint bar */
+  .sh-edit-hint{font-size:12px;font-weight:700;color:var(--s-dk);background:var(--s-pl);border:1.5px solid var(--s-b);border-radius:10px;padding:8px 12px;margin-bottom:10px;text-align:center;}
   .sh-preview-content{max-height:500px;overflow-y:auto;}
   .sh-preview-empty{text-align:center;padding:40px 20px;color:var(--muted);}
   .sh-preview-empty-icon{font-size:36px;margin-bottom:10px;}
@@ -1631,7 +1640,11 @@
       </div>
       <div class="field">
         <label class="field-label">Start Time</label>
-        <div class="field-input" id="cbStartTime" style="background:var(--off);color:var(--soft)"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="cb-time-step" onclick="cbStepStart(-15)">−</button>
+          <div class="field-input" id="cbStartTime" style="background:var(--off);color:var(--soft);flex:1"></div>
+          <button class="cb-time-step" onclick="cbStepStart(15)">＋</button>
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Duration</label>
@@ -1849,6 +1862,7 @@ function dm(d){
   if(d==='30m') return 30;
   if(d==='45m') return 45;
   if(d==='1h')  return 60;
+  const nm=/^(\d+)m$/.exec(d); if(nm) return parseInt(nm[1]); // '60m', '90m', … (block durations)
   if(d==='custom'){const v=document.getElementById('customDurIn');if(v){const n=parseInt(v.value);return isNaN(n)?60:n;}return 60;}
   // legacy fallback
   return d==='30 min'?30:d==='1 hour'?60:d==='1.5 hrs'?90:120;
@@ -2340,7 +2354,8 @@ function getAvailableSlots(dstr){
     if(isToday&&tM<=nowM) continue;
     const taken=booked.some(s=>{const sS=t2m(s.time),sE=sS+dm(s.dur);return tM<sE&&tM+60>sS;});
     if(taken) continue;
-    if(isSlotBlocked(dstr,t)) continue;
+    // A 1-hour lesson spans both half-hours — either being blocked hides the slot
+    if(isSlotBlocked(dstr,t)||isSlotBlocked(dstr,`${h.toString().padStart(2,'0')}:30`)) continue;
     slots.push(t);
   }
   return slots;
@@ -2393,24 +2408,21 @@ function shareViaChannel(channel){
 }
 let sharePreviewDate=null;
 let shareWeekStart=null;
+// The share preview IS the schedule week grid (anonymized): tap a free slot to block
+// it (unavailable to students), tap a blocked slot to restore it. Same BLOCKS store.
+function shWkBlock(dstr,timeStr){
+  BLOCKS.push({date:dstr,time:timeStr,dur:'30m',recur:'once'});
+  saveCache();renderSchedule();syncAvailability();
+  toast('Marked unavailable to students');
+  renderSharePage();
+}
+function shWkUnblock(dstr,timeStr){
+  unblockSlot(dstr,timeStr); // handles recurring blocks with a confirm
+  renderSharePage();
+}
 function renderSharePage(){
   const body=document.getElementById('shBody');
   if(!shareWeekStart) shareWeekStart=wkStart(today);
-
-  // Build week days for the current share week
-  const weekDays=[];
-  for(let i=0;i<7;i++){
-    const d=add(shareWeekStart,i);
-    const dstr=ds(d);
-    const isPast=d<today&&dstr!==ds(today);
-    const slots=isPast?[]:getAvailableSlots(dstr);
-    weekDays.push({d,dstr,slots,isPast});
-  }
-  // Auto-select first available day if none selected or not in current week
-  if(!sharePreviewDate||!weekDays.some(wd=>wd.dstr===sharePreviewDate)){
-    const first=weekDays.find(wd=>wd.slots.length>0);
-    sharePreviewDate=first?first.dstr:null;
-  }
 
   // Week label
   const weekEnd=add(shareWeekStart,6);
@@ -2421,29 +2433,16 @@ function renderSharePage(){
   const canPrev=shareWeekStart>wkStart(today);
   const canNext=add(shareWeekStart,7)<=add(today,28);
 
-  let previewHTML='';
-  const hasAnySessions=SESSIONS.length>0;
-  if(hasAnySessions){
-    const dayGrid=weekDays.map(wd=>{
-      const hasSlots=wd.slots.length>0;
-      const isSel=wd.dstr===sharePreviewDate;
-      const isToday=wd.dstr===ds(today);
-      return `<div data-sh-day="${wd.dstr}" onclick="${hasSlots?`selectShareDay('${wd.dstr}')`:''}" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;cursor:${hasSlots?'pointer':'default'};transition:all 0.15s;${isSel?'background:var(--p)':''};${wd.isPast?'opacity:0.3':''};${hasSlots&&!isSel?'border:1.5px solid transparent':''}${isSel?';border:1.5px solid var(--p)':''}"><div class="sh-day-name" style="font-size:9px;font-weight:800;color:${isSel?'rgba(255,255,255,0.8)':'var(--muted)'};text-transform:uppercase;margin-bottom:4px;transition:color 0.15s">${DW[((wd.d.getDay()+6)%7)]}</div><div class="sh-day-num" style="font-size:14px;font-weight:900;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${isSel?'#fff':isToday?'var(--p)':'var(--text)'};${isToday&&!isSel?'border:2px solid var(--p)':''};transition:color 0.15s">${wd.d.getDate()}</div>${hasSlots?`<div class="sh-day-dot" style="width:4px;height:4px;border-radius:50%;background:${isSel?'rgba(255,255,255,0.7)':'var(--p)'};margin-top:3px;transition:background 0.15s"></div>`:''}</div>`;
-    }).join('');
-
-    previewHTML=`<div style="padding:20px">
-      <div style="text-align:center;margin-bottom:16px"><div style="font-size:24px;margin-bottom:4px">🎾</div><div style="font-size:18px;font-weight:900;color:var(--text)">${coachFullName||'Coach'}</div><div style="font-size:12px;color:var(--soft);font-weight:600">Tennis Coach</div></div>
+  // The preview is the coach's own schedule grid, anonymized, tap-to-toggle availability
+  const previewHTML=`<div style="padding:14px 14px 20px">
+      <div class="sh-edit-hint">Tap a time to make it unavailable to students · <span style="color:var(--s-a)">blue outline</span> = a lesson booking (only you can see this)</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <button onclick="changeShareWeek(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canPrev?'':'opacity:0.3;pointer-events:none'}">‹</button>
         <div style="font-size:13px;font-weight:900;color:var(--text)">${weekLbl}</div>
         <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
       </div>
-      <div style="display:flex;gap:2px;margin-bottom:16px">${dayGrid}</div>
-      <div id="shPreviewSlots" style="transition:opacity 0.15s"></div>
+      ${renderWeekViewHTML(shareWeekStart,true)}
     </div>`;
-  } else {
-    previewHTML=`<div class="sh-preview-empty"><div class="sh-preview-empty-icon">📅</div><div class="sh-preview-empty-t">Your schedule is empty</div><div class="sh-preview-empty-s">Add some lessons first and your students<br>will see your availability here</div></div>`;
-  }
 
   // Student list for sharing
   let studentsListHTML='';
@@ -2466,12 +2465,8 @@ function renderSharePage(){
 
   body.innerHTML=`<div class="sh-split">
     <div class="sh-split-left">
-      <div class="sh-preview-label">👁 Student view — this is exactly what students see</div>
+      <div class="sh-preview-label">👁 When you share your calendar with students, this is how it'll appear</div>
       <div class="sh-preview-frame">
-        <div class="sh-preview-bar">
-          <div class="sh-preview-dots"><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div><div class="sh-preview-dot"></div></div>
-          <div class="sh-preview-url">${getBookingUrl().replace('https://','')}</div>
-        </div>
         <div class="sh-preview-content">${previewHTML}</div>
       </div>
     </div>
@@ -2499,46 +2494,15 @@ function renderSharePage(){
       </div>
     </div>
   </div>`;
-  // Render slots for selected day after DOM is set
-  setTimeout(()=>renderSharePreviewSlots(),0);
+  // One-time explainer for the lesson-booking outline
+  try{
+    if(!localStorage.getItem('fixturely_share_lesson_hint')){
+      localStorage.setItem('fixturely_share_lesson_hint','1');
+      setTimeout(()=>toast('💡 Blue outline = a lesson booking. Students just see it as unavailable.'),600);
+    }
+  }catch(e){}
 }
 
-function renderSharePreviewSlots(){
-  const el=document.getElementById('shPreviewSlots');
-  if(!el) return;
-  if(!sharePreviewDate){el.innerHTML='';return;}
-  const slots=getAvailableSlots(sharePreviewDate);
-  const d=new Date(sharePreviewDate+'T00:00:00');
-  const dateStr=`${DF[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]}`;
-  if(!slots.length){
-    el.innerHTML=`<div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;font-weight:600">No available times on this day</div>`;
-    return;
-  }
-  el.innerHTML=`<div style="font-size:10px;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Available times</div>`+
-    slots.map(t=>`<div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:900;color:var(--text)">${fmt(t)}</div><div style="font-size:11px;color:var(--soft);font-weight:600">1 hour · ${dateStr}</div></div><button onclick="openSharePreviewReq('${t}','${dateStr}')" style="background:var(--p);color:#fff;border:none;padding:8px 16px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 2px 6px rgba(79,70,229,0.25)">Request</button></div>`).join('');
-}
-function selectShareDay(dstr){
-  sharePreviewDate=dstr;
-  // Update day strip active states without full re-render
-  document.querySelectorAll('[data-sh-day]').forEach(el=>{
-    const d=el.dataset.shDay;
-    const isSel=d===dstr;
-    el.style.background=isSel?'var(--p)':'';
-    el.style.borderColor=isSel?'var(--p)':'transparent';
-    const nm=el.querySelector('.sh-day-name');if(nm) nm.style.color=isSel?'rgba(255,255,255,0.85)':'';
-    const num=el.querySelector('.sh-day-num');if(num) num.style.color=isSel?'#fff':'';
-    const dot=el.querySelector('.sh-day-dot');
-    if(dot) dot.style.background=isSel?'rgba(255,255,255,0.7)':'var(--p)';
-  });
-  // Fade out, swap content, fade in
-  const el=document.getElementById('shPreviewSlots');
-  if(el){
-    el.style.opacity='0';
-    setTimeout(()=>{renderSharePreviewSlots();el.style.opacity='1';},120);
-  } else {
-    renderSharePreviewSlots();
-  }
-}
 function changeShareWeek(n){
   const newWeek=add(shareWeekStart,n*7);
   if(newWeek<wkStart(today)) return;
@@ -2935,7 +2899,9 @@ function renderDayViewHTML(date, daySess, hol){
   return `${holBanner}<div class="sv-day-wrap"><div class="sv-day-head"><button class="sv-nav-arr" onclick="prevDay()">‹</button><div style="text-align:center"><div class="sv-day-ttl">${dateLabel}</div><div class="sv-day-cnt">${cnt} lesson${cnt!==1?'s':''}</div></div><button class="sv-nav-arr" onclick="nextDay()">›</button></div><div class="sv-grid"><div class="sv-times">${timesHTML}</div><div class="sv-cols" style="height:${totalH}px">${linesHTML}${freeSlotsHTML.join('')}${blocksHTML}${nowHTML}</div></div></div>`;
 }
 
-function renderWeekViewHTML(weekStart){
+// shareEdit: same grid, but anonymized (no student names) and clicks toggle
+// availability for the shared calendar instead of booking/opening lessons.
+function renderWeekViewHTML(weekStart,shareEdit){
   const days=[];
   for(let i=0;i<7;i++) days.push(add(weekStart,i));
   const todayStr=ds(today),selStr=ds(sel);
@@ -2950,8 +2916,8 @@ function renderWeekViewHTML(weekStart){
   const dayHdHTML=days.map((d,i)=>{
     const dstr=ds(d);
     const isToday=dstr===todayStr;
-    const isSel=dstr===selStr&&!isToday;
-    return `<div class="sg-day-hd${isToday?' sg-today':''}${isSel?' sg-sel':''}" onclick="selectDay(new Date('${dstr}T00:00:00'))"><div class="sg-day-name">${DW[i]}</div><div class="sg-day-num">${d.getDate()}</div></div>`;
+    const isSel=dstr===selStr&&!isToday&&!shareEdit;
+    return `<div class="sg-day-hd${isToday?' sg-today':''}${isSel?' sg-sel':''}"${shareEdit?'':` onclick="selectDay(new Date('${dstr}T00:00:00'))"`}><div class="sg-day-name">${DW[i]}</div><div class="sg-day-num">${d.getDate()}</div></div>`;
   }).join('');
 
   const timesHTML=slots.map(m=>{
@@ -2976,7 +2942,8 @@ function renderWeekViewHTML(weekStart){
       const timeStr=`${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;
       const lbl=`${h%12||12}:${mn.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;
       const blocked=isSlotBlocked(dstr,timeStr);
-      if(blocked) return `<div class="sg-block" style="top:${i*SG_SH}px;height:${SG_SH}px;pointer-events:auto;cursor:pointer" onclick="unblockSlot('${dstr}','${timeStr}')"><div class="sg-block-lbl">Blocked</div></div>`;
+      if(blocked) return `<div class="sg-block" style="top:${i*SG_SH}px;height:${SG_SH}px;pointer-events:auto;cursor:pointer" onclick="${shareEdit?`shWkUnblock('${dstr}','${timeStr}')`:`unblockSlot('${dstr}','${timeStr}')`}"><div class="sg-block-lbl">Blocked</div></div>`;
+      if(shareEdit) return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="shWkBlock('${dstr}','${timeStr}')"><span class="sg-slot-time">${lbl}</span></div>`;
       return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><div class="sg-slot-btns"><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button><button class="sg-block-btn" onclick="event.stopPropagation();blockSlot('${dstr}',${h},${mn})">Block</button></div></div>`;
     }).join('');
 
@@ -2986,6 +2953,8 @@ function renderWeekViewHTML(weekStart){
       const top=((startM-CAL_S*60)/30)*SG_SH;
       const height=Math.max((durM/30)*SG_SH-2,20);
       if(top+height<=0||top>=totalH) return '';
+      // Share view: lessons look like any other blocked time, plus a blue outline only the coach sees
+      if(shareEdit) return `<div class="sg-block sg-lesson-blk" style="top:${top}px;height:${height}px"><div class="sg-block-lbl">Blocked</div></div>`;
       const isPaid=s.payStatus==='paid';
       const compact=height<=35;
       const showTime=height>34;
@@ -2999,7 +2968,7 @@ function renderWeekViewHTML(weekStart){
 
   const weekEnd=add(weekStart,6);
   const weekLbl=weekStart.getMonth()===weekEnd.getMonth()?`${MN[weekStart.getMonth()]} ${weekStart.getFullYear()}`:`${MN[weekStart.getMonth()].slice(0,3)}–${MN[weekEnd.getMonth()].slice(0,3)} ${weekEnd.getFullYear()}`;
-  const weekNavHTML=`<div class="sv-week-nav" style="flex-wrap:wrap;gap:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>${whCtrlHTML()}</div>`;
+  const weekNavHTML=shareEdit?'':`<div class="sv-week-nav" style="flex-wrap:wrap;gap:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>${whCtrlHTML()}</div>`;
   return `<div class="sg-wrap">${weekNavHTML}<div class="sg-header"><div class="sg-corner"></div>${dayHdHTML}</div><div class="sg-body"><div class="sg-times">${timesHTML}</div><div class="sg-cols">${colsHTML}</div></div></div>`;
 }
 
@@ -3552,20 +3521,21 @@ function rerenderCourts() {
 // Build one court column (grid lines + free cells + session blocks).
 // showText: names/times inside blocks; cellButtons: Book/Select buttons + time label in free cells.
 function courtColHTML(r, opts) {
-  const { slotH, slots, gridS, myBookings, totalH, showText, cellButtons } = opts;
+  const { slotH, step, slots, gridS, myBookings, totalH, showText, cellButtons } = opts;
   const sessions = (r.Days && r.Days[0] ? r.Days[0].Sessions : []).filter(s => s.Category !== 0);
   const myBooked = myBookings.filter(b => b.court_name === r.Name && (b.status === 'confirmed' || b.status === 'pending'));
 
-  // Grid lines
-  const lines = slots.map((m,i) =>
-    `<div style="position:absolute;top:${i*slotH}px;left:0;right:0;height:${slotH}px;border-bottom:1px solid ${m%60===0?'var(--border)':'#F1F5F9'}"></div>`
-  ).join('');
+  // Grid lines — drawn only at half-hour boundaries, matching the old 30-min look
+  const lines = slots.map((m,i) => {
+    if ((m+step)%30!==0) return '';
+    return `<div style="position:absolute;top:${i*slotH}px;left:0;right:0;height:${slotH}px;border-bottom:1px solid ${(m+step)%60===30?'var(--border)':'#F1F5F9'}"></div>`;
+  }).join('');
 
   // Free-slot cells (not covered by any ClubSpark session or our pending booking)
   const freeCells = slots.map((m,i) => {
-    const isBusy = sessions.some(s => s.StartTime < m+30 && s.EndTime > m);
+    const isBusy = sessions.some(s => s.StartTime < m+step && s.EndTime > m);
     if (isBusy) return '';
-    const isMine = myBooked.some(b => b.start_mins < m+30 && b.end_mins > m);
+    const isMine = myBooked.some(b => b.start_mins < m+step && b.end_mins > m);
     if (isMine) return '';
     const selKey=`${r.Name}|${m}|${courtsDate}`;
     const isSel=mbSlots.some(s=>s.key===selKey);
@@ -3579,8 +3549,8 @@ function courtColHTML(r, opts) {
 
   // Merged session blocks: ClubSpark is source of truth, Supabase identifies ours
   const blocks = sessions.map(s => {
-    const top = Math.max(0, (s.StartTime - gridS) / 30 * slotH);
-    const h = Math.max((s.EndTime - s.StartTime) / 30 * slotH - 2, 14);
+    const top = Math.max(0, (s.StartTime - gridS) / step * slotH);
+    const h = Math.max((s.EndTime - s.StartTime) / step * slotH - 2, 14);
     // Check if this ClubSpark session matches one of our Supabase bookings
     const mine = myBooked.find(b => b.start_mins < s.EndTime && b.end_mins > s.StartTime);
     const timeStr = `${cgSlotFmt(s.StartTime)} – ${cgSlotFmt(s.EndTime)}`;
@@ -3604,8 +3574,8 @@ function courtColHTML(r, opts) {
     !sessions.some(s => s.StartTime < b.end_mins && s.EndTime > b.start_mins)
   );
   const pendingBlocks = pendingNotOnCS.map(b => {
-    const top = Math.max(0, (b.start_mins - gridS) / 30 * slotH);
-    const h = Math.max((b.end_mins - b.start_mins) / 30 * slotH - 2, 14);
+    const top = Math.max(0, (b.start_mins - gridS) / step * slotH);
+    const h = Math.max((b.end_mins - b.start_mins) / step * slotH - 2, 14);
     return `<div class="cg-mine cg-pending" style="top:${top}px;height:${h}px">${showText?'<div class="cg-mine-name">Booking...</div>':''}</div>`;
   }).join('');
 
@@ -3625,8 +3595,10 @@ function renderCourtsBody() {
     body.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;font-weight:700">No courts available for this day</div>`;
     return;
   }
+  // Booking slots: desktop 15-min cells; mobile 30-min cells (finer start times via the modal stepper)
+  const STEP = mode === 'desktop' ? 15 : 30;
   const slots = [];
-  for (let m = GRID_S; m < GRID_E; m += 30) slots.push(m);
+  for (let m = GRID_S; m < GRID_E; m += STEP) slots.push(m);
   let SLOT_H, spacer;
   if (mode === 'mobile') {
     // Fit the full day into the visible area: available height minus the sticky header row
@@ -3635,12 +3607,13 @@ function renderCourtsBody() {
     SLOT_H = Math.max(16, Math.floor(usable / slots.length));
     spacer = '';
   } else {
-    SLOT_H = 60;
+    SLOT_H = 30;
     spacer = `<div style="height:calc(var(--nav-h,70px) + 8px)"></div>`;
   }
   const totalH = slots.length * SLOT_H;
-  const opts = { slotH: SLOT_H, slots, gridS: GRID_S, myBookings, totalH, showText: true, cellButtons: mode === 'desktop' };
-  const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px">${minsToTimeLbl(m)}</div>`).join('')}${spacer}</div>`;
+  const opts = { slotH: SLOT_H, step: STEP, slots, gridS: GRID_S, myBookings, totalH, showText: true, cellButtons: mode === 'desktop' };
+  // Gutter lines only at half-hour boundaries (same positions as the old 30-min grid)
+  const timesCol = `<div class="cg-times">${slots.map(m=>`<div class="cg-time" style="height:${SLOT_H}px${(m+STEP)%30===0?'':';border-bottom:none'}">${minsToTimeLbl(m)}</div>`).join('')}${spacer}</div>`;
 
   let wrapClass, header, cols;
   if (mode === 'mobile') {
@@ -3863,6 +3836,27 @@ function setCbCustomDur(){
 
 function updateCbEndTime(){
   document.getElementById('cbEndTime').textContent=courtFmt12(cbStartMins+cbDuration);
+}
+// Is [start, start+cbDuration) free on the selected court? (ClubSpark sessions + our bookings)
+function cbRangeFree(start){
+  if(!courtsCache||courtsCache.date!==cbDate) return true;
+  const r=courtsCache.resources.find(x=>x.Name===cbCourt);
+  if(!r) return true;
+  const end=start+cbDuration;
+  const sess=(r.Days&&r.Days[0]?r.Days[0].Sessions:[]).filter(s=>s.Category!==0);
+  if(sess.some(s=>s.StartTime<end&&s.EndTime>start)) return false;
+  const myB=courtsCache.myBookings.filter(b=>b.court_name===cbCourt&&(b.status==='confirmed'||b.status==='pending'));
+  return !myB.some(b=>b.start_mins<end&&b.end_mins>start);
+}
+// Mobile stepper: nudge the start time in 15-min steps if the new range is free
+function cbStepStart(delta){
+  const next=cbStartMins+delta;
+  const gS=courtsCache?courtsCache.gridS:360, gE=courtsCache?courtsCache.gridE:1350;
+  if(next<gS||next+cbDuration>gE) return;
+  if(!cbRangeFree(next)){toast('That time is already booked');return;}
+  cbStartMins=next;
+  document.getElementById('cbStartTime').textContent=courtFmt12(cbStartMins);
+  updateCbEndTime();
 }
 
 function closeCourtBookModal(){
