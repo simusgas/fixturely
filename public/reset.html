@@ -16,7 +16,7 @@
 <body>
 <div class="card">
   <h1>🧹 Fixing the app…</h1>
-  <p>Clearing saved copies and cache machinery.</p>
+  <p>Clearing saved copies, cookies, and cache machinery.</p>
   <div id="log">Working…</div>
   <a href="/fixturely-app.html" id="go" style="display:none">Open the app →</a>
 </div>
@@ -35,6 +35,14 @@
       for (const k of keys) await caches.delete(k);
       log.push('✓ Deleted ' + keys.length + ' cached cop' + (keys.length === 1 ? 'y' : 'ies'));
     }
+    // Cookies are shared by every app ever run on this host (any port), and
+    // stale auth chunks can grow past the server's header limit (HTTP 431).
+    const names = document.cookie.split(';').map(c => c.split('=')[0].trim()).filter(Boolean);
+    for (const n of names) {
+      document.cookie = n + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+      document.cookie = n + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + location.hostname;
+    }
+    log.push('✓ Cleared ' + names.length + ' cookie' + (names.length === 1 ? '' : 's') + ' — you\'ll need to log in again');
     log.push('✓ All clean — open the app below');
   } catch (e) {
     log.push('⚠ ' + e.message);
