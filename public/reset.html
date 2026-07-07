@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fixturely — Reset</title>
+<style>
+  body{font-family:-apple-system,system-ui,'Inter',sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;background:#F7F7F5;margin:0}
+  .card{background:#fff;border-radius:20px;padding:32px 28px;max-width:360px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+  h1{font-size:20px;margin:0 0 8px}
+  p{color:#666;font-size:14px;line-height:1.5;margin:0 0 4px}
+  #log{font-size:13px;color:#444;text-align:left;margin:16px 0;line-height:1.8;background:#F7F7F5;border-radius:12px;padding:12px 16px}
+  a{display:inline-block;margin-top:8px;background:#4F46E5;color:#fff;text-decoration:none;padding:12px 28px;border-radius:100px;font-weight:700;font-size:14px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🧹 Fixing the app…</h1>
+  <p>Clearing saved copies and cache machinery.</p>
+  <div id="log">Working…</div>
+  <a href="/fixturely-app.html" id="go" style="display:none">Open the app →</a>
+</div>
+<script>
+(async () => {
+  const log = [];
+  const el = document.getElementById('log');
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const r of regs) await r.unregister();
+      log.push('✓ Removed ' + regs.length + ' service worker' + (regs.length === 1 ? '' : 's'));
+    }
+    if (window.caches) {
+      const keys = await caches.keys();
+      for (const k of keys) await caches.delete(k);
+      log.push('✓ Deleted ' + keys.length + ' cached cop' + (keys.length === 1 ? 'y' : 'ies'));
+    }
+    log.push('✓ All clean — open the app below');
+  } catch (e) {
+    log.push('⚠ ' + e.message);
+  }
+  el.innerHTML = log.join('<br>');
+  document.getElementById('go').style.display = 'inline-block';
+})();
+</script>
+</body>
+</html>
