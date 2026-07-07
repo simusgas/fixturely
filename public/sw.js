@@ -1,4 +1,4 @@
-const CACHE = 'fixturely-v1';
+const CACHE = 'fixturely-v2';
 const SHELL = [
   '/fixturely-app.html',
   '/icons/icon-192.png',
