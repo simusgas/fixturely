@@ -34,6 +34,7 @@ export async function GET() {
       payStatus: s.pay_status,
       cancelledDates: s.cancelled_dates || [],
       recurEnd: s.recur_end || null,
+      calendar: s.calendar || 'main',
     })),
     terms,
     holidays,
@@ -81,7 +82,7 @@ export async function POST(request) {
       // Strip to known columns per table
       const known = {
         students: ['coach_id', 'name', 'level', 'credits', 'sessions', 'owing'],
-        sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes', 'cancelled_dates', 'recur_end'],
+        sessions: ['coach_id', 'student', 'level', 'time', 'dur', 'court', 'recur', 'date', 'pay_status', 'notes', 'cancelled_dates', 'recur_end', 'calendar'],
         terms: ['coach_id', 'name', 'start', 'end', 'weeks'],
         holidays: ['coach_id', 'name', 'start', 'end'],
         invoices: ['coach_id', 'invoice_number', 'student', 'amount', 'status', 'date', 'items'],

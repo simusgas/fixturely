@@ -370,6 +370,15 @@
   .sg-lesson-blk{outline:2px solid var(--s-a);outline-offset:-2px;border-radius:8px;z-index:2;}
   .sg-block:hover{background:var(--border);}
   .sg-block-lbl{font-size:10px;font-weight:700;color:var(--muted);}
+  /* Share grid drag multi-select */
+  .sg-sel-cell.sg-selecting{background:rgba(79,70,229,0.18)!important;box-shadow:inset 0 0 0 1.5px var(--s-a);border-radius:6px;z-index:3;}
+  #shSelBar{display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:400;align-items:center;gap:10px;background:var(--text,#1a1a2e);color:#fff;padding:8px 10px 8px 16px;border-radius:100px;box-shadow:0 8px 28px rgba(0,0,0,0.28);font-family:'Inter',sans-serif;}
+  #shSelBar.open{display:flex;}
+  #shSelBar #shSelCount{font-size:13px;font-weight:800;white-space:nowrap;}
+  #shSelBar button{border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;border-radius:100px;padding:8px 16px;}
+  #shSelBar #shSelBlock{background:var(--s-a);color:#fff;}
+  #shSelBar #shSelUnblock{background:#fff;color:var(--text,#1a1a2e);}
+  #shSelBar #shSelCancel{background:rgba(255,255,255,0.18);color:#fff;padding:8px 12px;}
   .sg-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
   .sg-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
   /* Working hours control */
@@ -379,6 +388,16 @@
   .wh-edit.open{display:flex;}
   .wh-edit select{padding:6px 8px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;background:var(--white);color:var(--text);}
   .wh-edit button{padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;background:var(--s-a);color:#fff;}
+  /* Calendar template picker + banner + empty-import card */
+  .cal-sel{font-family:'Inter',sans-serif;font-size:12px;font-weight:800;color:var(--soft);cursor:pointer;padding:5px 10px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);white-space:nowrap;}
+  .cal-sel.cal-sel-active{color:#92400e;border-color:#fcd34d;background:#fef3c7;}
+  .cal-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:10px;padding:10px 14px;margin:0 16px 12px;font-size:13px;font-weight:700;}
+  .cal-banner button{border:none;background:#92400e;color:#fff;font-family:'Inter',sans-serif;font-weight:800;font-size:12px;border-radius:100px;padding:6px 12px;cursor:pointer;white-space:nowrap;}
+  .cal-import-card{background:var(--s-pl);border:1px solid var(--s-b);border-radius:12px;padding:18px;margin:0 16px 14px;text-align:center;}
+  .cal-import-title{font-size:15px;font-weight:900;color:var(--text);margin-bottom:4px;}
+  .cal-import-sub{font-size:13px;font-weight:600;color:var(--soft);margin-bottom:14px;line-height:1.4;}
+  .cal-import-card button{border:none;background:var(--s-a);color:#fff;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;border-radius:100px;padding:10px 22px;cursor:pointer;}
+  .cal-import-card button:disabled{opacity:0.6;cursor:default;}
 
   /* ══════════════════════
      STUDENTS
@@ -1446,6 +1465,10 @@
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeBlockModal()">✕</button>
     <div class="modal-title">Block Time</div>
+    <div class="field" id="blockDateField">
+      <label class="field-label">Date</label>
+      <input type="date" class="field-input" id="blockDate" />
+    </div>
     <div class="field">
       <label class="field-label">From</label>
       <input type="time" class="field-input" id="blockFrom" value="12:00" oninput="updateBlockDuration()" />
@@ -1468,6 +1491,14 @@
     </div>
     <button class="submit-btn" onclick="saveBlock()">Block Time ✓</button>
   </div>
+</div>
+
+<!-- SHARE DRAG SELECTION ACTION BAR -->
+<div id="shSelBar">
+  <span id="shSelCount">0 slots</span>
+  <button id="shSelBlock" onclick="applyShareBlock()">Block</button>
+  <button id="shSelUnblock" onclick="applyShareUnblock()">Unblock</button>
+  <button id="shSelCancel" onclick="clearShareSelection()" aria-label="Cancel">✕</button>
 </div>
 
 <!-- SHARE REQUEST MODAL -->
@@ -1746,6 +1777,15 @@ let INVOICES=[];
 let BLOCKS=[]; // {date,time,dur,recur} — blocked time slots
 let DAYS_OFF=[]; // [0-6] — days of week off (0=Sun,1=Mon,...)
 
+// ══ CALENDAR TEMPLATES ══
+// The schedule grid can show the live calendar ('main') or a planning template.
+// Only the grid respects this; every other view (dashboard, students, invoices,
+// share, public booking) always uses 'main'. Not persisted — resets on reload.
+let ACTIVE_CAL='main';
+const CAL_DEFS=[{id:'main',label:'Current'},{id:'next-term',label:'Next Term'},{id:'school-holidays',label:'School Holidays'}];
+function sessCal(s){return s.calendar||'main';}
+function calLabel(id){const c=CAL_DEFS.find(c=>c.id===id);return c?c.label:'Current';}
+
 const today=new Date(); today.setHours(0,0,0,0);
 let SESSIONS=[];
 let nextId=1;
@@ -1833,9 +1873,10 @@ async function dbDelete(table,id){
 // ══ HELPERS ══
 function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
-function getSessionsForDate(dstr){
+function getSessionsForDate(dstr,cal='main'){
   const target=new Date(dstr+'T00:00:00');
   return SESSIONS.filter(s=>{
+    if(sessCal(s)!==cal) return false;
     if(s.cancelledDates&&s.cancelledDates.includes(dstr)) return false;
     if(s.recurEnd&&dstr>s.recurEnd) return false;
     if(s.date===dstr) return true;
@@ -2200,18 +2241,18 @@ function sendRemind(id,name){
 // ══ STUDENT CALENDAR ══
 let scSelDate=new Date(today), scIsPreview=false, scReqSlot='';
 
-function isSlotBlocked(dstr,timeStr){
+function isSlotBlocked(dstr,timeStr,slotMin=30){
   const d=new Date(dstr+'T00:00:00');
   // Check days off
   if(DAYS_OFF.includes(d.getDay())) return true;
   const tM=t2m(timeStr);
-  // Check blocks (one-time and recurring)
+  // Check blocks (one-time and recurring); slotMin = width of the slot being tested
   return BLOCKS.some(b=>{
     const bM=t2m(b.time),bE=bM+dm(b.dur);
-    if(b.recur==='daily') return tM<bE&&tM+30>bM;
-    if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM<bE&&tM+30>bM;
-    if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return tM<bE&&tM+30>bM;
-    if(b.date===dstr&&(b.recur==='once'||!b.recur)) return tM<bE&&tM+30>bM;
+    if(b.recur==='daily') return tM<bE&&tM+slotMin>bM;
+    if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM<bE&&tM+slotMin>bM;
+    if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return tM<bE&&tM+slotMin>bM;
+    if(b.date===dstr&&(b.recur==='once'||!b.recur)) return tM<bE&&tM+slotMin>bM;
     return false;
   });
 }
@@ -2219,12 +2260,12 @@ function isDayOff(dstr){
   const d=new Date(dstr+'T00:00:00');
   return DAYS_OFF.includes(d.getDay());
 }
-function blockSlot(dstr,h,mn){
-  const time=`${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;
-  if(BLOCKS.some(b=>b.date===dstr&&b.time===time)) return;
-  BLOCKS.push({date:dstr,time,dur:'30m',recur:'once'});
-  saveCache();renderSchedule();syncAvailability();
-  toast('Slot blocked');
+// Re-render the block-aware views after a block mutation. Blocking now lives on
+// the Share tab, so refresh it whenever it's the active screen.
+function renderBlockViews(){
+  const shScreen=document.getElementById('screen-share');
+  if(shScreen&&shScreen.classList.contains('active')) renderSharePage();
+  else renderSchedule();
 }
 function unblockSlot(dstr,timeStr){
   // Find matching block — check one-time first, then recurring
@@ -2243,20 +2284,19 @@ function unblockSlot(dstr,timeStr){
   }
   if(idx>=0){
     BLOCKS.splice(idx,1);
-    saveCache();renderSchedule();syncAvailability();
+    saveCache();renderBlockViews();syncAvailability();
     toast('Block removed');
   }
 }
 let blockRepeatMode='thisday';
 let blockSelectedDays=[];
-function blockRecurring(){
-  openBlockModal();
-}
 function openBlockModal(){
   blockRepeatMode='thisday';
   blockSelectedDays=[];
   document.getElementById('blockFrom').value='12:00';
   document.getElementById('blockTo').value='13:00';
+  document.getElementById('blockDate').value=ds(today);
+  document.getElementById('blockDateField').style.display='block';
   document.querySelectorAll('#blockRepeatPills .pill').forEach((p,i)=>p.classList.toggle('active',i===0));
   document.getElementById('blockDaysPicker').style.display='none';
   renderBlockDaysPicker();
@@ -2282,6 +2322,7 @@ function setBlockRepeat(btn,mode){
   btn.classList.add('active');
   blockRepeatMode=mode;
   document.getElementById('blockDaysPicker').style.display=mode==='select'?'block':'none';
+  document.getElementById('blockDateField').style.display=mode==='thisday'?'block':'none';
 }
 function renderBlockDaysPicker(){
   const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -2306,14 +2347,15 @@ function saveBlock(){
   const dur=durMins+'m';
 
   if(blockRepeatMode==='thisday'){
-    BLOCKS.push({date:ds(sel),time:from,dur,recur:'once'});
+    const bDate=document.getElementById('blockDate').value||ds(today);
+    BLOCKS.push({date:bDate,time:from,dur,recur:'once'});
   } else if(blockRepeatMode==='daily'){
     BLOCKS.push({date:'',time:from,dur,recur:'daily'});
   } else if(blockRepeatMode==='select'){
     if(blockSelectedDays.length===0){toast('Select at least one day');return;}
     BLOCKS.push({date:'',time:from,dur,recur:'days',days:blockSelectedDays});
   }
-  saveCache();renderSchedule();syncAvailability();
+  saveCache();renderBlockViews();syncAvailability();
   closeBlockModal();
   toast('Time blocked');
 }
@@ -2411,14 +2453,200 @@ let shareWeekStart=null;
 // The share preview IS the schedule week grid (anonymized): tap a free slot to block
 // it (unavailable to students), tap a blocked slot to restore it. Same BLOCKS store.
 function shWkBlock(dstr,timeStr){
-  BLOCKS.push({date:dstr,time:timeStr,dur:'30m',recur:'once'});
-  saveCache();renderSchedule();syncAvailability();
+  BLOCKS.push({date:dstr,time:timeStr,dur:'15m',recur:'once'});
+  saveCache();syncAvailability();
   toast('Marked unavailable to students');
   renderSharePage();
 }
 function shWkUnblock(dstr,timeStr){
   unblockSlot(dstr,timeStr); // handles recurring blocks with a confirm
   renderSharePage();
+}
+
+// ── Drag multi-select on the share grid ──
+// Hold and drag across cells to select a rectangle of slots, then Block / Unblock
+// the whole selection. A plain click (zero movement) toggles a single slot as before.
+let shDrag={active:false,armed:false,ptrId:null,anchor:null,cur:null,anchorCell:null,lpTimer:null,startX:0,startY:0};
+function mToTime(m){const h=Math.floor(m/60),mn=m%60;return `${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;}
+function shGridInfo(){
+  const cols=document.getElementById('shGridCols');
+  if(!cols) return null;
+  const rowH=parseInt(cols.dataset.rowh)||24;
+  const step=parseInt(cols.dataset.step)||15;
+  const nSlots=Math.round((CAL_E-CAL_S)*60/step);
+  return {cols,rowH,step,nSlots};
+}
+function shCellAt(x,y,info){
+  const rect=info.cols.getBoundingClientRect();
+  let dayIdx=Math.floor((x-rect.left)/(rect.width/7));
+  let slotIdx=Math.floor((y-rect.top)/info.rowH);
+  dayIdx=Math.max(0,Math.min(6,dayIdx));
+  slotIdx=Math.max(0,Math.min(info.nSlots-1,slotIdx));
+  return {dayIdx,slotIdx};
+}
+function shHighlight(info){
+  if(!shDrag.anchor||!shDrag.cur) return;
+  const d0=Math.min(shDrag.anchor.dayIdx,shDrag.cur.dayIdx),d1=Math.max(shDrag.anchor.dayIdx,shDrag.cur.dayIdx);
+  const s0=Math.min(shDrag.anchor.slotIdx,shDrag.cur.slotIdx),s1=Math.max(shDrag.anchor.slotIdx,shDrag.cur.slotIdx);
+  info.cols.querySelectorAll('.sg-sel-cell').forEach(c=>{
+    const col=c.closest('.sg-col');
+    const dayIdx=Array.prototype.indexOf.call(info.cols.children,col);
+    const slotIdx=Math.round((parseInt(c.dataset.m)-CAL_S*60)/info.step);
+    const on=dayIdx>=d0&&dayIdx<=d1&&slotIdx>=s0&&slotIdx<=s1;
+    c.classList.toggle('sg-selecting',on);
+  });
+}
+function initShareDrag(){
+  const info=shGridInfo();
+  if(!info) return;
+  const cols=info.cols;
+  // Block native touch scroll only while a selection drag is in progress.
+  cols.addEventListener('touchmove',e=>{ if(shDrag.active) e.preventDefault(); },{passive:false});
+  cols.addEventListener('pointerdown',e=>{
+    const cell=e.target.closest('.sg-sel-cell');
+    if(!cell) return;
+    shDrag.ptrId=e.pointerId;shDrag.anchorCell=cell;shDrag.moved=false;
+    shDrag.startX=e.clientX;shDrag.startY=e.clientY;
+    shDrag.anchor=shCellAt(e.clientX,e.clientY,info);
+    shDrag.cur={...shDrag.anchor};
+    if(e.pointerType==='mouse'){ shDrag.armed=true; }
+    else {
+      // Touch: require a long-press to start selecting so plain swipes still scroll.
+      shDrag.lpTimer=setTimeout(()=>{ shStartSelecting(e.clientX,e.clientY); },300);
+    }
+  });
+  cols.addEventListener('pointermove',e=>{
+    if(shDrag.ptrId!==e.pointerId) return;
+    const dx=Math.abs(e.clientX-shDrag.startX),dy=Math.abs(e.clientY-shDrag.startY);
+    if(!shDrag.active){
+      if(shDrag.lpTimer&&(dx>8||dy>8)){ clearTimeout(shDrag.lpTimer);shDrag.lpTimer=null; } // moved before long-press → let it scroll
+      if(shDrag.armed&&(dx>3||dy>3)){ shStartSelecting(e.clientX,e.clientY); }
+      if(!shDrag.active) return;
+    }
+    shDrag.moved=true;
+    shDrag.cur=shCellAt(e.clientX,e.clientY,info);
+    shHighlight(info);
+  });
+  const endFn=e=>{
+    if(shDrag.ptrId!==e.pointerId) return;
+    if(shDrag.lpTimer){ clearTimeout(shDrag.lpTimer);shDrag.lpTimer=null; }
+    const wasActive=shDrag.active,cell=shDrag.anchorCell;
+    const single=!wasActive||(shDrag.anchor&&shDrag.cur&&shDrag.anchor.dayIdx===shDrag.cur.dayIdx&&shDrag.anchor.slotIdx===shDrag.cur.slotIdx&&!shDrag.moved);
+    document.body.style.userSelect='';
+    try{ cols.releasePointerCapture(e.pointerId); }catch(_){}
+    shDrag.active=false;shDrag.armed=false;shDrag.ptrId=null;
+    if(single){
+      // Zero-movement drag = single tap: keep the original one-slot toggle.
+      cols.querySelectorAll('.sg-selecting').forEach(c=>c.classList.remove('sg-selecting'));
+      if(cell){ const d=cell.dataset.d,t=mToTime(parseInt(cell.dataset.m)); if(cell.dataset.b) shWkUnblock(d,t); else shWkBlock(d,t); }
+      hideSelBar();
+      return;
+    }
+    showSelBar(info);
+  };
+  cols.addEventListener('pointerup',endFn);
+  cols.addEventListener('pointercancel',endFn);
+}
+function shStartSelecting(x,y){
+  const info=shGridInfo();if(!info) return;
+  shDrag.active=true;shDrag.armed=false;
+  if(shDrag.lpTimer){ clearTimeout(shDrag.lpTimer);shDrag.lpTimer=null; }
+  document.body.style.userSelect='none';
+  try{ info.cols.setPointerCapture(shDrag.ptrId); }catch(_){}
+  shDrag.cur=shCellAt(x,y,info);
+  shHighlight(info);
+}
+function shSelectedCells(){
+  const cols=document.getElementById('shGridCols');
+  if(!cols) return [];
+  return Array.prototype.map.call(cols.querySelectorAll('.sg-selecting'),c=>({
+    dstr:c.dataset.d, m:parseInt(c.dataset.m), blocked:!!c.dataset.b
+  }));
+}
+function showSelBar(){
+  const cells=shSelectedCells();
+  const bar=document.getElementById('shSelBar');
+  if(!cells.length){ hideSelBar(); return; }
+  const hasFree=cells.some(c=>!c.blocked),hasBlocked=cells.some(c=>c.blocked);
+  document.getElementById('shSelCount').textContent=`${cells.length} slot${cells.length!==1?'s':''}`;
+  document.getElementById('shSelBlock').style.display=hasFree?'':'none';
+  document.getElementById('shSelUnblock').style.display=hasBlocked?'':'none';
+  bar.classList.add('open');
+}
+function hideSelBar(){const b=document.getElementById('shSelBar');if(b)b.classList.remove('open');}
+function clearShareSelection(){
+  const cols=document.getElementById('shGridCols');
+  if(cols) cols.querySelectorAll('.sg-selecting').forEach(c=>c.classList.remove('sg-selecting'));
+  hideSelBar();
+}
+// Merge selected free slots into contiguous runs → one block per run (keeps payload small).
+function applyShareBlock(){
+  const step=(shGridInfo()||{}).step||15;
+  const free=shSelectedCells().filter(c=>!c.blocked);
+  if(!free.length){ clearShareSelection(); return; }
+  const byDay={};
+  free.forEach(c=>{ (byDay[c.dstr]=byDay[c.dstr]||[]).push(c.m); });
+  let added=0;
+  Object.keys(byDay).forEach(dstr=>{
+    const mins=byDay[dstr].sort((a,b)=>a-b);
+    let runStart=mins[0],prev=mins[0];
+    const flush=end=>{ BLOCKS.push({date:dstr,time:mToTime(runStart),dur:(end+step-runStart)+'m',recur:'once'}); added++; };
+    for(let i=1;i<mins.length;i++){
+      if(mins[i]===prev+step){ prev=mins[i]; }
+      else { flush(prev); runStart=prev=mins[i]; }
+    }
+    flush(prev);
+  });
+  saveCache();syncAvailability();
+  clearShareSelection();renderSharePage();
+  toast(`Blocked ${free.length} slot${free.length!==1?'s':''}`);
+}
+// Unblock selected blocked slots: split overlapping one-time blocks, and remove
+// overlapping recurring rules after a single confirm.
+function applyShareUnblock(){
+  const step=(shGridInfo()||{}).step||15;
+  const sel=shSelectedCells().filter(c=>c.blocked);
+  if(!sel.length){ clearShareSelection(); return; }
+  // Set of selected slot minutes per day.
+  const selByDay={};
+  sel.forEach(c=>{ (selByDay[c.dstr]=selByDay[c.dstr]||new Set()).add(c.m); });
+  // Gather recurring rules that overlap the selection.
+  const recurIdx=new Set();
+  sel.forEach(c=>{
+    const d=new Date(c.dstr+'T00:00:00'),dow=d.getDay();
+    BLOCKS.forEach((b,i)=>{
+      if(b.recur==='once'||!b.recur) return;
+      const bM=t2m(b.time),bE=bM+dm(b.dur);
+      const hit=(b.recur==='daily')||(b.recur==='weekdays'&&dow>=1&&dow<=5)||(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(dow));
+      if(hit&&c.m>=bM&&c.m<bE) recurIdx.add(i);
+    });
+  });
+  if(recurIdx.size){
+    if(!confirm(`Your selection includes ${recurIdx.size} recurring block${recurIdx.size!==1?'s':''}. Remove the entire recurring rule${recurIdx.size!==1?'s':''}?`)){
+      // Skip recurring rules; still process one-time blocks below.
+      recurIdx.clear();
+    }
+  }
+  // Rebuild one-time blocks: replace each overlapping once-block with its unselected remainder.
+  const keep=[],removeRecur=recurIdx;
+  BLOCKS.forEach((b,i)=>{
+    if(b.recur&&b.recur!=='once'){ if(!removeRecur.has(i)) keep.push(b); return; }
+    const selSet=selByDay[b.date];
+    if(!selSet){ keep.push(b); return; }
+    const bM=t2m(b.time),bE=bM+dm(b.dur);
+    // Walk the block's own step-sized sub-slots; keep runs that aren't selected.
+    let runStart=null;
+    for(let m=bM;m<bE;m+=step){
+      const sel=selSet.has(m);
+      if(!sel){ if(runStart===null) runStart=m; }
+      else if(runStart!==null){ keep.push({date:b.date,time:mToTime(runStart),dur:(m-runStart)+'m',recur:'once'}); runStart=null; }
+    }
+    if(runStart!==null) keep.push({date:b.date,time:mToTime(runStart),dur:(bE-runStart)+'m',recur:'once'});
+  });
+  BLOCKS=keep;
+  saveCache();syncAvailability();
+  clearShareSelection();renderSharePage();
+  toast(`Unblocked ${sel.length} slot${sel.length!==1?'s':''}`);
 }
 function renderSharePage(){
   const body=document.getElementById('shBody');
@@ -2435,11 +2663,14 @@ function renderSharePage(){
 
   // The preview is the coach's own schedule grid, anonymized, tap-to-toggle availability
   const previewHTML=`<div style="padding:14px 14px 20px">
-      <div class="sh-edit-hint">Tap a time to make it unavailable to students · <span style="color:var(--s-a)">blue outline</span> = a lesson booking (only you can see this)</div>
+      <div class="sh-edit-hint">Tap a time to make it unavailable · hold &amp; drag to select many · <span style="color:var(--s-a)">blue outline</span> = a lesson booking (only you can see this)</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <button onclick="changeShareWeek(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canPrev?'':'opacity:0.3;pointer-events:none'}">‹</button>
         <div style="font-size:13px;font-weight:900;color:var(--text)">${weekLbl}</div>
-        <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="openBlockModal()" style="border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:12px;font-weight:800;color:var(--soft);padding:5px 12px;border-radius:100px;font-family:'Inter',sans-serif">＋ Block Time</button>
+          <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
+        </div>
       </div>
       ${renderWeekViewHTML(shareWeekStart,true)}
     </div>`;
@@ -2494,6 +2725,9 @@ function renderSharePage(){
       </div>
     </div>
   </div>`;
+  // Re-attach drag multi-select each render (innerHTML wipes listeners) + clear any stale selection bar
+  clearShareSelection();
+  initShareDrag();
   // One-time explainer for the lesson-booking outline
   try{
     if(!localStorage.getItem('fixturely_share_lesson_hint')){
@@ -2679,6 +2913,32 @@ function whSelectHTML(id,val){
   return `<select id="${id}">${o}</select>`;
 }
 function toggleHoursEditor(){document.getElementById('whEdit').classList.toggle('open');}
+// Calendar template picker — shown on the main schedule grid only.
+function calSelHTML(){
+  const opts=CAL_DEFS.map(c=>`<option value="${c.id}"${c.id===ACTIVE_CAL?' selected':''}>${c.label}</option>`).join('');
+  return `<select class="cal-sel${ACTIVE_CAL!=='main'?' cal-sel-active':''}" onchange="setActiveCal(this.value)" title="Choose which calendar to organise">${opts}</select>`;
+}
+function setActiveCal(v){ACTIVE_CAL=v;renderSchedule();}
+async function importMainToTemplate(){
+  if(ACTIVE_CAL==='main') return;
+  const src=SESSIONS.filter(s=>sessCal(s)==='main');
+  if(!src.length){toast('Nothing to import');return;}
+  const btn=document.getElementById('calImportBtn');
+  if(btn){btn.disabled=true;btn.textContent='Importing…';}
+  const target=ACTIVE_CAL;
+  toast(`Importing ${src.length} lessons…`);
+  for(const s of src){
+    const copy={student:s.student,level:s.level||'',time:s.time,dur:s.dur,court:s.court||'',
+      recur:s.recur,date:s.date,payStatus:'unpaid',notes:s.notes||'',
+      cancelledDates:s.cancelledDates||[],recurEnd:s.recurEnd||null,calendar:target};
+    const local={...copy,id:nextId++}; SESSIONS.push(local);
+    const saved=await dbInsert('sessions',copy);
+    if(saved&&saved.id) local.id=saved.id;
+  }
+  saveCache();
+  if(ACTIVE_CAL===target) renderSchedule();
+  toast(`✓ Imported ${src.length} lessons into ${calLabel(target)}`);
+}
 function updateCourtsHoursCtrl(){
   const lbl=document.getElementById('whCtrlC');
   if(lbl) lbl.textContent=`🕐 ${fmtHour(CAL_S)} – ${fmtHour(CAL_E)}`;
@@ -2713,7 +2973,7 @@ function renderMobileScheduleHTML(){
   const days=[];
   for(let i=0;i<7;i++) days.push(add(ws,i));
   const todayStr=ds(today),selStr=ds(sel),dstr=ds(sel);
-  const daySess=getSessionsForDate(dstr).sort((a,b)=>a.time.localeCompare(b.time));
+  const daySess=getSessionsForDate(dstr,ACTIVE_CAL).sort((a,b)=>a.time.localeCompare(b.time));
 
   // Week label
   const weekEnd=add(ws,6);
@@ -2732,7 +2992,7 @@ function renderMobileScheduleHTML(){
     const dd=ds(d);
     const isT=dd===todayStr;
     const isS=dd===selStr;
-    const hasLessons=SESSIONS.some(s=>s.date===dd);
+    const hasLessons=SESSIONS.some(s=>s.date===dd&&sessCal(s)===ACTIVE_CAL);
     html+=`<div class="mc-day${isT?' is-today':''}${isS?' is-sel':''}" onclick="sel=new Date('${dd}T00:00:00');ws=wkStart(sel);renderSchedule()">
       <div class="mc-day-name">${DW[((d.getDay()+6)%7)]}</div>
       <div class="mc-day-num">${d.getDate()}</div>
@@ -2741,8 +3001,8 @@ function renderMobileScheduleHTML(){
   });
   html+=`</div></div>`;
 
-  // ── Book/Block buttons ──
-  html+=`<div class="mc-tl-header"><button class="mc-tl-block" onclick="blockRecurring()">Block</button><button class="mc-tl-book" onclick="openBookModal()">+ Book</button></div>`;
+  // ── Calendar picker + Book button ──
+  html+=`<div class="mc-tl-header">${calSelHTML()}<button class="mc-tl-book" onclick="openBookModal()">+ Book</button></div>`;
 
   // ── Daily timeline ──
   const ROW_H=60;
@@ -2781,22 +3041,6 @@ function renderMobileScheduleHTML(){
     </div>`;
   });
 
-  // Blocked slots — subtle bars (no free-slot buttons)
-  for(let h=CAL_S;h<CAL_E;h++){
-    for(let half=0;half<2;half++){
-      const m=h*60+half*30;
-      const timeStr=`${h.toString().padStart(2,'0')}:${(half*30).toString().padStart(2,'0')}`;
-      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
-      if(busy) continue;
-      const blocked=isSlotBlocked(dstr,timeStr);
-      if(blocked){
-        const slotTop=((m-CAL_S*60)/60)*ROW_H;
-        const slotH=ROW_H/2;
-        html+=`<div class="mc-blocked" style="top:${slotTop+1}px;height:${slotH-2}px" onclick="event.stopPropagation();unblockSlot('${dstr}','${timeStr}')">Blocked</div>`;
-      }
-    }
-  }
-
   // Now line
   if(showNow){
     const nowTop=((nowMins-CAL_S*60)/60)*ROW_H;
@@ -2824,14 +3068,22 @@ function scrollToMobileNow(){
 
 function renderSchedule(){
   let nudge='';
-  if(!schedNudgeDismissed){
+  // On the live calendar, show the share nudge. On a template, show a context banner instead.
+  if(ACTIVE_CAL!=='main'){
+    nudge=`<div class="cal-banner"><span>📋 Viewing <b>${calLabel(ACTIVE_CAL)}</b> template — invisible to students and reports</span><button onclick="setActiveCal('main')">Back to Current</button></div>`;
+  } else if(!schedNudgeDismissed){
     nudge=`<div class="sched-nudge"><div class="sched-nudge-text"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--s-dk)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Your students can view this schedule and book lessons</span><a onclick="switchTab('share',document.querySelector('[data-t=share]'))" style="color:var(--s-dk);font-weight:900;cursor:pointer;white-space:nowrap">Share Schedule →</a></div><button onclick="dismissSchedNudge()" class="sched-nudge-close">✕</button></div>`;
   }
+  // Empty template: offer a one-click import of the whole live calendar.
+  let importCard='';
+  if(ACTIVE_CAL!=='main'&&!SESSIONS.some(s=>sessCal(s)===ACTIVE_CAL)){
+    importCard=`<div class="cal-import-card"><div class="cal-import-title">This template is empty</div><div class="cal-import-sub">Start fresh, or copy every lesson from your current calendar to reorganise it here.</div><button id="calImportBtn" onclick="importMainToTemplate()">Import from my main calendar</button></div>`;
+  }
   if(isMobile()){
-    document.getElementById('sBody').innerHTML=nudge+renderMobileScheduleHTML();
+    document.getElementById('sBody').innerHTML=nudge+importCard+renderMobileScheduleHTML();
     setTimeout(scrollToMobileNow,50);
   } else {
-    document.getElementById('sBody').innerHTML = nudge + renderWeekViewHTML(ws);
+    document.getElementById('sBody').innerHTML = nudge + importCard + renderWeekViewHTML(ws);
   }
 }
 function selectDay(d){sel=new Date(d);renderSchedule();}
@@ -2902,16 +3154,19 @@ function renderDayViewHTML(date, daySess, hol){
 // shareEdit: same grid, but anonymized (no student names) and clicks toggle
 // availability for the shared calendar instead of booking/opening lessons.
 function renderWeekViewHTML(weekStart,shareEdit){
+  const step=shareEdit?15:30;          // share grid blocks at 15-min granularity
+  const rowH=shareEdit?24:SG_SH;       // shorter rows so 15-min grid stays a similar height
+  const gridCal=shareEdit?'main':ACTIVE_CAL; // share view always reflects the live calendar
   const days=[];
   for(let i=0;i<7;i++) days.push(add(weekStart,i));
   const todayStr=ds(today),selStr=ds(sel);
   const slots=[];
-  for(let m=CAL_S*60;m<CAL_E*60;m+=30) slots.push(m);
-  const totalH=slots.length*SG_SH;
+  for(let m=CAL_S*60;m<CAL_E*60;m+=step) slots.push(m);
+  const totalH=slots.length*rowH;
   const now=new Date();
   const nowMins=now.getHours()*60+now.getMinutes();
   const showNow=nowMins>=CAL_S*60&&nowMins<CAL_E*60;
-  const nowTop=((nowMins-CAL_S*60)/30)*SG_SH;
+  const nowTop=((nowMins-CAL_S*60)/step)*rowH;
 
   const dayHdHTML=days.map((d,i)=>{
     const dstr=ds(d);
@@ -2922,36 +3177,43 @@ function renderWeekViewHTML(weekStart,shareEdit){
 
   const timesHTML=slots.map(m=>{
     const lbl=m%60===0?(m/60===0?'12am':m/60<12?`${m/60}am`:m/60===12?'12pm':`${m/60-12}pm`):'';
-    return `<div class="sg-time" style="height:${SG_SH}px">${lbl}</div>`;
+    return `<div class="sg-time" style="height:${rowH}px">${lbl}</div>`;
   }).join('');
 
   const colsHTML=days.map(d=>{
     const dstr=ds(d);
-    const daySess=getSessionsForDate(dstr);
+    const daySess=getSessionsForDate(dstr,gridCal);
     const isToday=dstr===todayStr;
+    const dayOff=shareEdit&&isDayOff(dstr);
 
     const linesHTML=slots.map((m,i)=>
-      `<div class="sg-hr-line" style="top:${i*SG_SH}px"></div>`+
-      (m%60===0?'':`<div class="sg-half-line" style="top:${i*SG_SH}px"></div>`)
+      `<div class="sg-hr-line" style="top:${i*rowH}px"></div>`+
+      (m%60===0?'':`<div class="sg-half-line" style="top:${i*rowH}px"></div>`)
     ).join('')+`<div class="sg-hr-line" style="top:${totalH}px"></div>`;
 
     const freeHTML=slots.map((m,i)=>{
-      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+30>sm;});
+      const busy=daySess.some(s=>{const sm=t2m(s.time),em=sm+dm(s.dur);return m<em&&m+step>sm;});
       if(busy) return '';
       const h=Math.floor(m/60),mn=m%60;
       const timeStr=`${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')}`;
       const lbl=`${h%12||12}:${mn.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;
-      const blocked=isSlotBlocked(dstr,timeStr);
-      if(blocked) return `<div class="sg-block" style="top:${i*SG_SH}px;height:${SG_SH}px;pointer-events:auto;cursor:pointer" onclick="${shareEdit?`shWkUnblock('${dstr}','${timeStr}')`:`unblockSlot('${dstr}','${timeStr}')`}"><div class="sg-block-lbl">Blocked</div></div>`;
-      if(shareEdit) return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="shWkBlock('${dstr}','${timeStr}')"><span class="sg-slot-time">${lbl}</span></div>`;
-      return `<div class="sg-slot-free" style="top:${i*SG_SH}px;height:${SG_SH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><div class="sg-slot-btns"><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button><button class="sg-block-btn" onclick="event.stopPropagation();blockSlot('${dstr}',${h},${mn})">Block</button></div></div>`;
+      // Blocking only exists on the shareable schedule now.
+      if(shareEdit){
+        const blocked=isSlotBlocked(dstr,timeStr,step);
+        // Day-off cells look blocked but aren't per-slot rules — not selectable/removable here.
+        if(dayOff) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px" title="Day off — change in Profile"></div>`;
+        const selAttr=` data-d="${dstr}" data-m="${m}"`;
+        if(blocked) return `<div class="sg-block sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px;pointer-events:auto;cursor:pointer"${selAttr} data-b="1"><div class="sg-block-lbl">Blocked</div></div>`;
+        return `<div class="sg-slot-free sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px"${selAttr}><span class="sg-slot-time">${lbl}</span></div>`;
+      }
+      return `<div class="sg-slot-free" style="top:${i*rowH}px;height:${rowH}px" onclick="bookAtTime('${dstr}',${h},${mn})"><span class="sg-slot-time">${lbl}</span><div class="sg-slot-btns"><button class="sg-book-btn" onclick="event.stopPropagation();bookAtTime('${dstr}',${h},${mn})">Book</button></div></div>`;
     }).join('');
 
     const blocksHTML=daySess.map(s=>{
       const startM=t2m(s.time);
       const durM=dm(s.dur);
-      const top=((startM-CAL_S*60)/30)*SG_SH;
-      const height=Math.max((durM/30)*SG_SH-2,20);
+      const top=((startM-CAL_S*60)/step)*rowH;
+      const height=Math.max((durM/step)*rowH-2,20);
       if(top+height<=0||top>=totalH) return '';
       // Share view: lessons look like any other blocked time, plus a blue outline only the coach sees
       if(shareEdit) return `<div class="sg-block sg-lesson-blk" style="top:${top}px;height:${height}px"><div class="sg-block-lbl">Blocked</div></div>`;
@@ -2968,8 +3230,9 @@ function renderWeekViewHTML(weekStart,shareEdit){
 
   const weekEnd=add(weekStart,6);
   const weekLbl=weekStart.getMonth()===weekEnd.getMonth()?`${MN[weekStart.getMonth()]} ${weekStart.getFullYear()}`:`${MN[weekStart.getMonth()].slice(0,3)}–${MN[weekEnd.getMonth()].slice(0,3)} ${weekEnd.getFullYear()}`;
-  const weekNavHTML=shareEdit?'':`<div class="sv-week-nav" style="flex-wrap:wrap;gap:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>${whCtrlHTML()}</div>`;
-  return `<div class="sg-wrap">${weekNavHTML}<div class="sg-header"><div class="sg-corner"></div>${dayHdHTML}</div><div class="sg-body"><div class="sg-times">${timesHTML}</div><div class="sg-cols">${colsHTML}</div></div></div>`;
+  const weekNavHTML=shareEdit?'':`<div class="sv-week-nav" style="flex-wrap:wrap;gap:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><button class="sv-nav-arr" onclick="changeWeek(-1)">‹</button><div class="sv-week-lbl">${weekLbl}</div><button class="sv-nav-arr" onclick="changeWeek(1)">›</button></div>${calSelHTML()}${whCtrlHTML()}</div>`;
+  const colsAttr=shareEdit?` id="shGridCols" data-rowh="${rowH}" data-step="${step}"`:'';
+  return `<div class="sg-wrap">${weekNavHTML}<div class="sg-header"><div class="sg-corner"></div>${dayHdHTML}</div><div class="sg-body"><div class="sg-times">${timesHTML}</div><div class="sg-cols"${colsAttr}>${colsHTML}</div></div></div>`;
 }
 
 function handleDayGridClick(e,dstr){
@@ -3108,6 +3371,7 @@ function checkOverlap(){
   if(!time){warn.classList.remove('show');return;}
   const sM=t2m(time),eM=sM+dm(selDur),dstr=ds(sel);
   const conflict=SESSIONS.find(s=>{
+    if(sessCal(s)!==ACTIVE_CAL) return false; // conflicts are checked within the calendar being booked into
     if(s.date!==dstr) return false;
     if(court&&s.court.toLowerCase()!==court) return false;
     const sS=t2m(s.time),sE=sS+dm(s.dur);
@@ -3191,7 +3455,7 @@ async function bookLesson(){
   if(selDur==='custom'){const cv=document.getElementById('customDurIn').value.trim();durLabel=cv||'60m';}
   // Auto-add student if toggle is on and name is new
   const addStu=document.getElementById('addStuToggle').checked&&!STUDENTS.some(s=>s.name.toLowerCase()===name.toLowerCase());
-  const sess={id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'};
+  const sess={id:nextId++,student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid',calendar:ACTIVE_CAL};
   SESSIONS.push(sess);
   if(addStu){
     const stu={name,phone:'',level:'',credits:0,sessions:0,owing:0};
@@ -3202,7 +3466,7 @@ async function bookLesson(){
     });
   }
   closeBookModal();renderSchedule();renderToday();renderStudents();toast(`✓ Lesson booked for ${name}`);
-  const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid'});
+  const saved=await dbInsert('sessions',{student:name,level:'',time,dur:durLabel,court,recur:selRecur,date:ds(sel),payStatus:'unpaid',calendar:ACTIVE_CAL});
   if(saved){ const idx=SESSIONS.indexOf(sess); if(idx>=0) SESSIONS[idx].id=saved.id; renderSchedule();renderToday(); }
   saveCache();
 }
@@ -3299,7 +3563,7 @@ function renderStudents(){
 }
 function renderStuList(list){
   document.getElementById('stuList').innerHTML=list.map(s=>{
-    const upcoming=SESSIONS.filter(se=>se.student===s.name&&se.date>=ds(today)).length;
+    const upcoming=SESSIONS.filter(se=>se.student===s.name&&se.date>=ds(today)&&sessCal(se)==='main').length;
     const metaParts=[s.level];
     if(upcoming>0) metaParts.push(`${upcoming} upcoming`);
     metaParts.push(`${s.sessions} completed`);
@@ -3310,7 +3574,7 @@ function renderStuList(list){
 function filterStuList(q){renderStuList(q?STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):STUDENTS);}
 function openStuDetail(name){
   const s=STUDENTS.find(s=>s.name===name);
-  const up=SESSIONS.filter(se=>se.student===name&&se.date>=ds(today)).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+  const up=SESSIONS.filter(se=>se.student===name&&se.date>=ds(today)&&sessCal(se)==='main').sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
   document.getElementById('detAv').textContent=ini(s.name);
   document.getElementById('detName').textContent=s.name;
   document.getElementById('detSub').textContent=`${s.level} · ${s.sessions} sessions total`;

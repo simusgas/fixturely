@@ -40,13 +40,17 @@ export async function GET(request) {
 
   const { data: sessions, error: sessError } = await supabase
     .from('sessions')
-    .select('date, time, dur')
+    .select('*')
     .eq('coach_id', coach.id)
     .in('date', dates)
 
   if (sessError) {
     console.error('[Coach Public] Sessions error:', sessError)
   }
+
+  // Only the live ('main') calendar affects public availability; planning templates never leak.
+  // JS-side filter so the route keeps working before the `calendar` migration is applied.
+  const mainSessions = (sessions || []).filter(s => !s.calendar || s.calendar === 'main')
 
   // Also load pending requests to avoid double-booking
   const { data: pendingReqs } = await supabase
@@ -63,7 +67,7 @@ export async function GET(request) {
   const coachDaysOff = coach.user_metadata?.days_off || []
 
   // Calculate available slots per day
-  const bookedSessions = sessions || []
+  const bookedSessions = mainSessions
   const pendingSlots = pendingReqs || []
   const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
   const todayStr = dates[0]
@@ -83,10 +87,11 @@ export async function GET(request) {
       const [bh, bm] = (b.time || '00:00').split(':').map(Number)
       const bStart = bh * 60 + bm
       const bEnd = bStart + parseDur(b.dur || '30m')
-      if (b.recur === 'daily') return tM < bEnd && tM + 30 > bStart
-      if (b.recur === 'weekdays' && dow >= 1 && dow <= 5) return tM < bEnd && tM + 30 > bStart
-      if (b.recur === 'days' && Array.isArray(b.days) && b.days.includes(dow)) return tM < bEnd && tM + 30 > bStart
-      if (b.date === dateStr && (b.recur === 'once' || !b.recur)) return tM < bEnd && tM + 30 > bStart
+      // Public slots are 1-hour lessons, so test the full 60-min window against each block.
+      if (b.recur === 'daily') return tM < bEnd && tM + 60 > bStart
+      if (b.recur === 'weekdays' && dow >= 1 && dow <= 5) return tM < bEnd && tM + 60 > bStart
+      if (b.recur === 'days' && Array.isArray(b.days) && b.days.includes(dow)) return tM < bEnd && tM + 60 > bStart
+      if (b.date === dateStr && (b.recur === 'once' || !b.recur)) return tM < bEnd && tM + 60 > bStart
       return false
     })
   }
