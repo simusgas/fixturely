@@ -34,7 +34,17 @@ const PART_META = {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap');
 .fx * { box-sizing: border-box; }
-.fx { font-family: 'Inter', -apple-system, system-ui, sans-serif; }
+.fx {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  min-height: 100vh; min-height: 100dvh;      /* fill the screen even as the mobile bar hides */
+  overflow-x: hidden;                          /* never allow a sideways scroll */
+  -webkit-text-size-adjust: 100%;              /* stop iOS inflating text in landscape */
+  -webkit-tap-highlight-color: transparent;
+}
+.fx input, .fx textarea { font-size: 16px; }   /* 16px+ stops iOS Safari zooming on focus */
+.fx-scroll { scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.fx-scroll::-webkit-scrollbar { display: none; }
+.fx-daypill { scroll-snap-align: start; }
 .fx-display { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
 @keyframes fxMesh { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(-5%,4%) scale(1.12)} 100%{transform:translate(0,0) scale(1)} }
 @keyframes fxMesh2 { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(6%,-3%) scale(1.1)} 100%{transform:translate(0,0) scale(1)} }
@@ -245,11 +255,11 @@ export default function CoachPage({ params }) {
     .filter(g => g.slots.length)
 
   return (
-    <div className="fx" style={{ minHeight: '100vh', background: OFF }}>
+    <div className="fx" style={{ background: OFF }}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       {/* ── Hero ── */}
-      <div style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(150deg, ${P_DK}, ${P} 55%, ${P2})`, padding: '20px 20px 84px' }}>
+      <div style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(150deg, ${P_DK}, ${P} 55%, ${P2})`, padding: 'calc(20px + env(safe-area-inset-top)) 20px 84px' }}>
         <div style={{ position: 'absolute', top: '-35%', left: '-12%', width: '70%', height: '170%', background: 'radial-gradient(circle, rgba(190,242,100,.4), transparent 60%)', filter: 'blur(34px)', animation: 'fxMesh 14s ease-in-out infinite' }} />
         <div style={{ position: 'absolute', bottom: '-45%', right: '-18%', width: '80%', height: '170%', background: 'radial-gradient(circle, rgba(167,139,250,.6), transparent 60%)', filter: 'blur(34px)', animation: 'fxMesh2 17s ease-in-out infinite' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 72% 18%, rgba(255,255,255,.16), transparent 42%)' }} />
@@ -270,29 +280,34 @@ export default function CoachPage({ params }) {
             <div style={{ width: 84, height: 84, borderRadius: '50%', margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,.18)', border: '2px solid rgba(255,255,255,.4)', backdropFilter: 'blur(8px)', boxShadow: '0 10px 30px rgba(0,0,0,.18)' }}>
               <span className="fx-display" style={{ fontSize: 30, fontWeight: 800, color: '#fff', letterSpacing: .5 }}>{initialsOf(coachName)}</span>
             </div>
-            <div className="fx-display" style={{ fontSize: 30, fontWeight: 800, color: '#fff', letterSpacing: -.5, lineHeight: 1.1 }}>{coachName}</div>
+            <div className="fx-display" style={{ fontSize: 'clamp(24px, 7vw, 30px)', fontWeight: 800, color: '#fff', letterSpacing: -.5, lineHeight: 1.1, padding: '0 8px', wordBreak: 'break-word' }}>{coachName}</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,.82)', marginTop: 5 }}>Tennis Coach</div>
 
-            {/* Trust chips */}
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 18 }}>
-              {stats.openings > 0 && (
-                <div style={chip}><b style={{ color: '#EAFFB0' }}>{stats.openings}</b>&nbsp;openings this fortnight</div>
-              )}
-              <div style={chip}>⚡ Usually replies fast</div>
-              <div style={chip}>✅ Book in seconds</div>
-            </div>
+            {/* Soonest available opening — the one genuinely useful fact */}
+            {stats.soonest && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <button onClick={() => setSelDate(stats.soonest.date)} style={{ ...chip, cursor: 'pointer', border: 'none' }}>
+                  Next opening&nbsp;<b style={{ color: '#EAFFB0' }}>{(() => {
+                    const d = new Date(stats.soonest.date + 'T00:00:00')
+                    const lbl = stats.soonest.date === todayStr ? 'today'
+                      : `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
+                    return `${lbl}, ${fmt(stats.soonest.time)}`
+                  })()}</b>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* ── Booking card (overlaps hero) ── */}
-      <div style={{ maxWidth: 500, margin: '-64px auto 0', padding: '0 16px 40px', position: 'relative' }}>
+      <div style={{ maxWidth: 500, margin: '-64px auto 0', padding: '0 16px max(40px, calc(env(safe-area-inset-bottom) + 24px))', position: 'relative' }}>
         <div className="fx-up" style={{ background: '#fff', borderRadius: 24, padding: '20px 18px 22px', boxShadow: '0 24px 60px rgba(30,27,75,.16)', border: '1px solid rgba(255,255,255,.7)' }}>
           <div className="fx-display" style={{ fontSize: 18, fontWeight: 800, color: TEXT, marginBottom: 4 }}>Pick a time</div>
           <div style={{ fontSize: 13, fontWeight: 600, color: MUTED, marginBottom: 16 }}>Request a lesson — your coach confirms it</div>
 
           {/* Day strip */}
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 6, marginBottom: 18, WebkitOverflowScrolling: 'touch' }}>
+          <div className="fx-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 6, marginBottom: 18 }}>
             {days.map(day => {
               const d = new Date(day.date + 'T00:00:00')
               const openCount = day.slots.filter(s => !isPast(day.date, s.time)).length
@@ -393,8 +408,8 @@ export default function CoachPage({ params }) {
           backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', animation: 'fxFade .2s ease both',
         }}>
           <div style={{
-            background: '#fff', borderRadius: '26px 26px 0 0', padding: '22px 20px 40px', width: '100%', maxWidth: 500,
-            maxHeight: '92vh', overflowY: 'auto', overscrollBehavior: 'contain', animation: 'fxSheet .34s cubic-bezier(.22,1,.36,1) both',
+            background: '#fff', borderRadius: '26px 26px 0 0', padding: '22px 20px max(34px, calc(env(safe-area-inset-bottom) + 20px))', width: '100%', maxWidth: 500,
+            maxHeight: '92dvh', overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', animation: 'fxSheet .34s cubic-bezier(.22,1,.36,1) both',
           }}>
             {!submitted ? (
               <>
@@ -474,8 +489,8 @@ const chip = {
   color: '#fff', padding: '6px 12px', borderRadius: 100, fontSize: 12, fontWeight: 700, backdropFilter: 'blur(6px)',
 }
 const inputStyle = {
-  width: '100%', padding: '13px 15px', background: OFF, border: `1.5px solid ${BORDER}`, borderRadius: 13,
-  fontSize: 15, fontWeight: 600, color: TEXT, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+  width: '100%', padding: '14px 15px', background: OFF, border: `1.5px solid ${BORDER}`, borderRadius: 13,
+  fontSize: 16, fontWeight: 600, color: TEXT, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
 }
 const calBtn = {
   flex: 1, background: '#fff', border: `1.5px solid ${BORDER}`, color: TEXT, padding: '12px 8px', borderRadius: 12,
