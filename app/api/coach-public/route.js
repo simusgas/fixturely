@@ -38,14 +38,22 @@ export async function GET(request) {
     dates.push(d.toISOString().slice(0, 10))
   }
 
-  // Fetch every session up to the window's end — weekly/fortnightly lessons are
-  // stored as one row on their original date and expanded per-occurrence below,
-  // so a repeating lesson from weeks ago still blocks upcoming weeks.
+  // Fetch the sessions that can affect the visible window:
+  //   • one-time lessons dated inside [today, windowEnd]
+  //   • every recurring lesson (Weekly/Fortnightly), whatever its original date,
+  //     since it expands forward into the window (handled by occursOn below).
+  // Bounding it this way keeps the result small — an unbounded fetch silently
+  // hits Supabase's 1000-row cap for busy coaches and drops the very rows we
+  // need, which made far-out days wrongly show as fully free.
+  const windowStart = dates[0]
+  const windowEnd = dates[dates.length - 1]
   const { data: sessions, error: sessError } = await supabase
     .from('sessions')
     .select('*')
     .eq('coach_id', coach.id)
-    .lte('date', dates[dates.length - 1])
+    .lte('date', windowEnd)
+    .or(`date.gte.${windowStart},recur.eq.Weekly,recur.eq.Fortnightly`)
+    .limit(2000)
 
   if (sessError) {
     console.error('[Coach Public] Sessions error:', sessError)

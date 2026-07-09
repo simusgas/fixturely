@@ -2358,6 +2358,17 @@ function unblockSlot(dstr,timeStr,step=15){
     toast('Block removed');
   }
 }
+// Why a non-free grid cell can't be tapped to block/unblock — turns silent
+// "nothing happens" clicks into a clear explanation pointing at the real control.
+function explainCell(kind){
+  const msg={
+    lesson:'🎾 This is a booked lesson — manage it in the Schedule tab',
+    hours:'Outside your working hours — change the range in Working hours above',
+    lunch:'🥪 Lunch break — adjust it in Working hours above',
+    off:'Day off — change it in your Profile',
+  }[kind];
+  if(msg) toast(msg);
+}
 let blockRepeatMode='thisday';
 let blockSelectedDays=[];
 function openBlockModal(){
@@ -3455,10 +3466,10 @@ function renderWeekViewHTML(weekStart,shareEdit){
       if(shareEdit){
         const blocked=isSlotBlocked(dstr,timeStr,step);
         // Day-off cells look blocked but aren't per-slot rules — not selectable/removable here.
-        if(dayOff) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px" title="Day off — change in Profile"></div>`;
+        if(dayOff) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px;cursor:default" title="Day off" onclick="explainCell('off')"></div>`;
         // Outside working hours / lunch break — set in the Working hours card, not tap-blockable
         const oh=outsideHours(d.getDay(),m,step);
-        if(oh) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px;opacity:0.55" title="${oh}"></div>`;
+        if(oh) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px;opacity:0.55;cursor:default" title="${oh}" onclick="explainCell('${oh==='Lunch break'?'lunch':'hours'}')"></div>`;
         const selAttr=` data-d="${dstr}" data-m="${m}"`;
         if(blocked) return `<div class="sg-block sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px;pointer-events:auto;cursor:pointer"${selAttr} data-b="1"><div class="sg-block-lbl">Blocked</div></div>`;
         return `<div class="sg-slot-free sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px"${selAttr}><span class="sg-slot-time">${lbl}</span></div>`;
@@ -3472,8 +3483,9 @@ function renderWeekViewHTML(weekStart,shareEdit){
       const top=((startM-CAL_S*60)/step)*rowH;
       const height=Math.max((durM/step)*rowH-2,20);
       if(top+height<=0||top>=totalH) return '';
-      // Share view: lessons look like any other blocked time, plus a blue outline only the coach sees
-      if(shareEdit) return `<div class="sg-block sg-lesson-blk" style="top:${top}px;height:${height}px"><div class="sg-block-lbl">Blocked</div></div>`;
+      // Share view: a real lesson booking — blue outline only the coach sees. Not
+      // tap-blockable (it's a booking, not a block); tapping explains why.
+      if(shareEdit) return `<div class="sg-block sg-lesson-blk" style="top:${top}px;height:${height}px;cursor:default" onclick="explainCell('lesson')"><div class="sg-block-lbl">${height>=20?'🎾 Lesson':''}</div></div>`;
       const isPaid=s.payStatus==='paid';
       const compact=height<=35;
       const showTime=height>34;
