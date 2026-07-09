@@ -2322,22 +2322,37 @@ function renderBlockViews(){
   if(shScreen&&shScreen.classList.contains('active')) updateShareGrid();
   else renderSchedule();
 }
-function unblockSlot(dstr,timeStr){
-  // Find matching block — check one-time first, then recurring
-  let idx=BLOCKS.findIndex(b=>b.date===dstr&&b.time===timeStr);
-  if(idx===-1){
-    // May be a recurring block — ask if they want to remove the recurring rule
-    const d=new Date(dstr+'T00:00:00');
-    idx=BLOCKS.findIndex(b=>{
-      const bM=t2m(b.time),tM=t2m(timeStr);
-      if(b.recur==='daily') return tM>=bM&&tM<bM+dm(b.dur);
-      if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return tM>=bM&&tM<bM+dm(b.dur);
-      if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return tM>=bM&&tM<bM+dm(b.dur);
-      return false;
-    });
-    if(idx>=0&&!confirm(`This is a recurring block (${BLOCKS[idx].time}, ${BLOCKS[idx].recur}). Remove the entire recurring block?`)) return;
+function unblockSlot(dstr,timeStr,step=15){
+  // Match by OVERLAP, exactly like isSlotBlocked marks cells — otherwise a
+  // block longer than one cell (from the Block Time modal, a drag-select, or an
+  // old version) renders blocked but only its start cell could ever be removed.
+  const d=new Date(dstr+'T00:00:00');
+  const tM=t2m(timeStr);
+  const overlaps=b=>{const bM=t2m(b.time);return tM<bM+dm(b.dur)&&tM+step>bM;};
+
+  // One-time block covering this slot → trim just this 15-min slice, keeping the
+  // remainder before/after so a long block shrinks instead of vanishing.
+  const oi=BLOCKS.findIndex(b=>(b.recur==='once'||!b.recur)&&b.date===dstr&&overlaps(b));
+  if(oi>=0){
+    const b=BLOCKS[oi],bM=t2m(b.time),bE=bM+dm(b.dur),pieces=[];
+    if(bM<tM) pieces.push({date:b.date,time:mToTime(bM),dur:(tM-bM)+'m',recur:'once'});
+    if(bE>tM+step) pieces.push({date:b.date,time:mToTime(tM+step),dur:(bE-tM-step)+'m',recur:'once'});
+    BLOCKS.splice(oi,1,...pieces);
+    saveCache();renderBlockViews();syncAvailability();
+    toast('Block removed');
+    return;
   }
+
+  // Otherwise a recurring rule covers it — remove the whole rule (with confirm)
+  const idx=BLOCKS.findIndex(b=>{
+    if(!overlaps(b)) return false;
+    if(b.recur==='daily') return true;
+    if(b.recur==='weekdays'&&d.getDay()>=1&&d.getDay()<=5) return true;
+    if(b.recur==='days'&&Array.isArray(b.days)&&b.days.includes(d.getDay())) return true;
+    return false;
+  });
   if(idx>=0){
+    if(!confirm(`This is a recurring block (${BLOCKS[idx].time}, ${BLOCKS[idx].recur}). Remove the entire recurring block?`)) return;
     BLOCKS.splice(idx,1);
     saveCache();renderBlockViews();syncAvailability();
     toast('Block removed');
