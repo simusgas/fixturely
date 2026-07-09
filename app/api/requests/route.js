@@ -34,28 +34,48 @@ export async function POST(request) {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { coachId, studentName, contact, message, date, time } = body
+  const { coachId, studentName, contact, message, date, time, dur, recur } = body
 
   if (!coachId || !studentName || !contact || !date || !time) {
     return Response.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  // The form requires an explicit one-time/weekly choice
+  if (!['One-time', 'Weekly'].includes(recur)) {
+    return Response.json({ error: 'Missing lesson frequency' }, { status: 400 })
+  }
+
+  const requestedDur = ['30m', '45m', '1h'].includes(dur) ? dur : '1h'
+
   // Use admin client since this is an unauthenticated request
   const supabase = createAdminClient()
 
-  const { data, error } = await supabase
+  const row = {
+    coach_id: coachId,
+    student_name: studentName.trim(),
+    contact: contact.trim(),
+    message: (message || '').trim(),
+    requested_date: date,
+    requested_time: time,
+    requested_dur: requestedDur,
+    requested_recur: recur,
+    status: 'pending',
+  }
+
+  let { data, error } = await supabase
     .from('lesson_requests')
-    .insert({
-      coach_id: coachId,
-      student_name: studentName.trim(),
-      contact: contact.trim(),
-      message: (message || '').trim(),
-      requested_date: date,
-      requested_time: time,
-      status: 'pending',
-    })
+    .insert(row)
     .select()
     .single()
+
+  // Retry without the newer columns if their migration isn't applied yet
+  if (error) {
+    const missing = ['requested_dur', 'requested_recur'].filter(c => `${error.message}`.includes(c))
+    if (missing.length) {
+      missing.forEach(c => delete row[c])
+      ;({ data, error } = await supabase.from('lesson_requests').insert(row).select().single())
+    }
+  }
 
   if (error) {
     console.error('[Requests] Insert error:', error)
@@ -108,9 +128,9 @@ export async function PATCH(request) {
         student: req.student_name,
         level: '',
         time: req.requested_time,
-        dur: '1h',
+        dur: req.requested_dur || '1h',
         court: '',
-        recur: 'One-time',
+        recur: req.requested_recur || 'One-time',
         date: req.requested_date,
         pay_status: 'unpaid',
         notes: req.message || '',

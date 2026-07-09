@@ -38,11 +38,14 @@ export async function GET(request) {
     dates.push(d.toISOString().slice(0, 10))
   }
 
+  // Fetch every session up to the window's end — weekly/fortnightly lessons are
+  // stored as one row on their original date and expanded per-occurrence below,
+  // so a repeating lesson from weeks ago still blocks upcoming weeks.
   const { data: sessions, error: sessError } = await supabase
     .from('sessions')
     .select('*')
     .eq('coach_id', coach.id)
-    .in('date', dates)
+    .lte('date', dates[dates.length - 1])
 
   if (sessError) {
     console.error('[Coach Public] Sessions error:', sessError)
@@ -53,9 +56,10 @@ export async function GET(request) {
   const mainSessions = (sessions || []).filter(s => !s.calendar || s.calendar === 'main')
 
   // Also load pending requests to avoid double-booking
+  // Select * so this works before and after the requested_dur migration
   const { data: pendingReqs } = await supabase
     .from('lesson_requests')
-    .select('requested_date, requested_time')
+    .select('*')
     .eq('coach_id', coach.id)
     .eq('status', 'pending')
     .in('requested_date', dates)
@@ -66,11 +70,11 @@ export async function GET(request) {
   const coachBlocks = coach.user_metadata?.blocks || []
   const coachDaysOff = coach.user_metadata?.days_off || []
 
-  // Calculate available slots per day
-  const bookedSessions = mainSessions
+  // Build anonymized busy intervals per day — the public page renders the same
+  // week grid as the coach's share preview, so it needs intervals, not free hours.
+  // Sessions, share-blocks, and pending requests all collapse into plain "busy";
+  // nothing about their origin leaves the server.
   const pendingSlots = pendingReqs || []
-  const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
-  const todayStr = dates[0]
 
   function parseDur(d) {
     if (d === '30m') return 30
@@ -80,61 +84,100 @@ export async function GET(request) {
     return isNaN(n) ? 60 : n
   }
 
-  function isBlockedPublic(dateStr, tM) {
-    const d = new Date(dateStr + 'T00:00:00')
-    const dow = d.getDay()
-    return coachBlocks.some(b => {
-      const [bh, bm] = (b.time || '00:00').split(':').map(Number)
-      const bStart = bh * 60 + bm
-      const bEnd = bStart + parseDur(b.dur || '30m')
-      // Public slots are 1-hour lessons, so test the full 60-min window against each block.
-      if (b.recur === 'daily') return tM < bEnd && tM + 60 > bStart
-      if (b.recur === 'weekdays' && dow >= 1 && dow <= 5) return tM < bEnd && tM + 60 > bStart
-      if (b.recur === 'days' && Array.isArray(b.days) && b.days.includes(dow)) return tM < bEnd && tM + 60 > bStart
-      if (b.date === dateStr && (b.recur === 'once' || !b.recur)) return tM < bEnd && tM + 60 > bStart
-      return false
-    })
+  function t2m(t) {
+    const [h, m] = (t || '00:00').split(':').map(Number)
+    return h * 60 + m
   }
 
-  const slots = {}
-  for (const dateStr of dates) {
-    // Check day off
+  function blockIntervals(dateStr, dow) {
+    const out = []
+    for (const b of coachBlocks) {
+      const applies =
+        b.recur === 'daily' ||
+        (b.recur === 'weekdays' && dow >= 1 && dow <= 5) ||
+        (b.recur === 'days' && Array.isArray(b.days) && b.days.includes(dow)) ||
+        ((b.recur === 'once' || !b.recur) && b.date === dateStr)
+      if (!applies) continue
+      const s = t2m(b.time)
+      out.push([s, s + parseDur(b.dur || '30m')])
+    }
+    return out
+  }
+
+  // Same expansion rules as the app's getSessionsForDate (DB snake_case columns)
+  function occursOn(s, dateStr) {
+    if (s.cancelled_dates && s.cancelled_dates.includes(dateStr)) return false
+    if (s.recur_end && dateStr > s.recur_end) return false
+    if (s.date === dateStr) return true
+    if (s.recur === 'Weekly' || s.recur === 'Fortnightly') {
+      const target = new Date(dateStr + 'T00:00:00')
+      const orig = new Date(s.date + 'T00:00:00')
+      if (target <= orig || target.getDay() !== orig.getDay()) return false
+      const diffDays = Math.round((target - orig) / 86400000)
+      return s.recur === 'Weekly' ? diffDays % 7 === 0 : diffDays % 14 === 0
+    }
+    return false
+  }
+
+  function mergeIntervals(list) {
+    const sorted = [...list].sort((a, b) => a[0] - b[0])
+    const merged = []
+    for (const [s, e] of sorted) {
+      const last = merged[merged.length - 1]
+      if (last && s <= last[1]) last[1] = Math.max(last[1], e)
+      else merged.push([s, e])
+    }
+    return merged
+  }
+
+  // Privacy: only available start times leave the server — never the shape of
+  // the coach's day. Each slot lists which durations fit (back-to-back with the
+  // next booking is allowed: a lesson may end exactly when something starts).
+  const DUR_MINS = [['30m', 30], ['45m', 45], ['1h', 60]]
+  const weeklyHours = coach.user_metadata?.weekly_hours || {}
+
+  // Per-day bookable window (+ optional lunch break), falling back to the
+  // global work hours — mirrors dayHours() in the coach app.
+  function dayWindow(dow) {
+    const wh = weeklyHours[dow]
+    if (wh && typeof wh.s === 'number' && typeof wh.e === 'number') return wh
+    return { s: workStart * 60, e: workEnd * 60, bs: null, be: null }
+  }
+
+  function fitsAt(startMin, durMin, busy, dayEndM) {
+    if (startMin + durMin > dayEndM) return false
+    return !busy.some(([s, e]) => startMin < e && startMin + durMin > s)
+  }
+
+  function mToTime(m) {
+    return `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`
+  }
+
+  const days = dates.map(dateStr => {
     const dow = new Date(dateStr + 'T00:00:00').getDay()
-    if (coachDaysOff.includes(dow)) continue
+    if (coachDaysOff.includes(dow)) return { date: dateStr, slots: [] }
+
+    const wh = dayWindow(dow)
+    const busy = mergeIntervals([
+      ...mainSessions.filter(s => occursOn(s, dateStr))
+        .map(s => [t2m(s.time), t2m(s.time) + parseDur(s.dur)]),
+      ...pendingSlots.filter(r => r.requested_date === dateStr)
+        .map(r => [t2m(r.requested_time), t2m(r.requested_time) + parseDur(r.requested_dur || '1h')]),
+      ...blockIntervals(dateStr, dow),
+      ...(wh.bs != null ? [[wh.bs, wh.be]] : []), // lunch break
+    ])
 
     const daySlots = []
-    const daySess = bookedSessions.filter(s => s.date === dateStr)
-    const dayPending = pendingSlots.filter(r => r.requested_date === dateStr)
-
-    for (let h = Math.max(workStart, 7); h <= Math.min(workEnd - 1, 19); h++) {
-      const t = `${h.toString().padStart(2, '0')}:00`
-      const tM = h * 60
-
-      // Skip past times today
-      if (dateStr === todayStr && tM <= nowMins) continue
-
-      // Check blocks
-      if (isBlockedPublic(dateStr, tM)) continue
-
-      // Check session conflicts
-      const taken = daySess.some(s => {
-        const [sh, sm] = s.time.split(':').map(Number)
-        const sStart = sh * 60 + sm
-        const sEnd = sStart + parseDur(s.dur)
-        return tM < sEnd && tM + 60 > sStart
-      })
-
-      // Check pending request conflicts
-      const pendingConflict = dayPending.some(r => r.requested_time === t)
-
-      if (!taken && !pendingConflict) daySlots.push(t)
+    for (let m = wh.s; m + 30 <= wh.e; m += 30) {
+      const durs = DUR_MINS.filter(([, mins]) => fitsAt(m, mins, busy, wh.e)).map(([lbl]) => lbl)
+      if (durs.length) daySlots.push({ time: mToTime(m), durs })
     }
-    if (daySlots.length > 0) slots[dateStr] = daySlots
-  }
+    return { date: dateStr, slots: daySlots }
+  })
 
   return Response.json({
     coachName: coach.user_metadata?.full_name || 'Coach',
     coachId: coach.id,
-    slots,
+    days,
   })
 }

@@ -408,6 +408,15 @@ window.__bootErrors=[];
   .sg-now-line{position:absolute;left:0;right:0;height:2px;background:var(--t-a);z-index:5;pointer-events:none;}
   .sg-now-dot{width:9px;height:9px;border-radius:50%;background:var(--t-a);position:absolute;left:-5px;top:-4px;}
   /* Working hours control */
+  /* Weekly working-hours editor (Share tab) */
+  .wh-days{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+  .wh-day{border:1.5px solid var(--border);background:var(--white);border-radius:100px;padding:5px 10px;font-size:11px;font-weight:800;color:var(--soft);cursor:pointer;font-family:'Inter',sans-serif;}
+  .wh-day.active{background:var(--s-a);border-color:var(--s-a);color:#fff;}
+  .wh-day.off{opacity:0.4;}
+  .wh-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--soft);flex-wrap:wrap;}
+  .wh-row select{padding:6px 8px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;background:var(--white);color:var(--text);}
+  .wh-apply{border:1.5px solid var(--border);background:var(--white);color:var(--soft);padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;}
+  .wh-apply:hover{background:var(--off);}
   .wh-ctrl{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--soft);cursor:pointer;padding:4px 10px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);transition:background 0.15s;white-space:nowrap;}
   .wh-ctrl:hover{background:var(--off);}
   .wh-edit{display:none;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 0;}
@@ -944,7 +953,12 @@ window.__bootErrors=[];
   .sh-preview-label{font-size:14px;font-weight:900;color:var(--p-dk);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;text-align:center;background:var(--p-lt);padding:10px 16px;border-radius:10px;border:1.5px solid rgba(79,70,229,0.15);}
   /* Availability-editing hint bar */
   .sh-edit-hint{font-size:12px;font-weight:700;color:var(--s-dk);background:var(--s-pl);border:1.5px solid var(--s-b);border-radius:10px;padding:8px 12px;margin-bottom:10px;text-align:center;}
+  .sh-mode-tgl{display:inline-flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;background:var(--white);flex-shrink:0;}
+  .sh-mode-tgl button{border:none;background:transparent;font-size:11px;font-weight:800;color:var(--soft);padding:5px 10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;}
+  .sh-mode-tgl button.active{background:var(--s-a);color:#fff;}
   .sh-preview-content{max-height:500px;overflow-y:auto;}
+  .sh-live-preview{background:var(--white);border-radius:20px;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.08);overflow:hidden;}
+  .sh-live-preview iframe{display:block;width:100%;height:640px;border:none;}
   .sh-preview-empty{text-align:center;padding:40px 20px;color:var(--muted);}
   .sh-preview-empty-icon{font-size:36px;margin-bottom:10px;}
   .sh-preview-empty-t{font-size:14px;font-weight:800;color:var(--soft);margin-bottom:6px;}
@@ -1802,6 +1816,20 @@ let HOLIDAYS=[];
 let INVOICES=[];
 let BLOCKS=[]; // {date,time,dur,recur} — blocked time slots
 let DAYS_OFF=[]; // [0-6] — days of week off (0=Sun,1=Mon,...)
+let WEEKLY_HOURS={}; // {dow:{s,e,bs,be}} minutes — per-day bookable window + optional lunch break
+// Per-day working hours with fallback to the global Profile work hours
+function dayHours(dow){
+  const wh=WEEKLY_HOURS&&WEEKLY_HOURS[dow];
+  if(wh&&typeof wh.s==='number'&&typeof wh.e==='number') return wh;
+  return {s:CAL_S*60,e:CAL_E*60,bs:null,be:null};
+}
+// Is this 15-min cell outside the day's bookable window (before start, after end, or lunch)?
+function outsideHours(dow,m,step){
+  const wh=dayHours(dow);
+  if(m<wh.s||m+step>wh.e) return 'Outside working hours';
+  if(wh.bs!=null&&m<wh.be&&m+step>wh.bs) return 'Lunch break';
+  return null;
+}
 
 // ══ CALENDAR TEMPLATES ══
 // The schedule grid can show the live calendar ('main') or a planning template.
@@ -1851,7 +1879,7 @@ async function loadAllData(){
 }
 function saveCache(){
   try { localStorage.setItem('fixturely_data',JSON.stringify({
-    students:STUDENTS,sessions:SESSIONS,terms:TERMS,holidays:HOLIDAYS,invoices:INVOICES,blocks:BLOCKS,daysOff:DAYS_OFF,ts:Date.now()
+    students:STUDENTS,sessions:SESSIONS,terms:TERMS,holidays:HOLIDAYS,invoices:INVOICES,blocks:BLOCKS,daysOff:DAYS_OFF,weeklyHours:WEEKLY_HOURS,ts:Date.now()
   })); } catch(e){}
 }
 function loadCachedData(){
@@ -1866,6 +1894,7 @@ function loadCachedData(){
     INVOICES=d.invoices||[];
     BLOCKS=d.blocks||[];
     DAYS_OFF=d.daysOff||[];
+    WEEKLY_HOURS=d.weeklyHours||{};
     return true;
   } catch(e){ return false; }
 }
@@ -2290,7 +2319,7 @@ function isDayOff(dstr){
 // the Share tab, so refresh it whenever it's the active screen.
 function renderBlockViews(){
   const shScreen=document.getElementById('screen-share');
-  if(shScreen&&shScreen.classList.contains('active')) renderSharePage();
+  if(shScreen&&shScreen.classList.contains('active')) updateShareGrid();
   else renderSchedule();
 }
 function unblockSlot(dstr,timeStr){
@@ -2398,7 +2427,15 @@ function toggleDayOff(day){
   renderDaysOff();
 }
 function syncAvailability(){
-  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({blocks:BLOCKS,daysOff:DAYS_OFF})}).catch(()=>{});
+  // Refresh the live student preview only after the server has the new state
+  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({blocks:BLOCKS,daysOff:DAYS_OFF,weeklyHours:WEEKLY_HOURS})})
+    .then(()=>refreshStudentPreview()).catch(()=>{});
+}
+function refreshStudentPreview(){
+  // Ask the embedded student page to silently refetch availability — no reload,
+  // no flash; it just swaps the times in place.
+  const f=document.getElementById('shStudentPreview');
+  try{ if(f) f.contentWindow.postMessage('fixturely-availability-changed','*'); }catch(_){}
 }
 function renderDaysOff(){
   const el=document.getElementById('pfDaysOff');
@@ -2478,15 +2515,29 @@ let sharePreviewDate=null;
 let shareWeekStart=null;
 // The share preview IS the schedule week grid (anonymized): tap a free slot to block
 // it (unavailable to students), tap a blocked slot to restore it. Same BLOCKS store.
+// What a tap on the share grid blocks: just that date, or that weekday+time every week
+let shBlockMode='once';
+function setShBlockMode(m){
+  shBlockMode=m;
+  // Just flip the toggle's active state — no reason to redraw the grid
+  document.querySelectorAll('.sh-mode-tgl button').forEach((b,i)=>b.classList.toggle('active',(i===0)===(m==='once')));
+}
 function shWkBlock(dstr,timeStr){
-  BLOCKS.push({date:dstr,time:timeStr,dur:'15m',recur:'once'});
+  if(shBlockMode==='weekly'){
+    const dow=new Date(dstr+'T00:00:00').getDay();
+    BLOCKS.push({time:timeStr,dur:'15m',recur:'days',days:[dow]});
+    toast(`Blocked weekly — every ${DF[dow]} at this time`);
+  } else {
+    BLOCKS.push({date:dstr,time:timeStr,dur:'15m',recur:'once'});
+    toast('Marked unavailable to students');
+  }
   saveCache();syncAvailability();
-  toast('Marked unavailable to students');
-  renderSharePage();
+  if(!swapCellToBlocked(dstr,t2m(timeStr))) updateShareGrid();
 }
 function shWkUnblock(dstr,timeStr){
-  unblockSlot(dstr,timeStr); // handles recurring blocks with a confirm
-  renderSharePage();
+  // unblockSlot refreshes the grid itself via renderBlockViews when it removes
+  // a block (a multi-slot block can free several cells, so a redraw is needed)
+  unblockSlot(dstr,timeStr);
 }
 
 // ── Drag multi-select on the share grid ──
@@ -2616,7 +2667,12 @@ function applyShareBlock(){
   Object.keys(byDay).forEach(dstr=>{
     const mins=byDay[dstr].sort((a,b)=>a-b);
     let runStart=mins[0],prev=mins[0];
-    const flush=end=>{ BLOCKS.push({date:dstr,time:mToTime(runStart),dur:(end+step-runStart)+'m',recur:'once'}); added++; };
+    const flush=end=>{
+      const dur=(end+step-runStart)+'m';
+      if(shBlockMode==='weekly') BLOCKS.push({time:mToTime(runStart),dur,recur:'days',days:[new Date(dstr+'T00:00:00').getDay()]});
+      else BLOCKS.push({date:dstr,time:mToTime(runStart),dur,recur:'once'});
+      added++;
+    };
     for(let i=1;i<mins.length;i++){
       if(mins[i]===prev+step){ prev=mins[i]; }
       else { flush(prev); runStart=prev=mins[i]; }
@@ -2624,7 +2680,10 @@ function applyShareBlock(){
     flush(prev);
   });
   saveCache();syncAvailability();
-  clearShareSelection();renderSharePage();
+  // Swap just the selected cells to Blocked; only rebuild if one can't be found
+  let allSwapped=true;
+  free.forEach(c=>{ if(!swapCellToBlocked(c.dstr,c.m)) allSwapped=false; });
+  if(allSwapped) clearShareSelection(); else updateShareGrid();
   toast(`Blocked ${free.length} slot${free.length!==1?'s':''}`);
 }
 // Unblock selected blocked slots: split overlapping one-time blocks, and remove
@@ -2671,14 +2730,80 @@ function applyShareUnblock(){
   });
   BLOCKS=keep;
   saveCache();syncAvailability();
-  clearShareSelection();renderSharePage();
+  updateShareGrid();
   toast(`Unblocked ${sel.length} slot${sel.length!==1?'s':''}`);
 }
-function renderSharePage(){
-  const body=document.getElementById('shBody');
-  if(!shareWeekStart) shareWeekStart=wkStart(today);
+// ── Weekly working-hours editor ──
+// Per-day bookable window + optional lunch break. Students only ever see inside
+// these; tap-blocking is just for one-off exceptions on top.
+let whEditDay=new Date().getDay();
+function whOpts(from,to,step,sel){
+  let h='';
+  for(let m=from;m<=to;m+=step) h+=`<option value="${m}"${m===sel?' selected':''}>${fmt(mToTime(m))}</option>`;
+  return h;
+}
+function buildWhEditorHTML(){
+  const dow=whEditDay;
+  const wh=dayHours(dow);
+  const dayPills=[1,2,3,4,5,6,0].map(i=>
+    `<button class="wh-day${i===dow?' active':''}${DAYS_OFF.includes(i)?' off':''}" onclick="whSelectDay(${i})">${DS_[i]}</button>`
+  ).join('');
+  const gs=CAL_S*60,ge=CAL_E*60;
+  const isOff=DAYS_OFF.includes(dow);
+  const bodyHTML=isOff
+    ?`<div style="font-size:12px;font-weight:700;color:var(--muted);padding:6px 0">${DF[dow]} is a day off — change it in Profile</div>`
+    :`<div class="wh-row"><span>Hours</span>
+        <select onchange="whSet('s',this.value)">${whOpts(gs,ge-30,30,wh.s)}</select><span>to</span>
+        <select onchange="whSet('e',this.value)">${whOpts(gs+30,ge,30,wh.e)}</select></div>
+      <div class="wh-row"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0"><input type="checkbox" ${wh.bs!=null?'checked':''} onchange="whToggleBreak(this.checked)"><span>Lunch break</span></label>
+        ${wh.bs!=null?`<select onchange="whSet('bs',this.value)">${whOpts(wh.s,wh.e-15,15,wh.bs)}</select><span>to</span>
+        <select onchange="whSet('be',this.value)">${whOpts(wh.s+15,wh.e,15,wh.be)}</select>`:''}</div>`;
+  return `<div class="sh-link-card" id="shWhCard" style="margin:18px 0 20px">
+    <div class="sh-link-title">🕐 Working hours — ${DF[dow]}</div>
+    <div class="sh-link-sub">Students can only book inside these hours — set once, block less</div>
+    <div class="wh-days">${dayPills}</div>
+    ${bodyHTML}
+    ${isOff?'':`<button class="wh-apply" onclick="whApplyAll()">Apply ${DS_[dow]}'s hours to all days</button>`}
+  </div>`;
+}
+function updateWhEditor(){ const el=document.getElementById('shWhCard'); if(el) el.outerHTML=buildWhEditorHTML(); }
+function whSelectDay(dow){ whEditDay=dow; updateWhEditor(); }
+function whCommit(cur){
+  // Keep the window sane: end after start, break inside the window
+  if(cur.e<=cur.s) cur.e=Math.min(cur.s+60,CAL_E*60);
+  if(cur.bs!=null){
+    cur.bs=Math.max(cur.s,Math.min(cur.bs,cur.e-15));
+    cur.be=Math.max(cur.bs+15,Math.min(cur.be,cur.e));
+  }
+  WEEKLY_HOURS[whEditDay]=cur;
+  saveCache();syncAvailability();
+  updateWhEditor();updateShareGrid();
+}
+function whSet(field,val){
+  const cur={...dayHours(whEditDay)};
+  cur[field]=parseInt(val);
+  whCommit(cur);
+}
+function whToggleBreak(on){
+  const cur={...dayHours(whEditDay)};
+  if(on){
+    cur.bs=Math.min(Math.max(cur.s,720),cur.e-60);
+    cur.be=cur.bs+60;
+  } else { cur.bs=null;cur.be=null; }
+  whCommit(cur);
+}
+function whApplyAll(){
+  const cur=dayHours(whEditDay);
+  for(let i=0;i<7;i++) WEEKLY_HOURS[i]={...cur};
+  saveCache();syncAvailability();
+  updateWhEditor();updateShareGrid();
+  toast('Hours applied to every day of the week');
+}
 
-  // Week label
+// The editable grid area (hint, week nav, block-mode toggle, week grid), shared
+// by the full page render and the in-place grid update.
+function buildSharePreviewHTML(){
+  if(!shareWeekStart) shareWeekStart=wkStart(today);
   const weekEnd=add(shareWeekStart,6);
   const weekLbl=shareWeekStart.getMonth()===weekEnd.getMonth()
     ?`${MN[shareWeekStart.getMonth()]} ${shareWeekStart.getFullYear()}`
@@ -2686,20 +2811,61 @@ function renderSharePage(){
   // Don't allow navigating before current week
   const canPrev=shareWeekStart>wkStart(today);
   const canNext=add(shareWeekStart,7)<=add(today,28);
-
-  // The preview is the coach's own schedule grid, anonymized, tap-to-toggle availability
-  const previewHTML=`<div style="padding:14px 14px 20px">
+  return `<div style="padding:14px 14px 20px">
       <div class="sh-edit-hint">Tap a time to make it unavailable · hold &amp; drag to select many · <span style="color:var(--s-a)">blue outline</span> = a lesson booking (only you can see this)</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <button onclick="changeShareWeek(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canPrev?'':'opacity:0.3;pointer-events:none'}">‹</button>
         <div style="font-size:13px;font-weight:900;color:var(--text)">${weekLbl}</div>
         <div style="display:flex;align-items:center;gap:8px">
+          <div class="sh-mode-tgl" title="What a tap on the grid blocks">
+            <button class="${shBlockMode==='once'?'active':''}" onclick="setShBlockMode('once')">Once</button>
+            <button class="${shBlockMode==='weekly'?'active':''}" onclick="setShBlockMode('weekly')">🔁 Weekly</button>
+          </div>
           <button onclick="openBlockModal()" style="border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:12px;font-weight:800;color:var(--soft);padding:5px 12px;border-radius:100px;font-family:'Inter',sans-serif">＋ Block Time</button>
           <button onclick="changeShareWeek(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;color:var(--soft);display:flex;align-items:center;justify-content:center;${canNext?'':'opacity:0.3;pointer-events:none'}">›</button>
         </div>
       </div>
       ${renderWeekViewHTML(shareWeekStart,true)}
     </div>`;
+}
+
+// Redraw ONLY the editable grid, in place. The scroll container, the live
+// student preview iframe, and the rest of the page are never touched, so
+// nothing can flash or teleport the scroll position.
+function updateShareGrid(){
+  const pc=document.querySelector('#shBody .sh-preview-content');
+  if(!pc){ renderSharePage(); return; }
+  const st=pc.scrollTop;
+  pc.innerHTML=buildSharePreviewHTML();
+  pc.scrollTop=st;
+  clearShareSelection();
+  initShareDrag();
+}
+
+// Swap a single tapped grid cell from free to Blocked without re-rendering
+// anything else — no repaint, no flicker, no scroll movement.
+function swapCellToBlocked(dstr,m){
+  const cols=document.getElementById('shGridCols');
+  if(!cols) return false;
+  const cell=cols.querySelector(`.sg-sel-cell[data-d="${dstr}"][data-m="${m}"]:not([data-b])`);
+  if(!cell) return false;
+  cell.outerHTML=`<div class="sg-block sg-sel-cell" style="top:${cell.style.top};height:${cell.style.height};pointer-events:auto;cursor:pointer" data-d="${dstr}" data-m="${m}" data-b="1"><div class="sg-block-lbl">Blocked</div></div>`;
+  return true;
+}
+
+function renderSharePage(){
+  const body=document.getElementById('shBody');
+  if(!shareWeekStart) shareWeekStart=wkStart(today);
+  // Rebuilding innerHTML resets scroll to the top — snapshot the grid scroller
+  // and every scrolled ancestor (desktop scrolls .sh-preview-content, mobile
+  // scrolls the page) so blocking a slot doesn't teleport the coach back up.
+  const oldGrid=body.querySelector('.sh-preview-content');
+  const gridScroll=oldGrid?oldGrid.scrollTop:0;
+  const scrolled=[];
+  for(let el=body.parentElement;el;el=el.parentElement){ if(el.scrollTop>0) scrolled.push([el,el.scrollTop]); }
+  const docScroll=document.scrollingElement?document.scrollingElement.scrollTop:0;
+
+  const previewHTML=buildSharePreviewHTML();
 
   // Student list for sharing
   let studentsListHTML='';
@@ -2722,9 +2888,14 @@ function renderSharePage(){
 
   body.innerHTML=`<div class="sh-split">
     <div class="sh-split-left">
-      <div class="sh-preview-label">👁 When you share your calendar with students, this is how it'll appear</div>
+      <div class="sh-preview-label">🗓 Your shareable schedule — tap to block times</div>
       <div class="sh-preview-frame">
         <div class="sh-preview-content">${previewHTML}</div>
+      </div>
+      ${buildWhEditorHTML()}
+      <div class="sh-preview-label">👁 Live preview — exactly what your students see</div>
+      <div class="sh-live-preview">
+        <iframe id="shStudentPreview" src="/coach/${getCoachSlug()}" title="Student preview"></iframe>
       </div>
     </div>
     <div class="sh-split-right">
@@ -2751,6 +2922,22 @@ function renderSharePage(){
       </div>
     </div>
   </div>`;
+  // Restore scroll positions captured before the rebuild. Late async work (the
+  // preview iframe's first slow load after a refresh) can reset scroll again,
+  // so re-apply on the next frame, shortly after, and on iframe load — but only
+  // when the position was actually knocked back to 0, never against the user.
+  const reapplyScroll=(force)=>{
+    const gc=body.querySelector('.sh-preview-content');
+    if(gc&&gridScroll&&(force||gc.scrollTop===0)) gc.scrollTop=gridScroll;
+    scrolled.forEach(([el,st])=>{ if(st&&(force||el.scrollTop===0)) el.scrollTop=st; });
+    const se=document.scrollingElement;
+    if(se&&docScroll&&(force||se.scrollTop===0)) se.scrollTop=docScroll;
+  };
+  reapplyScroll(true);
+  requestAnimationFrame(()=>reapplyScroll(false));
+  setTimeout(()=>reapplyScroll(false),250);
+  const pFrame=document.getElementById('shStudentPreview');
+  if(pFrame) pFrame.addEventListener('load',()=>setTimeout(()=>reapplyScroll(false),50));
   // Re-attach drag multi-select each render (innerHTML wipes listeners) + clear any stale selection bar
   clearShareSelection();
   initShareDrag();
@@ -2770,7 +2957,7 @@ function changeShareWeek(n){
   if(newWeek>add(today,28)) return;
   shareWeekStart=newWeek;
   sharePreviewDate=null;
-  renderSharePage();
+  updateShareGrid();
 }
 let shReqTime='',shReqDateStr='',shReqFreq='One-time',shReqDur='1h';
 function openSharePreviewReq(time,dateStr){
@@ -3228,6 +3415,9 @@ function renderWeekViewHTML(weekStart,shareEdit){
         const blocked=isSlotBlocked(dstr,timeStr,step);
         // Day-off cells look blocked but aren't per-slot rules — not selectable/removable here.
         if(dayOff) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px" title="Day off — change in Profile"></div>`;
+        // Outside working hours / lunch break — set in the Working hours card, not tap-blockable
+        const oh=outsideHours(d.getDay(),m,step);
+        if(oh) return `<div class="sg-block" style="top:${i*rowH}px;height:${rowH}px;opacity:0.55" title="${oh}"></div>`;
         const selAttr=` data-d="${dstr}" data-m="${m}"`;
         if(blocked) return `<div class="sg-block sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px;pointer-events:auto;cursor:pointer"${selAttr} data-b="1"><div class="sg-block-lbl">Blocked</div></div>`;
         return `<div class="sg-slot-free sg-sel-cell" style="top:${i*rowH}px;height:${rowH}px"${selAttr}><span class="sg-slot-time">${lbl}</span></div>`;
@@ -4003,6 +4193,7 @@ function updateProfileWidgets(){
       if(d.workEnd!==undefined) CAL_E=d.workEnd;
       if(d.blocks) BLOCKS=d.blocks;
       if(d.daysOff) DAYS_OFF=d.daysOff;
+      if(d.weeklyHours) WEEKLY_HOURS=d.weeklyHours;
       updateProfileWidgets();
       renderSchedule(); renderToday();
     }
@@ -4640,7 +4831,7 @@ async function acceptRequest(id){
       const req=pendingRequests.find(r=>r.id===id);
       if(req){
         // Add to local SESSIONS
-        SESSIONS.push({id:'req-'+id,student:req.student_name,level:'',time:req.requested_time,dur:'1h',court:'',recur:'One-time',date:req.requested_date,payStatus:'unpaid'});
+        SESSIONS.push({id:'req-'+id,student:req.student_name,level:'',time:req.requested_time,dur:req.requested_dur||'1h',court:'',recur:req.requested_recur||'One-time',date:req.requested_date,payStatus:'unpaid'});
         saveCache();
       }
       pendingRequests=pendingRequests.filter(r=>r.id!==id);
@@ -4671,7 +4862,7 @@ function renderPendingRequestsHTML(){
     const dateLabel=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
     html+=`<div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-left:3px solid var(--p)">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-        <div><div style="font-size:15px;font-weight:900;color:var(--text)">${req.student_name}</div><div style="font-size:12px;font-weight:600;color:var(--soft);margin-top:2px">${dateLabel} · ${fmt(req.requested_time)}</div>${req.contact?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${req.contact}</div>`:''}</div>
+        <div><div style="font-size:15px;font-weight:900;color:var(--text)">${req.student_name}</div><div style="font-size:12px;font-weight:600;color:var(--soft);margin-top:2px">${dateLabel} · ${fmt(req.requested_time)} · ${req.requested_dur||'1h'}${req.requested_recur==='Weekly'?' · 🔁 Weekly':''}</div>${req.contact?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${req.contact}</div>`:''}</div>
       </div>
       ${req.message?`<div style="font-size:12px;color:var(--soft);font-style:italic;margin-bottom:8px">"${req.message}"</div>`:''}
       <div style="display:flex;gap:8px">
