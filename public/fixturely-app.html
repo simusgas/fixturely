@@ -234,6 +234,26 @@ window.__bootErrors=[];
   .dh-stu-btn{margin-left:auto;background:var(--t-pl);color:var(--t-dk);border:none;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;}
   .dh-sheet-empty{text-align:center;padding:30px 10px;color:var(--muted);font-size:14px;font-weight:700;}
 
+  /* ══ PENDING REQUESTS (home) ══ */
+  .req-wrap{margin-bottom:16px;}
+  .req-hd{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--p);padding:0 2px 9px;display:flex;align-items:center;gap:7px;}
+  .req-count{background:var(--err);color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:100px;}
+  .req-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--p);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(15,23,42,.05);}
+  .req-top{display:flex;align-items:center;gap:12px;}
+  .req-av{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;text-transform:uppercase;}
+  .req-name{font-size:15px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .req-when{font-size:12px;font-weight:700;color:var(--soft);margin-top:2px;}
+  .req-contact{font-size:12px;font-weight:700;color:var(--soft);margin:10px 0 0;display:flex;align-items:center;gap:6px;}
+  .req-msg{font-size:12.5px;color:var(--soft);font-style:italic;background:var(--off);border-radius:10px;padding:9px 12px;margin-top:10px;line-height:1.45;}
+  .req-reply{display:flex;gap:8px;margin-top:12px;}
+  .req-reply a{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);color:var(--p-dk);font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:none;transition:background .15s;}
+  .req-reply a:active{background:var(--off);}
+  .req-acts{display:flex;gap:8px;margin-top:8px;}
+  .req-acts button{flex:1;padding:11px;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .12s;}
+  .req-acts button:active{transform:scale(.98);}
+  .req-accept{border:none;background:linear-gradient(135deg,var(--ok),#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.26);}
+  .req-decline{border:1.5px solid var(--border);background:var(--white);color:var(--soft);}
+
   /* This Week page */
   .tw-wrap{max-width:600px;margin:0 auto;padding:16px;}
   .tw-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
@@ -5256,21 +5276,43 @@ async function declineRequest(id){
     }
   }catch(e){toast('Failed to decline request');}
 }
+// Work out whether a student left an email or a phone number so we can offer
+// the right way to reply.
+function contactKind(c){
+  if(!c) return null;
+  const t=c.trim();
+  if(/@/.test(t)) return 'email';
+  return t.replace(/[^0-9]/g,'').length>=6 ? 'phone' : 'other';
+}
 function renderPendingRequestsHTML(){
   if(pendingRequests.length===0) return '';
-  let html=`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.8px;color:var(--p);padding:0 2px 8px;display:flex;align-items:center;gap:6px">📩 Pending Requests <span style="background:var(--err);color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:100px">${pendingRequests.length}</span></div>`;
+  let html=`<div class="req-wrap"><div class="req-hd">📩 Requests <span class="req-count">${pendingRequests.length}</span></div>`;
   pendingRequests.forEach(req=>{
     const d=new Date(req.requested_date+'T00:00:00');
-    const dateLabel=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]}`;
-    html+=`<div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-left:3px solid var(--p)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-        <div><div style="font-size:15px;font-weight:900;color:var(--text)">${req.student_name}</div><div style="font-size:12px;font-weight:600;color:var(--soft);margin-top:2px">${dateLabel} · ${fmt(req.requested_time)} · ${req.requested_dur||'1h'}${req.requested_recur==='Weekly'?' · 🔁 Weekly':''}</div>${req.contact?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${req.contact}</div>`:''}</div>
+    const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} · ${fmt(req.requested_time)} · ${req.requested_dur||'1h'}${req.requested_recur==='Weekly'?' · 🔁 Weekly':''}`;
+    const c=(req.contact||'').trim();
+    const kind=contactKind(c);
+    const first=(req.student_name||'there').split(' ')[0];
+    const whenNice=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
+    const body=encodeURIComponent(`Hi ${first}, thanks for your lesson request for ${whenNice}. `);
+    // Reply action matches what they entered
+    let reply='';
+    if(kind==='email'){
+      reply=`<div class="req-reply"><a href="mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${body}">✉️ Email ${first}</a></div>`;
+    } else if(kind==='phone'){
+      const tel=c.replace(/[^0-9+]/g,'');
+      reply=`<div class="req-reply"><a href="sms:${tel}?&body=${body}">💬 Text</a><a href="tel:${tel}">📞 Call</a></div>`;
+    }
+    const contactLine=c?`<div class="req-contact">${kind==='email'?'✉️':kind==='phone'?'📞':'📇'} ${c}</div>`:'';
+    html+=`<div class="req-card">
+      <div class="req-top">
+        <div class="req-av" style="background:${suAvatar(req.student_name)}">${ini(req.student_name||'?')}</div>
+        <div style="flex:1;min-width:0"><div class="req-name">${req.student_name}</div><div class="req-when">${when}</div></div>
       </div>
-      ${req.message?`<div style="font-size:12px;color:var(--soft);font-style:italic;margin-bottom:8px">"${req.message}"</div>`:''}
-      <div style="display:flex;gap:8px">
-        <button onclick="acceptRequest('${req.id}')" style="flex:1;padding:8px;border-radius:10px;border:none;background:var(--p);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Accept</button>
-        <button onclick="declineRequest('${req.id}')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Decline</button>
-      </div>
+      ${contactLine}
+      ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
+      ${reply}
+      <div class="req-acts"><button class="req-accept" onclick="acceptRequest('${req.id}')">✓ Accept</button><button class="req-decline" onclick="declineRequest('${req.id}')">Decline</button></div>
     </div>`;
   });
   html+=`</div>`;
