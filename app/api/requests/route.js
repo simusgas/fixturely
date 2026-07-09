@@ -1,6 +1,55 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+// Email the coach when a new request lands. Uses Resend if configured; a no-op
+// (never throws, never blocks the request) when RESEND_API_KEY is unset.
+async function notifyCoachOfRequest(supabase, coachId, req) {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return
+  try {
+    const { data } = await supabase.auth.admin.getUserById(coachId)
+    const to = data?.user?.email
+    if (!to) return
+    const from = process.env.NOTIFY_FROM || 'Fixturely <onboarding@resend.dev>'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://fixturely.app'
+
+    const d = new Date(req.requested_date + 'T00:00:00')
+    const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const [h, m] = (req.requested_time || '0:0').split(':').map(Number)
+    const time = `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`
+    const when = `${DAYS[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} at ${time}`
+    const durLbl = { '30m': '30 min', '45m': '45 min', '1h': '1 hour' }[req.requested_dur] || req.requested_dur || '1 hour'
+    const recur = req.requested_recur === 'Weekly' ? ' · Weekly' : ''
+
+    const html = `
+      <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:480px;margin:0 auto;color:#0F172A">
+        <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:16px;padding:24px;text-align:center;color:#fff">
+          <div style="font-size:26px">🎾</div>
+          <div style="font-size:19px;font-weight:800;margin-top:6px">New lesson request</div>
+        </div>
+        <div style="padding:22px 4px">
+          <p style="font-size:15px;margin:0 0 16px"><b>${req.student_name}</b> requested a lesson:</p>
+          <table style="font-size:14px;line-height:1.9;color:#475569">
+            <tr><td>🗓️ When</td><td style="padding-left:12px;color:#0F172A;font-weight:700">${when}</td></tr>
+            <tr><td>⏱️ Length</td><td style="padding-left:12px;color:#0F172A;font-weight:700">${durLbl}${recur}</td></tr>
+            <tr><td>📇 Contact</td><td style="padding-left:12px;color:#0F172A;font-weight:700">${req.contact || '—'}</td></tr>
+          </table>
+          ${req.message ? `<p style="font-size:14px;font-style:italic;color:#475569;background:#F7F8FC;border-radius:10px;padding:12px 14px;margin:16px 0">"${req.message}"</p>` : ''}
+          <a href="${appUrl}" style="display:inline-block;margin-top:8px;background:#4F46E5;color:#fff;text-decoration:none;padding:12px 26px;border-radius:100px;font-weight:800;font-size:14px">Open Fixturely to respond →</a>
+        </div>
+      </div>`
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, subject: `New lesson request from ${req.student_name}`, html }),
+    })
+  } catch (e) {
+    console.error('[Requests] Coach notification failed:', e)
+  }
+}
+
 // GET — Coach fetches their pending requests (auth required)
 export async function GET() {
   const supabase = await createClient()
@@ -82,6 +131,9 @@ export async function POST(request) {
     console.error('[Requests] Insert error:', error)
     return Response.json({ error: 'Failed to submit request' }, { status: 500 })
   }
+
+  // Let the coach know (best-effort; never blocks the student's confirmation)
+  await notifyCoachOfRequest(supabase, coachId, row)
 
   return Response.json({ success: true, request: data })
 }
