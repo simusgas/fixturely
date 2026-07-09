@@ -50,6 +50,53 @@ async function notifyCoachOfRequest(supabase, coachId, req) {
   }
 }
 
+function contactKind(c) {
+  if (!c) return null
+  const t = c.trim()
+  if (/@/.test(t)) return 'email'
+  return t.replace(/[^0-9]/g, '').length >= 6 ? 'phone' : 'other'
+}
+async function sendEmail(to, subject, html) {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return false
+  try {
+    const from = process.env.NOTIFY_FROM || 'Fixturely <onboarding@resend.dev>'
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, subject, html }),
+    })
+    return r.ok
+  } catch (e) { console.error('[Requests] sendEmail failed:', e); return false }
+}
+// Email the student that their request was accepted/declined. Only for email
+// contacts (phone is handled in-app via Messages). No-op without RESEND_API_KEY.
+async function emailStudentDecision(req, coachName, accepted, customMessage) {
+  const c = (req.contact || '').trim()
+  if (contactKind(c) !== 'email') return { notified: false }
+  const d = new Date(req.requested_date + 'T00:00:00')
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const [h, m] = (req.requested_time || '0:0').split(':').map(Number)
+  const time = `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`
+  const when = `${DAYS[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} at ${time}`
+  const first = (req.student_name || 'there').split(' ')[0]
+  const def = accepted
+    ? `Hi ${first}, ${coachName} has accepted your lesson request for ${when}. See you on court! 🎾`
+    : `Hi ${first}, unfortunately ${coachName} can't make a lesson on ${when}. Feel free to request another time.`
+  const text = (customMessage && customMessage.trim()) ? customMessage.trim() : def
+  const heading = accepted ? 'Lesson confirmed 🎾' : 'About your lesson request'
+  const bar = accepted ? '#4F46E5,#7C3AED' : '#64748B,#475569'
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:480px;margin:0 auto;color:#0F172A">
+    <div style="background:linear-gradient(135deg,${bar});border-radius:16px;padding:22px;text-align:center;color:#fff">
+      <div style="font-size:26px">🎾</div><div style="font-size:18px;font-weight:800;margin-top:6px">${heading}</div>
+    </div>
+    <p style="font-size:15px;line-height:1.6;padding:20px 4px 0;white-space:pre-wrap">${text.replace(/</g, '&lt;')}</p>
+  </div>`
+  const ok = await sendEmail(c, accepted ? 'Your lesson is confirmed' : 'About your lesson request', html)
+  return { notified: ok }
+}
+
 // GET — Coach fetches their pending requests (auth required)
 export async function GET() {
   const supabase = await createClient()
@@ -154,7 +201,7 @@ export async function PATCH(request) {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { id, action } = body
+  const { id, action, message } = body
 
   if (!id || !['accept', 'decline'].includes(action)) {
     return Response.json({ error: 'Invalid request' }, { status: 400 })
@@ -201,7 +248,9 @@ export async function PATCH(request) {
       .update({ status: 'accepted' })
       .eq('id', id)
 
-    return Response.json({ success: true, action: 'accepted' })
+    const coachName = user.user_metadata?.full_name || 'Your coach'
+    const { notified } = await emailStudentDecision(req, coachName, true, message)
+    return Response.json({ success: true, action: 'accepted', notified })
   }
 
   if (action === 'decline') {
@@ -210,6 +259,8 @@ export async function PATCH(request) {
       .update({ status: 'declined' })
       .eq('id', id)
 
-    return Response.json({ success: true, action: 'declined' })
+    const coachName = user.user_metadata?.full_name || 'Your coach'
+    const { notified } = await emailStudentDecision(req, coachName, false, message)
+    return Response.json({ success: true, action: 'declined', notified })
   }
 }

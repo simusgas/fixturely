@@ -5253,61 +5253,71 @@ function updateRequestBadge(){
     badge.classList.remove('show');
   }
 }
-// Accept opens a modal with a pre-written reply you can tweak. "Accept & open
-// Messages/Email" adds the lesson AND opens your messaging app pre-filled and
-// addressed to the student, ready for you to hit send. "Accept only" skips it.
-let acceptReqId=null;
-function openAcceptModal(id){
+// Accept/Decline both open a modal with an editable pre-written message.
+// EMAIL contact → Fixturely emails the student automatically.
+// PHONE contact → opens the coach's Messages app pre-filled (no auto-SMS).
+let reqModalId=null, reqModalMode='accept';
+function openReqModal(id, mode){
   const req=pendingRequests.find(r=>r.id==id); if(!req) return;
-  acceptReqId=id;
-  const c=(req.contact||'').trim();
-  const kind=contactKind(c);
+  reqModalId=id; reqModalMode=mode;
+  const accept = mode!=='decline';
+  const c=(req.contact||'').trim(), kind=contactKind(c);
   const first=(req.student_name||'there').split(' ')[0];
   const d=new Date(req.requested_date+'T00:00:00');
   const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
-  const def=`Hi ${first}, I've accepted your lesson request for ${when}. See you on court! 🎾`;
+  const def = accept
+    ? `Hi ${first}, I've accepted your lesson request for ${when}. See you on court! 🎾`
+    : `Hi ${first}, sorry — I can't make a lesson on ${when}. Feel free to request another time.`;
+  const grad = accept?'var(--ok),#047857':'#64748B,#475569';
+  const chan = kind==='email'?`✉️ Emails ${c}`:kind==='phone'?`💬 Opens Messages to ${c}`:'⚠ No contact details';
   const canMsg = kind==='email'||kind==='phone';
-  const openLbl = kind==='email'?'✉️ Accept & open email':'💬 Accept & open Messages';
-  const chan = kind==='email'?`Opens your email to ${c}`:kind==='phone'?`Opens Messages to ${c}`:'⚠ No contact details — accept only';
+  const primaryLbl = kind==='email'?(accept?'✓ Accept & email':'Decline & email')
+                    :kind==='phone'?(accept?'💬 Accept & open Messages':'💬 Decline & open Messages')
+                    :(accept?'✓ Accept':'Decline');
+  const hint = kind==='email'?'Fixturely emails this to them automatically.'
+             :kind==='phone'?'Opens Messages with this ready to send — you tap send.':'';
   const sheet=document.getElementById('acceptSheet');
   sheet.innerHTML=`<div class="dh-sheet-handle"></div>
-    <div class="dh-sheet-title">Accept request</div>
+    <div class="dh-sheet-title">${accept?'Accept request':'Decline request'}</div>
     <div class="dh-sheet-sub">${req.student_name} · ${when}</div>
-    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:${canMsg?'var(--u-dk)':'var(--warn)'};background:${canMsg?'var(--u-pl)':'var(--warn-lt)'};padding:7px 12px;border-radius:100px;margin-bottom:16px">${kind==='email'?'✉️':kind==='phone'?'💬':'⚠'} ${chan}</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:${canMsg?'var(--u-dk)':'var(--warn)'};background:${canMsg?'var(--u-pl)':'var(--warn-lt)'};padding:7px 12px;border-radius:100px;margin-bottom:16px">${chan}</div>
     ${canMsg?`<div style="font-size:12.5px;font-weight:800;color:var(--soft);margin-bottom:7px">Message <span style="color:var(--muted);font-weight:600">— edit if you like</span></div>
-    <textarea id="acceptMsg" class="su-notes">${escHtml(def)}</textarea>
-    <div style="font-size:11px;font-weight:600;color:var(--muted);margin:6px 0 16px">Opens ${kind==='email'?'your email app':'Messages'} with this ready to send — you tap send.</div>
-    <button onclick="confirmAccept()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">${openLbl}</button>
-    <button onclick="acceptOnly()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Accept only (no message)</button>`
-    :`<button onclick="acceptOnly()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">✓ Accept</button>`}
+    <textarea id="reqMsg" class="su-notes">${escHtml(def)}</textarea>
+    <div style="font-size:11px;font-weight:600;color:var(--muted);margin:6px 0 16px">${hint}</div>
+    <button onclick="confirmReqModal()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,${grad});box-shadow:0 6px 16px rgba(15,23,42,.2)">${primaryLbl}</button>
+    <button onclick="reqModalOnly()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">${accept?'Accept':'Decline'} only (no message)</button>`
+    :`<button onclick="reqModalOnly()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,${grad});box-shadow:0 6px 16px rgba(15,23,42,.2)">${accept?'✓ Accept':'Decline'}</button>`}
     <button onclick="closeAcceptModal()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:none;background:none;color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>`;
   document.getElementById('acceptOvl').classList.add('open');
 }
-function closeAcceptModal(){document.getElementById('acceptOvl').classList.remove('open');acceptReqId=null;}
-// Open the coach's Messages/Email pre-filled and addressed to the student
+function closeAcceptModal(){document.getElementById('acceptOvl').classList.remove('open');reqModalId=null;}
+// Open the coach's Messages/Email pre-filled and addressed to the student (phone path)
 function openReplyApp(req,msg){
   if(!req) return;
-  const c=(req.contact||'').trim(); const kind=contactKind(c);
-  const text=(msg||'').trim();
-  if(kind==='email'){ window.location.href=`mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${encodeURIComponent(text)}`; }
-  else if(kind==='phone'){ const tel=c.replace(/[^0-9+]/g,''); window.location.href=`sms:${tel}?&body=${encodeURIComponent(text)}`; }
+  const c=(req.contact||'').trim(), kind=contactKind(c), text=(msg||'').trim();
+  if(kind==='phone'){ const tel=c.replace(/[^0-9+]/g,''); window.location.href=`sms:${tel}?&body=${encodeURIComponent(text)}`; }
+  else if(kind==='email'){ window.location.href=`mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${encodeURIComponent(text)}`; }
 }
-function confirmAccept(){
-  const id=acceptReqId;
+function confirmReqModal(){
+  const id=reqModalId, mode=reqModalMode;
   const req=pendingRequests.find(r=>r.id==id);
-  const msg=(document.getElementById('acceptMsg')?.value||'').trim();
+  const kind=contactKind((req&&req.contact||'').trim());
+  const msg=(document.getElementById('reqMsg')?.value||'').trim();
   closeAcceptModal();
-  acceptRequest(id);              // add to schedule (async)
-  openReplyApp(req,msg);          // open Messages/Email pre-filled — same tap, keeps the gesture
+  // Email → send the message to the server so Fixturely emails it.
+  // Phone → open Messages (server email is a no-op for phone).
+  if(mode==='accept') acceptRequest(id, kind==='email'?msg:'');
+  else declineRequest(id, kind==='email'?msg:'');
+  if(kind==='phone') openReplyApp(req,msg);
 }
-function acceptOnly(){
-  const id=acceptReqId;
+function reqModalOnly(){
+  const id=reqModalId, mode=reqModalMode;
   closeAcceptModal();
-  acceptRequest(id);
+  if(mode==='accept') acceptRequest(id,''); else declineRequest(id,'');
 }
-async function acceptRequest(id){
+async function acceptRequest(id, message){
   try{
-    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept'})});
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept',message:message||''})});
     const d=await r.json();
     if(d.success){
       const req=pendingRequests.find(r=>r.id===id);
@@ -5318,20 +5328,19 @@ async function acceptRequest(id){
       pendingRequests=pendingRequests.filter(r=>r.id!==id);
       updateRequestBadge();
       renderToday();renderSchedule();
-      toast('✓ Accepted — added to your schedule');
+      toast(d.notified?'✓ Accepted — student emailed':'✓ Accepted — added to your schedule');
     }
   }catch(e){toast('Failed to accept request');}
 }
-async function declineRequest(id){
-  if(!confirm('Decline this lesson request?')) return;
+async function declineRequest(id, message){
   try{
-    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'decline'})});
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'decline',message:message||''})});
     const d=await r.json();
     if(d.success){
       pendingRequests=pendingRequests.filter(r=>r.id!==id);
       updateRequestBadge();
       renderToday();
-      toast('Request declined');
+      toast(d.notified?'Declined — student emailed':'Request declined');
     }
   }catch(e){toast('Failed to decline request');}
 }
@@ -5361,7 +5370,7 @@ function renderPendingRequestsHTML(){
       </div>
       ${contactLine}
       ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
-      <div class="req-acts"><button class="req-accept" onclick="openAcceptModal('${req.id}')">✓ Accept</button><button class="req-decline" onclick="declineRequest('${req.id}')">Decline</button></div>
+      <div class="req-acts"><button class="req-accept" onclick="openReqModal('${req.id}','accept')">✓ Accept</button><button class="req-decline" onclick="openReqModal('${req.id}','decline')">Decline</button></div>
     </div>`;
   });
   html+=`</div>`;
