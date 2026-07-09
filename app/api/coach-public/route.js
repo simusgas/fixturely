@@ -84,22 +84,19 @@ export async function GET(request) {
   // nothing about their origin leaves the server.
   const pendingSlots = pendingReqs || []
 
-  // Must mirror dm() in fixturely-app.html — a mismatch here silently mis-sizes
-  // booked lessons (e.g. parseInt('1 hour') === 1), leaking taken slots as free.
+  // Interpret every duration format that has ever been stored, in minutes. A
+  // miss here silently mis-sizes a booked lesson and leaks its time as free
+  // (e.g. parseInt('1.5h') === 1). Covers: '30m'/'90m', '1h'/'1.5h', '1 hour'/
+  // '1.5 hrs', bare numbers ('90'). Unknown → 60 (safer to over-block than leak).
   function parseDur(d) {
     if (typeof d === 'number') return d
     if (!d) return 60
-    if (d === '30m') return 30
-    if (d === '45m') return 45
-    if (d === '1h') return 60
-    const nm = /^(\d+)m$/.exec(d) // '60m', '90m', … block/custom durations
-    if (nm) return parseInt(nm[1])
-    if (d === '30 min') return 30
-    if (d === '1 hour') return 60
-    if (d === '1.5 hrs') return 90
-    if (d === '2 hrs') return 120
-    const n = parseInt(d)
-    return isNaN(n) ? 60 : n
+    const s = String(d).trim().toLowerCase()
+    let m
+    if ((m = /^(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours)$/.exec(s))) return Math.round(parseFloat(m[1]) * 60)
+    if ((m = /^(\d+)\s*(m|min|mins|minute|minutes)$/.exec(s))) return parseInt(m[1])
+    const n = parseFloat(s)
+    return isNaN(n) ? 60 : Math.round(n) // bare number = minutes
   }
 
   function t2m(t) {
