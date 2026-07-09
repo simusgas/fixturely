@@ -3,6 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const slug = searchParams.get('slug')
+  // Which schedule to publish: main (this term) / next-term / school-holidays
+  const CALS = ['main', 'next-term', 'school-holidays']
+  const cal = CALS.includes(searchParams.get('cal')) ? searchParams.get('cal') : 'main'
 
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 })
@@ -59,9 +62,9 @@ export async function GET(request) {
     console.error('[Coach Public] Sessions error:', sessError)
   }
 
-  // Only the live ('main') calendar affects public availability; planning templates never leak.
-  // JS-side filter so the route keeps working before the `calendar` migration is applied.
-  const mainSessions = (sessions || []).filter(s => !s.calendar || s.calendar === 'main')
+  // Availability reflects the requested schedule only (this term / next term /
+  // holidays). Untagged rows count as the live 'main' calendar.
+  const mainSessions = (sessions || []).filter(s => (s.calendar || 'main') === cal)
 
   // Also load pending requests to avoid double-booking
   // Select * so this works before and after the requested_dur migration
@@ -176,7 +179,7 @@ export async function GET(request) {
     const busy = mergeIntervals([
       ...mainSessions.filter(s => occursOn(s, dateStr))
         .map(s => [t2m(s.time), t2m(s.time) + parseDur(s.dur)]),
-      ...pendingSlots.filter(r => r.requested_date === dateStr)
+      ...pendingSlots.filter(r => r.requested_date === dateStr && (r.requested_cal || 'main') === cal)
         .map(r => [t2m(r.requested_time), t2m(r.requested_time) + parseDur(r.requested_dur || '1h')]),
       ...blockIntervals(dateStr, dow),
       ...(wh.bs != null ? [[wh.bs, wh.be]] : []), // lunch break

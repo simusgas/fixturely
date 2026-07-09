@@ -34,7 +34,7 @@ export async function POST(request) {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { coachId, studentName, contact, message, date, time, dur, recur } = body
+  const { coachId, studentName, contact, message, date, time, dur, recur, calendar } = body
 
   if (!coachId || !studentName || !contact || !date || !time) {
     return Response.json({ error: 'Missing required fields' }, { status: 400 })
@@ -59,6 +59,7 @@ export async function POST(request) {
     requested_time: time,
     requested_dur: requestedDur,
     requested_recur: recur,
+    requested_cal: ['main', 'next-term', 'school-holidays'].includes(calendar) ? calendar : 'main',
     status: 'pending',
   }
 
@@ -70,7 +71,7 @@ export async function POST(request) {
 
   // Retry without the newer columns if their migration isn't applied yet
   if (error) {
-    const missing = ['requested_dur', 'requested_recur'].filter(c => `${error.message}`.includes(c))
+    const missing = ['requested_dur', 'requested_recur', 'requested_cal'].filter(c => `${error.message}`.includes(c))
     if (missing.length) {
       missing.forEach(c => delete row[c])
       ;({ data, error } = await supabase.from('lesson_requests').insert(row).select().single())
@@ -134,6 +135,7 @@ export async function PATCH(request) {
         date: req.requested_date,
         pay_status: 'unpaid',
         notes: req.message || '',
+        calendar: req.requested_cal || 'main',
       })
 
     if (sessError) {
