@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, use } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, use } from 'react'
 
 const P = '#4F46E5', P2 = '#7C3AED', P_DK = '#3730A3'
 const TEXT = '#0F172A', SOFT = '#475569', MUTED = '#94A3B8', BORDER = '#E7E9F2', OFF = '#F7F8FC'
@@ -89,6 +89,9 @@ export default function CoachPage({ params }) {
   const [selDate, setSelDate] = useState(null)
 
   const [showForm, setShowForm] = useState(false)
+  const [dragY, setDragY] = useState(0)         // swipe-to-dismiss offset
+  const [dragActive, setDragActive] = useState(false)
+  const dragRef = useRef({ startY: 0, atTop: true })
   const [selSlot, setSelSlot] = useState(null)
   const [selDur, setSelDur] = useState('1h')
   const [selRecur, setSelRecur] = useState(null)
@@ -158,7 +161,31 @@ export default function CoachPage({ params }) {
     setReqContact('')
     setReqMsg('')
     setSubmitted(false)
+    setDragY(0)
     setShowForm(true)
+  }
+
+  function closeSheet() { setDragY(0); setDragActive(false); setShowForm(false) }
+  // Swipe-to-dismiss via the grab handle (pointer events → works for touch and
+  // mouse). The handle owns the gesture (touch-action:none) so dragging it never
+  // fights the form's own scrolling.
+  function onDragDown(e) {
+    dragRef.current.startY = e.clientY
+    dragRef.current.dragging = true
+    setDragActive(true)
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch (_) {}
+  }
+  function onDragMove(e) {
+    if (!dragRef.current.dragging) return
+    const dy = e.clientY - dragRef.current.startY
+    setDragY(dy > 0 ? dy : 0)
+  }
+  function onDragUp() {
+    if (!dragRef.current.dragging) return
+    dragRef.current.dragging = false
+    setDragActive(false)
+    if (dragY > 90) closeSheet()          // dragged far enough → dismiss
+    else setDragY(0)                       // otherwise snap back
   }
 
   async function submitRequest() {
@@ -403,19 +430,28 @@ export default function CoachPage({ params }) {
 
       {/* ── Request sheet ── */}
       {showForm && selSlot && (
-        <div onClick={e => e.target === e.currentTarget && setShowForm(false)} style={{
+        <div onClick={e => e.target === e.currentTarget && closeSheet()} style={{
           position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,27,75,.5)',
           backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', animation: 'fxFade .2s ease both',
         }}>
-          <div style={{
-            background: '#fff', borderRadius: '26px 26px 0 0', padding: '22px 20px max(34px, calc(env(safe-area-inset-bottom) + 20px))', width: '100%', maxWidth: 500,
-            maxHeight: '92dvh', overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', animation: 'fxSheet .34s cubic-bezier(.22,1,.36,1) both',
-          }}>
+          <div
+            style={{
+              position: 'relative', background: '#fff', borderRadius: '24px 24px 0 0', padding: '4px 18px max(28px, calc(env(safe-area-inset-bottom) + 18px))', width: '100%', maxWidth: 480,
+              maxHeight: '90dvh', overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch',
+              transform: dragY ? `translateY(${dragY}px)` : undefined,
+              transition: dragActive ? 'none' : 'transform .28s cubic-bezier(.22,1,.36,1)',
+              animation: dragY ? 'none' : 'fxSheet .32s cubic-bezier(.22,1,.36,1) both',
+            }}>
+            {/* Grab handle — drag it down to dismiss */}
+            <div onPointerDown={onDragDown} onPointerMove={onDragMove} onPointerUp={onDragUp} onPointerCancel={onDragUp}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 28, margin: '0 -18px', cursor: 'grab', touchAction: 'none' }}>
+              <div style={{ width: 40, height: 4.5, background: '#D9DCE8', borderRadius: 100 }} />
+            </div>
             {!submitted ? (
               <>
-                <div style={{ width: 42, height: 4, background: '#E5E7EB', borderRadius: 100, margin: '0 auto 18px' }} />
-                <div className="fx-display" style={{ fontSize: 21, fontWeight: 800, color: TEXT, marginBottom: 4 }}>Request this lesson</div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'linear-gradient(135deg, #EEF0FF, #F3EEFF)', padding: '7px 13px', borderRadius: 100, fontSize: 13, fontWeight: 800, color: P_DK, marginBottom: 20 }}>
+                <button onClick={closeSheet} aria-label="Close" style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', border: 'none', background: OFF, color: MUTED, fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1 }}>✕</button>
+                <div className="fx-display" style={{ fontSize: 18, fontWeight: 800, color: TEXT, marginBottom: 3 }}>Request this lesson</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #EEF0FF, #F3EEFF)', padding: '6px 12px', borderRadius: 100, fontSize: 12.5, fontWeight: 800, color: P_DK, marginBottom: 18 }}>
                   🎾 {fmt(selSlot.time)} · {(() => { const d = new Date(selDate + 'T00:00:00'); return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}` })()}
                 </div>
 
@@ -447,9 +483,9 @@ export default function CoachPage({ params }) {
                 </Field>
 
                 <button onClick={submitRequest} disabled={submitting || !reqName.trim() || !reqContact.trim() || !selRecur} className="fx-cta" style={{
-                  width: '100%', padding: 16, background: `linear-gradient(135deg, ${P}, ${P2})`, color: '#fff', border: 'none',
-                  borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit',
-                  boxShadow: '0 6px 18px rgba(79,70,229,.32)', opacity: (!reqName.trim() || !reqContact.trim() || !selRecur) ? 0.5 : 1, marginTop: 6,
+                  width: '100%', padding: 15, background: `linear-gradient(135deg, ${P}, ${P2})`, color: '#fff', border: 'none',
+                  borderRadius: 14, fontSize: 15.5, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit',
+                  boxShadow: '0 6px 18px rgba(79,70,229,.32)', opacity: (!reqName.trim() || !reqContact.trim() || !selRecur) ? 0.5 : 1, marginTop: 4,
                 }}>
                   {submitting ? 'Sending…' : !selRecur ? 'Choose one-time or weekly' : 'Send request →'}
                 </button>
@@ -471,7 +507,7 @@ export default function CoachPage({ params }) {
                   <button onClick={addToIcs} className="fx-ghost" style={calBtn}>🍎 Apple / .ics</button>
                 </div>
 
-                <button onClick={() => setShowForm(false)} className="fx-cta" style={{ width: '100%', padding: 15, borderRadius: 14, background: `linear-gradient(135deg, ${P}, ${P2})`, color: '#fff', border: 'none', fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 18px rgba(79,70,229,.3)' }}>Done</button>
+                <button onClick={closeSheet} className="fx-cta" style={{ width: '100%', padding: 15, borderRadius: 14, background: `linear-gradient(135deg, ${P}, ${P2})`, color: '#fff', border: 'none', fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 18px rgba(79,70,229,.3)' }}>Done</button>
                 <a href="/" className="fx-link" style={{ display: 'block', textDecoration: 'none', color: MUTED, fontSize: 12.5, fontWeight: 700, marginTop: 16 }}>
                   Want a page like this? <span style={{ color: P, fontWeight: 800 }}>Create yours free →</span>
                 </a>
@@ -499,8 +535,8 @@ const calBtn = {
 
 function Field({ label, children }) {
   return (
-    <div style={{ marginBottom: 15 }}>
-      <label style={{ fontSize: 12.5, fontWeight: 800, color: SOFT, marginBottom: 7, display: 'block' }}>{label}</label>
+    <div style={{ marginBottom: 13 }}>
+      <label style={{ fontSize: 12, fontWeight: 800, color: SOFT, marginBottom: 6, display: 'block' }}>{label}</label>
       {children}
     </div>
   )
@@ -508,7 +544,7 @@ function Field({ label, children }) {
 function Pill({ active, disabled, onClick, children }) {
   return (
     <button disabled={disabled} onClick={onClick} className="fx-ghost" style={{
-      flex: 1, padding: '11px 0', borderRadius: 100, fontSize: 14, fontWeight: 800, fontFamily: 'inherit',
+      flex: 1, padding: '10px 0', borderRadius: 100, fontSize: 13.5, fontWeight: 800, fontFamily: 'inherit',
       cursor: disabled ? 'not-allowed' : 'pointer',
       border: `1.5px solid ${active ? 'transparent' : BORDER}`,
       background: active ? `linear-gradient(135deg, ${P}, ${P2})` : '#fff',
