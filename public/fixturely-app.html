@@ -245,10 +245,10 @@ window.__bootErrors=[];
   .req-when{font-size:12px;font-weight:700;color:var(--soft);margin-top:2px;}
   .req-contact{font-size:12px;font-weight:700;color:var(--soft);margin:10px 0 0;display:flex;align-items:center;gap:6px;}
   .req-msg{font-size:12.5px;color:var(--soft);font-style:italic;background:var(--off);border-radius:10px;padding:9px 12px;margin-top:10px;line-height:1.45;}
-  .req-reply{display:flex;gap:8px;margin-top:12px;}
-  .req-reply a{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);color:var(--p-dk);font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:none;transition:background .15s;}
-  .req-reply a:active{background:var(--off);}
-  .req-acts{display:flex;gap:8px;margin-top:8px;}
+  .req-body{cursor:pointer;border-radius:12px;margin:-4px;padding:4px;transition:background .12s;}
+  .req-body:active{background:var(--off);}
+  .req-reply-hint{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--p-dk);background:var(--p-lt);padding:7px 12px;border-radius:100px;white-space:nowrap;}
+  .req-acts{display:flex;gap:8px;margin-top:12px;}
   .req-acts button{flex:1;padding:11px;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .12s;}
   .req-acts button:active{transform:scale(.98);}
   .req-accept{border:none;background:linear-gradient(135deg,var(--ok),#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.26);}
@@ -2156,7 +2156,7 @@ function switchTab(tab,btn,skipHash){
   updateTopbar(tab);
   if(!skipHash && location.hash!=='#'+tab) history.replaceState(null,'','#'+tab);
   if(tab==='students') renderStudents();
-  if(tab==='today')    renderToday();
+  if(tab==='today')    { renderToday(); loadPendingRequests(); }
   if(tab==='thisweek') renderThisWeek();
   if(tab==='courts') { updateCourtsHoursCtrl(); if(!courtsLoaded){ courtsLoaded=true; loadCourts(); } }
   if(tab==='share')    renderSharePage();
@@ -5233,7 +5233,14 @@ async function loadPendingRequests(){
     const d=await r.json();
     pendingRequests=d.requests||[];
     updateRequestBadge();
+    // Requests resolve after the first home render — refresh so they appear
+    const home=document.getElementById('screen-today');
+    if(home&&home.classList.contains('active')) renderToday();
   }catch(e){}
+}
+// Re-check for new requests whenever the coach returns to the app
+if(typeof document!=='undefined'){
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadPendingRequests(); });
 }
 function updateRequestBadge(){
   const badge=document.getElementById('homeBadge');
@@ -5284,6 +5291,18 @@ function contactKind(c){
   if(/@/.test(t)) return 'email';
   return t.replace(/[^0-9]/g,'').length>=6 ? 'phone' : 'other';
 }
+// Open the coach's mail or messages app to reply, based on what the student left
+function messageStudent(id){
+  const req=pendingRequests.find(r=>r.id==id); if(!req) return;
+  const c=(req.contact||'').trim(); const kind=contactKind(c);
+  const first=(req.student_name||'there').split(' ')[0];
+  const d=new Date(req.requested_date+'T00:00:00');
+  const whenNice=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
+  const body=encodeURIComponent(`Hi ${first}, thanks for your lesson request for ${whenNice}. `);
+  if(kind==='email'){ window.open(`mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${body}`); }
+  else if(kind==='phone'){ const tel=c.replace(/[^0-9+]/g,''); window.open(`sms:${tel}?&body=${body}`); }
+  else { toast('No contact details on this request'); }
+}
 function renderPendingRequestsHTML(){
   if(pendingRequests.length===0) return '';
   let html=`<div class="req-wrap"><div class="req-hd">📩 Requests <span class="req-count">${pendingRequests.length}</span></div>`;
@@ -5292,26 +5311,20 @@ function renderPendingRequestsHTML(){
     const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} · ${fmt(req.requested_time)} · ${req.requested_dur||'1h'}${req.requested_recur==='Weekly'?' · 🔁 Weekly':''}`;
     const c=(req.contact||'').trim();
     const kind=contactKind(c);
-    const first=(req.student_name||'there').split(' ')[0];
-    const whenNice=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
-    const body=encodeURIComponent(`Hi ${first}, thanks for your lesson request for ${whenNice}. `);
-    // Reply action matches what they entered
-    let reply='';
-    if(kind==='email'){
-      reply=`<div class="req-reply"><a href="mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${body}">✉️ Email ${first}</a></div>`;
-    } else if(kind==='phone'){
-      const tel=c.replace(/[^0-9+]/g,'');
-      reply=`<div class="req-reply"><a href="sms:${tel}?&body=${body}">💬 Text</a><a href="tel:${tel}">📞 Call</a></div>`;
-    }
+    const replyLbl=kind==='email'?'✉️ Reply':kind==='phone'?'💬 Reply':'Reply';
     const contactLine=c?`<div class="req-contact">${kind==='email'?'✉️':kind==='phone'?'📞':'📇'} ${c}</div>`:'';
+    // Tapping the body opens email or SMS. Accept/Decline sit outside it so they
+    // don't trigger a message — accepting never contacts the student.
     html+=`<div class="req-card">
-      <div class="req-top">
-        <div class="req-av" style="background:${suAvatar(req.student_name)}">${ini(req.student_name||'?')}</div>
-        <div style="flex:1;min-width:0"><div class="req-name">${req.student_name}</div><div class="req-when">${when}</div></div>
+      <div class="req-body" onclick="messageStudent('${req.id}')">
+        <div class="req-top">
+          <div class="req-av" style="background:${suAvatar(req.student_name)}">${ini(req.student_name||'?')}</div>
+          <div style="flex:1;min-width:0"><div class="req-name">${req.student_name}</div><div class="req-when">${when}</div></div>
+          ${c?`<div class="req-reply-hint">${replyLbl}</div>`:''}
+        </div>
+        ${contactLine}
+        ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
       </div>
-      ${contactLine}
-      ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
-      ${reply}
       <div class="req-acts"><button class="req-accept" onclick="acceptRequest('${req.id}')">✓ Accept</button><button class="req-decline" onclick="declineRequest('${req.id}')">Decline</button></div>
     </div>`;
   });
