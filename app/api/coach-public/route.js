@@ -76,10 +76,20 @@ export async function GET(request) {
   // nothing about their origin leaves the server.
   const pendingSlots = pendingReqs || []
 
+  // Must mirror dm() in fixturely-app.html — a mismatch here silently mis-sizes
+  // booked lessons (e.g. parseInt('1 hour') === 1), leaking taken slots as free.
   function parseDur(d) {
+    if (typeof d === 'number') return d
+    if (!d) return 60
     if (d === '30m') return 30
     if (d === '45m') return 45
     if (d === '1h') return 60
+    const nm = /^(\d+)m$/.exec(d) // '60m', '90m', … block/custom durations
+    if (nm) return parseInt(nm[1])
+    if (d === '30 min') return 30
+    if (d === '1 hour') return 60
+    if (d === '1.5 hrs') return 90
+    if (d === '2 hrs') return 120
     const n = parseInt(d)
     return isNaN(n) ? 60 : n
   }

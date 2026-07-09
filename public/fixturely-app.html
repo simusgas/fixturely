@@ -2758,9 +2758,14 @@ function buildWhEditorHTML(){
       <div class="wh-row"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0"><input type="checkbox" ${wh.bs!=null?'checked':''} onchange="whToggleBreak(this.checked)"><span>Lunch break</span></label>
         ${wh.bs!=null?`<select onchange="whSet('bs',this.value)">${whOpts(wh.s,wh.e-15,15,wh.bs)}</select><span>to</span>
         <select onchange="whSet('be',this.value)">${whOpts(wh.s+15,wh.e,15,wh.be)}</select>`:''}</div>`;
+  const rangeOpts=(id,val)=>{let o='';for(let h=0;h<24;h++)o+=`<option value="${h}"${h===val?' selected':''}>${fmtHour(h)}</option>`;return `<select id="${id}" onchange="setCalRange()">${o}</select>`;};
   return `<div class="sh-link-card" id="shWhCard" style="margin:18px 0 20px">
-    <div class="sh-link-title">🕐 Working hours — ${DF[dow]}</div>
+    <div class="sh-link-title">🕐 Working hours</div>
     <div class="sh-link-sub">Students can only book inside these hours — set once, block less</div>
+    <div class="wh-row" style="padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--border)">
+      <span>📅 Calendar shows</span>
+      ${rangeOpts('calRangeStart',CAL_S)}<span>to</span>${rangeOpts('calRangeEnd',CAL_E)}
+    </div>
     <div class="wh-days">${dayPills}</div>
     ${bodyHTML}
     ${isOff?'':`<button class="wh-apply" onclick="whApplyAll()">Apply ${DS_[dow]}'s hours to all days</button>`}
@@ -2768,6 +2773,27 @@ function buildWhEditorHTML(){
 }
 function updateWhEditor(){ const el=document.getElementById('shWhCard'); if(el) el.outerHTML=buildWhEditorHTML(); }
 function whSelectDay(dow){ whEditDay=dow; updateWhEditor(); }
+// Overall visible calendar window (CAL_S..CAL_E). Per-day hours live inside it,
+// so clamp any day that now falls outside the new range.
+function setCalRange(){
+  let s=parseInt(document.getElementById('calRangeStart').value);
+  let e=parseInt(document.getElementById('calRangeEnd').value);
+  if(s>=e){ toast('Start must be before end'); updateWhEditor(); return; }
+  CAL_S=s;CAL_E=e;
+  Object.keys(WEEKLY_HOURS).forEach(k=>{
+    const wh=WEEKLY_HOURS[k]; if(!wh) return;
+    wh.s=Math.max(wh.s,s*60); wh.e=Math.min(wh.e,e*60);
+    if(wh.e<=wh.s){ wh.s=s*60; wh.e=e*60; }
+    if(wh.bs!=null){ wh.bs=Math.max(wh.s,Math.min(wh.bs,wh.e-15)); wh.be=Math.max(wh.bs+15,Math.min(wh.be,wh.e)); }
+  });
+  saveCache();
+  fetch('/api/user',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({workStart:s,workEnd:e,weeklyHours:WEEKLY_HOURS})})
+    .then(()=>refreshStudentPreview()).catch(()=>{});
+  if(typeof courtsLoaded!=='undefined'&&courtsLoaded) loadCourts();
+  renderSchedule();
+  updateWhEditor();updateShareGrid();
+  toast(`Calendar: ${fmtHour(s)} – ${fmtHour(e)}`);
+}
 function whCommit(cur){
   // Keep the window sane: end after start, break inside the window
   if(cur.e<=cur.s) cur.e=Math.min(cur.s+60,CAL_E*60);
