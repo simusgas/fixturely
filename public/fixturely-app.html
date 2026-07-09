@@ -1980,6 +1980,7 @@ window.__bootErrors=[];
 </div>
 
 <div class="dh-ovl" id="dhOvl" onclick="if(event.target===this)closeDhModal()"><div class="dh-sheet" id="dhSheet"></div></div>
+<div class="dh-ovl" id="acceptOvl" onclick="if(event.target===this)closeAcceptModal()"><div class="dh-sheet" id="acceptSheet"></div></div>
 
 <div class="toast" id="toastEl"></div>
 
@@ -5252,21 +5253,52 @@ function updateRequestBadge(){
     badge.classList.remove('show');
   }
 }
-async function acceptRequest(id){
+// Accept opens a small modal: optionally type a message; Fixturely then emails
+// or texts the student directly (default message if left blank).
+let acceptReqId=null;
+function openAcceptModal(id){
+  const req=pendingRequests.find(r=>r.id==id); if(!req) return;
+  acceptReqId=id;
+  const c=(req.contact||'').trim();
+  const kind=contactKind(c);
+  const first=(req.student_name||'there').split(' ')[0];
+  const d=new Date(req.requested_date+'T00:00:00');
+  const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
+  const def=`Hi ${first}, I've accepted your lesson request for ${when}. See you on court! 🎾`;
+  const chanInfo = kind==='email'?`📧 Emails ${c}`:kind==='phone'?`💬 Texts ${c}`:'⚠ No contact — can\'t notify';
+  const sheet=document.getElementById('acceptSheet');
+  sheet.innerHTML=`<div class="dh-sheet-handle"></div>
+    <div class="dh-sheet-title">Accept & notify</div>
+    <div class="dh-sheet-sub">${req.student_name} · ${when}</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:${kind==='other'||!kind?'var(--warn)':'var(--u-dk)'};background:${kind==='other'||!kind?'var(--warn-lt)':'var(--u-pl)'};padding:7px 12px;border-radius:100px;margin-bottom:16px">${chanInfo}</div>
+    <div style="font-size:12.5px;font-weight:800;color:var(--soft);margin-bottom:7px">Add a message <span style="color:var(--muted);font-weight:600">(optional)</span></div>
+    <textarea id="acceptMsg" class="su-notes" placeholder="${escHtml(def)}"></textarea>
+    <div style="font-size:11px;font-weight:600;color:var(--muted);margin:6px 0 16px">Leave blank and we'll send the default message above.</div>
+    <button onclick="confirmAccept()" class="dh-act--primary" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">✓ Accept & send</button>
+    <button onclick="closeAcceptModal()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>`;
+  document.getElementById('acceptOvl').classList.add('open');
+}
+function closeAcceptModal(){document.getElementById('acceptOvl').classList.remove('open');acceptReqId=null;}
+function confirmAccept(){
+  const id=acceptReqId;
+  const msg=(document.getElementById('acceptMsg')?.value||'').trim();
+  closeAcceptModal();
+  acceptRequest(id,msg);
+}
+async function acceptRequest(id, message){
   try{
-    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept'})});
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept',message:message||''})});
     const d=await r.json();
     if(d.success){
       const req=pendingRequests.find(r=>r.id===id);
       if(req){
-        // Add to local SESSIONS
         SESSIONS.push({id:'req-'+id,student:req.student_name,level:'',time:req.requested_time,dur:req.requested_dur||'1h',court:'',recur:req.requested_recur||'One-time',date:req.requested_date,payStatus:'unpaid'});
         saveCache();
       }
       pendingRequests=pendingRequests.filter(r=>r.id!==id);
       updateRequestBadge();
       renderToday();renderSchedule();
-      toast('✓ Lesson accepted — added to schedule');
+      toast(d.notified?`✓ Accepted — ${d.channel==='text'?'text':'email'} sent to student`:'✓ Accepted — added to schedule');
     }
   }catch(e){toast('Failed to accept request');}
 }
@@ -5291,18 +5323,6 @@ function contactKind(c){
   if(/@/.test(t)) return 'email';
   return t.replace(/[^0-9]/g,'').length>=6 ? 'phone' : 'other';
 }
-// Open the coach's mail or messages app to reply, based on what the student left
-function messageStudent(id){
-  const req=pendingRequests.find(r=>r.id==id); if(!req) return;
-  const c=(req.contact||'').trim(); const kind=contactKind(c);
-  const first=(req.student_name||'there').split(' ')[0];
-  const d=new Date(req.requested_date+'T00:00:00');
-  const whenNice=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
-  const body=encodeURIComponent(`Hi ${first}, thanks for your lesson request for ${whenNice}. `);
-  if(kind==='email'){ window.open(`mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${body}`); }
-  else if(kind==='phone'){ const tel=c.replace(/[^0-9+]/g,''); window.open(`sms:${tel}?&body=${body}`); }
-  else { toast('No contact details on this request'); }
-}
 function renderPendingRequestsHTML(){
   if(pendingRequests.length===0) return '';
   let html=`<div class="req-wrap"><div class="req-hd">📩 Requests <span class="req-count">${pendingRequests.length}</span></div>`;
@@ -5311,21 +5331,17 @@ function renderPendingRequestsHTML(){
     const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} · ${fmt(req.requested_time)} · ${req.requested_dur||'1h'}${req.requested_recur==='Weekly'?' · 🔁 Weekly':''}`;
     const c=(req.contact||'').trim();
     const kind=contactKind(c);
-    const replyLbl=kind==='email'?'✉️ Reply':kind==='phone'?'💬 Reply':'Reply';
     const contactLine=c?`<div class="req-contact">${kind==='email'?'✉️':kind==='phone'?'📞':'📇'} ${c}</div>`:'';
-    // Tapping the body opens email or SMS. Accept/Decline sit outside it so they
-    // don't trigger a message — accepting never contacts the student.
+    // Accept opens a modal to (optionally) add a message; Fixturely then emails
+    // or texts the student itself. Nothing here opens the coach's mail/SMS app.
     html+=`<div class="req-card">
-      <div class="req-body" onclick="messageStudent('${req.id}')">
-        <div class="req-top">
-          <div class="req-av" style="background:${suAvatar(req.student_name)}">${ini(req.student_name||'?')}</div>
-          <div style="flex:1;min-width:0"><div class="req-name">${req.student_name}</div><div class="req-when">${when}</div></div>
-          ${c?`<div class="req-reply-hint">${replyLbl}</div>`:''}
-        </div>
-        ${contactLine}
-        ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
+      <div class="req-top">
+        <div class="req-av" style="background:${suAvatar(req.student_name)}">${ini(req.student_name||'?')}</div>
+        <div style="flex:1;min-width:0"><div class="req-name">${req.student_name}</div><div class="req-when">${when}</div></div>
       </div>
-      <div class="req-acts"><button class="req-accept" onclick="acceptRequest('${req.id}')">✓ Accept</button><button class="req-decline" onclick="declineRequest('${req.id}')">Decline</button></div>
+      ${contactLine}
+      ${req.message?`<div class="req-msg">"${req.message}"</div>`:''}
+      <div class="req-acts"><button class="req-accept" onclick="openAcceptModal('${req.id}')">✓ Accept</button><button class="req-decline" onclick="declineRequest('${req.id}')">Decline</button></div>
     </div>`;
   });
   html+=`</div>`;
