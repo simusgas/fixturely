@@ -50,76 +50,6 @@ async function notifyCoachOfRequest(supabase, coachId, req) {
   }
 }
 
-// Is the contact an email or a phone number?
-function contactKind(c) {
-  if (!c) return null
-  const t = c.trim()
-  if (/@/.test(t)) return 'email'
-  return t.replace(/[^0-9]/g, '').length >= 6 ? 'phone' : 'other'
-}
-// Send an email via Resend. Returns true on success, false if unconfigured/failed.
-async function sendEmail(to, subject, html) {
-  const key = process.env.RESEND_API_KEY
-  if (!key) return false
-  try {
-    const from = process.env.NOTIFY_FROM || 'Fixturely <onboarding@resend.dev>'
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to, subject, html }),
-    })
-    return r.ok
-  } catch (e) { console.error('[Requests] sendEmail failed:', e); return false }
-}
-// Send an SMS via Twilio. Returns true on success, false if unconfigured/failed.
-async function sendSms(to, text) {
-  const sid = process.env.TWILIO_ACCOUNT_SID, token = process.env.TWILIO_AUTH_TOKEN, from = process.env.TWILIO_FROM
-  if (!sid || !token || !from) return false
-  try {
-    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({ To: to, From: from, Body: text }).toString(),
-    })
-    return r.ok
-  } catch (e) { console.error('[Requests] sendSms failed:', e); return false }
-}
-// Tell the student their request was accepted — Fixturely sends it directly, via
-// email or text depending on what they left. Uses the coach's custom message, or
-// a default. Returns which channel (if any) actually sent.
-async function notifyStudentAccepted(req, coachName, customMessage) {
-  const c = (req.contact || '').trim()
-  const kind = contactKind(c)
-  if (kind !== 'email' && kind !== 'phone') return { notified: false, channel: null }
-
-  const d = new Date(req.requested_date + 'T00:00:00')
-  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const [h, m] = (req.requested_time || '0:0').split(':').map(Number)
-  const time = `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`
-  const when = `${DAYS[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} at ${time}`
-  const first = (req.student_name || 'there').split(' ')[0]
-  const text = (customMessage && customMessage.trim())
-    ? customMessage.trim()
-    : `Hi ${first}, ${coachName} has accepted your lesson request for ${when}. See you on court! 🎾`
-
-  if (kind === 'phone') {
-    const ok = await sendSms(c.replace(/[^0-9+]/g, ''), text)
-    return { notified: ok, channel: 'text' }
-  }
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:480px;margin:0 auto;color:#0F172A">
-    <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:16px;padding:22px;text-align:center;color:#fff">
-      <div style="font-size:26px">🎾</div><div style="font-size:18px;font-weight:800;margin-top:6px">Lesson confirmed</div>
-    </div>
-    <p style="font-size:15px;line-height:1.6;padding:20px 4px 0;white-space:pre-wrap">${text.replace(/</g, '&lt;')}</p>
-  </div>`
-  const ok = await sendEmail(c, `Your lesson with ${coachName}`, html)
-  return { notified: ok, channel: 'email' }
-}
-
 // GET — Coach fetches their pending requests (auth required)
 export async function GET() {
   const supabase = await createClient()
@@ -224,7 +154,7 @@ export async function PATCH(request) {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { id, action, message } = body
+  const { id, action } = body
 
   if (!id || !['accept', 'decline'].includes(action)) {
     return Response.json({ error: 'Invalid request' }, { status: 400 })
@@ -271,11 +201,7 @@ export async function PATCH(request) {
       .update({ status: 'accepted' })
       .eq('id', id)
 
-    // Notify the student directly (email or text), with the coach's message or a default
-    const coachName = user.user_metadata?.full_name || 'Your coach'
-    const { notified, channel } = await notifyStudentAccepted(req, coachName, message)
-
-    return Response.json({ success: true, action: 'accepted', notified, channel })
+    return Response.json({ success: true, action: 'accepted' })
   }
 
   if (action === 'decline') {

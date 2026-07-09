@@ -5253,8 +5253,9 @@ function updateRequestBadge(){
     badge.classList.remove('show');
   }
 }
-// Accept opens a small modal: optionally type a message; Fixturely then emails
-// or texts the student directly (default message if left blank).
+// Accept opens a modal with a pre-written reply you can tweak. "Accept & open
+// Messages/Email" adds the lesson AND opens your messaging app pre-filled and
+// addressed to the student, ready for you to hit send. "Accept only" skips it.
 let acceptReqId=null;
 function openAcceptModal(id){
   const req=pendingRequests.find(r=>r.id==id); if(!req) return;
@@ -5265,29 +5266,48 @@ function openAcceptModal(id){
   const d=new Date(req.requested_date+'T00:00:00');
   const when=`${DS_[d.getDay()]} ${d.getDate()} ${MS[d.getMonth()]} at ${fmt(req.requested_time)}`;
   const def=`Hi ${first}, I've accepted your lesson request for ${when}. See you on court! 🎾`;
-  const chanInfo = kind==='email'?`📧 Emails ${c}`:kind==='phone'?`💬 Texts ${c}`:'⚠ No contact — can\'t notify';
+  const canMsg = kind==='email'||kind==='phone';
+  const openLbl = kind==='email'?'✉️ Accept & open email':'💬 Accept & open Messages';
+  const chan = kind==='email'?`Opens your email to ${c}`:kind==='phone'?`Opens Messages to ${c}`:'⚠ No contact details — accept only';
   const sheet=document.getElementById('acceptSheet');
   sheet.innerHTML=`<div class="dh-sheet-handle"></div>
-    <div class="dh-sheet-title">Accept & notify</div>
+    <div class="dh-sheet-title">Accept request</div>
     <div class="dh-sheet-sub">${req.student_name} · ${when}</div>
-    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:${kind==='other'||!kind?'var(--warn)':'var(--u-dk)'};background:${kind==='other'||!kind?'var(--warn-lt)':'var(--u-pl)'};padding:7px 12px;border-radius:100px;margin-bottom:16px">${chanInfo}</div>
-    <div style="font-size:12.5px;font-weight:800;color:var(--soft);margin-bottom:7px">Add a message <span style="color:var(--muted);font-weight:600">(optional)</span></div>
-    <textarea id="acceptMsg" class="su-notes" placeholder="${escHtml(def)}"></textarea>
-    <div style="font-size:11px;font-weight:600;color:var(--muted);margin:6px 0 16px">Leave blank and we'll send the default message above.</div>
-    <button onclick="confirmAccept()" class="dh-act--primary" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">✓ Accept & send</button>
-    <button onclick="closeAcceptModal()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>`;
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:${canMsg?'var(--u-dk)':'var(--warn)'};background:${canMsg?'var(--u-pl)':'var(--warn-lt)'};padding:7px 12px;border-radius:100px;margin-bottom:16px">${kind==='email'?'✉️':kind==='phone'?'💬':'⚠'} ${chan}</div>
+    ${canMsg?`<div style="font-size:12.5px;font-weight:800;color:var(--soft);margin-bottom:7px">Message <span style="color:var(--muted);font-weight:600">— edit if you like</span></div>
+    <textarea id="acceptMsg" class="su-notes">${escHtml(def)}</textarea>
+    <div style="font-size:11px;font-weight:600;color:var(--muted);margin:6px 0 16px">Opens ${kind==='email'?'your email app':'Messages'} with this ready to send — you tap send.</div>
+    <button onclick="confirmAccept()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">${openLbl}</button>
+    <button onclick="acceptOnly()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);color:var(--soft);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Accept only (no message)</button>`
+    :`<button onclick="acceptOnly()" style="width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;color:#fff;background:linear-gradient(135deg,var(--ok),#047857);box-shadow:0 6px 16px rgba(5,150,105,.3)">✓ Accept</button>`}
+    <button onclick="closeAcceptModal()" style="width:100%;padding:13px;margin-top:8px;border-radius:14px;border:none;background:none;color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Cancel</button>`;
   document.getElementById('acceptOvl').classList.add('open');
 }
 function closeAcceptModal(){document.getElementById('acceptOvl').classList.remove('open');acceptReqId=null;}
+// Open the coach's Messages/Email pre-filled and addressed to the student
+function openReplyApp(req,msg){
+  if(!req) return;
+  const c=(req.contact||'').trim(); const kind=contactKind(c);
+  const text=(msg||'').trim();
+  if(kind==='email'){ window.location.href=`mailto:${c}?subject=${encodeURIComponent('Your tennis lesson')}&body=${encodeURIComponent(text)}`; }
+  else if(kind==='phone'){ const tel=c.replace(/[^0-9+]/g,''); window.location.href=`sms:${tel}?&body=${encodeURIComponent(text)}`; }
+}
 function confirmAccept(){
   const id=acceptReqId;
+  const req=pendingRequests.find(r=>r.id==id);
   const msg=(document.getElementById('acceptMsg')?.value||'').trim();
   closeAcceptModal();
-  acceptRequest(id,msg);
+  acceptRequest(id);              // add to schedule (async)
+  openReplyApp(req,msg);          // open Messages/Email pre-filled — same tap, keeps the gesture
 }
-async function acceptRequest(id, message){
+function acceptOnly(){
+  const id=acceptReqId;
+  closeAcceptModal();
+  acceptRequest(id);
+}
+async function acceptRequest(id){
   try{
-    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept',message:message||''})});
+    const r=await fetch('/api/requests',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action:'accept'})});
     const d=await r.json();
     if(d.success){
       const req=pendingRequests.find(r=>r.id===id);
@@ -5298,7 +5318,7 @@ async function acceptRequest(id, message){
       pendingRequests=pendingRequests.filter(r=>r.id!==id);
       updateRequestBadge();
       renderToday();renderSchedule();
-      toast(d.notified?`✓ Accepted — ${d.channel==='text'?'text':'email'} sent to student`:'✓ Accepted — added to schedule');
+      toast('✓ Accepted — added to your schedule');
     }
   }catch(e){toast('Failed to accept request');}
 }
